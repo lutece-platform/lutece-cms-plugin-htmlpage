@@ -1,0 +1,15 @@
+<div id="one-zone-first" class="span-15 prepend-1 append-1 prepend-top">
+	<h2 class="page-title">#i18n{htmlpage.page_htmlpage.pageTitle}</h2>
+	<ul>
+		<#if htmlpages_list?has_content>
+			<#list htmlpages_list as htmlpage >
+				<li><a href="jsp/site/Portal.jsp?page=htmlpage&htmlpage_id=${htmlpage.id}">${htmlpage.description}</a></li>
+			</#list>
+		<#else>
+			#i18n{htmlpage.page_htmlpage.messageListEmpty}
+		</#if>
+	</ul>
+</div>
+<div id="sidebar" class="span-6 append-1 prepend-top last">
+	${page_tree_menu?if_exists}        
+</div>

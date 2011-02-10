@@ -1,0 +1,10 @@
+<div id="one-zone-first" class="span-15 prepend-1 append-1 prepend-top">
+	<div id="one-zone-first-content">
+		<h2 class="page-title">#i18n{htmlpage.page_htmlpage.pageTitle}</h2>
+		<input type="hidden" name="htmlpage_id" description="htmlpage_id" value="${htmlpage.id}"/>            
+		${htmlpage.htmlContent}
+	</div>
+</div>    
+<div id="sidebar" class="span-6 append-1 prepend-top last">
+	${page_tree_menu?if_exists}        
+</div>
