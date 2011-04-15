@@ -41,6 +41,9 @@ import fr.paris.lutece.portal.service.message.SiteMessageException;
 import fr.paris.lutece.portal.service.message.SiteMessageService;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
+import fr.paris.lutece.portal.service.search.SearchEngine;
+import fr.paris.lutece.portal.service.search.SearchResult;
+import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.web.xpages.XPage;
@@ -50,8 +53,10 @@ import fr.paris.lutece.util.html.HtmlTemplate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang.StringUtils;
 
 
 /**
@@ -66,6 +71,7 @@ public class HtmlPageApp implements XPageApplication
     private static final String PARAMETER_PAGE = "page";
     /*private static final String PARAMETER_HTMLPAGE = "htmlpage";*/
     private static final String PARAMETER_HTMLPAGE_ID = "htmlpage_id";
+    private static final String PARAMETER_QUERY = "query";
 
     // Properties
     private static final String PROPERTY_PAGE_TITLE = "htmlpage.pageTitle";
@@ -79,11 +85,14 @@ public class HtmlPageApp implements XPageApplication
     private static final String MARK_HTMLPAGE_LIST = "htmlpages_list";
     private static final String MARK_HTMLPAGE = "htmlpage";
     private static final String MARK_PAGE = "page";
+    private static final String MARK_RESULT = "result";
+    private static final String MARK_QUERY = "query";
 
     // Templates
     private static final String TEMPLATE_XPAGE_HTMLPAGE = "skin/plugins/htmlpage/page_htmlpage.html";
     private static final String TEMPLATE_XPAGE_HTMLPAGE_LISTS = "skin/plugins/htmlpage/htmlpages_list.html";
-
+    // Bean
+    private static final String BEAN_SEARCH_ENGINE = "htmlpage.htmlpageSearchEngine";
 
     // private fields
     private Plugin _plugin;
@@ -108,6 +117,7 @@ public class HtmlPageApp implements XPageApplication
         XPage page = new XPage(  );
 
         String strPluginName = request.getParameter( PARAMETER_PAGE );
+        String strQuery =  request.getParameter( PARAMETER_QUERY );
         _plugin = PluginService.getPlugin( strPluginName );
 
         page.setTitle( AppPropertiesService.getProperty( PROPERTY_PAGE_TITLE ) );
@@ -115,20 +125,40 @@ public class HtmlPageApp implements XPageApplication
 
         String strHtmlPageId = request.getParameter( PARAMETER_HTMLPAGE_ID );
 
-        if ( strHtmlPageId == null )
+        if ( StringUtils.isNotBlank( strQuery ) )
         {
-            page.setContent( getHtmlPagesLists( request ) );
+        	page.setContent( getSearch ( strQuery, strPluginName, request ) );
         }
-
-        if ( ( strHtmlPageId != null ) )
+        else
         {
-            page.setContent( getHtmlPage( request, strHtmlPageId ) );
+	        if ( strHtmlPageId == null )
+	        {
+	            page.setContent( getHtmlPagesLists( request ) );
+	        }
+	
+	        if ( strHtmlPageId != null )
+	        {
+	            page.setContent( getHtmlPage( request, strHtmlPageId ) );
+	        }
         }
 
         return page;
     }
 
-    private String getHtmlPagesLists( HttpServletRequest request )
+    private String getSearch( String strQuery, String strPluginName, HttpServletRequest request )
+    {
+    	SearchEngine engine = (SearchEngine) SpringContextService.getPluginBean( strPluginName, BEAN_SEARCH_ENGINE );
+        List<SearchResult> listResults = engine.getSearchResults( strQuery, request );
+        
+        HashMap<String, Object> model = new HashMap<String, Object>(  );
+        model.put( MARK_RESULT, listResults );
+        model.put( MARK_QUERY, strQuery );
+        
+        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_XPAGE_HTMLPAGE_LISTS, request.getLocale(  ), model );
+        return template.getHtml(  );
+	}
+
+	private String getHtmlPagesLists( HttpServletRequest request )
         throws SiteMessageException
     {
         HashMap model = new HashMap(  );
@@ -146,8 +176,7 @@ public class HtmlPageApp implements XPageApplication
 
         model.put( MARK_HTMLPAGE_LIST, visibleHtmlPageList );
 
-        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_XPAGE_HTMLPAGE_LISTS, request.getLocale(  ),
-                model );
+        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_XPAGE_HTMLPAGE_LISTS, request.getLocale(  ), model );
 
         return template.getHtml(  );
     }

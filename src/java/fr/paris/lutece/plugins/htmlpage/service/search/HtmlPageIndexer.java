@@ -73,7 +73,9 @@ public class HtmlPageIndexer implements SearchIndexer
     private static final String PROPERTY_INDEXER_DESCRIPTION = "htmlpage.indexer.description";
     private static final String PROPERTY_INDEXER_VERSION = "htmlpage.indexer.version";
     private static final String PROPERTY_INDEXER_ENABLE = "htmlpage.indexer.enable";
+    public static final String PROPERTY_INDEX_TYPE_PAGE = "htmlpage";
     private static final String PARAMETER_HTMLPAGE_ID = "htmlpage_id";
+    private static final String JSP_SEARCH_HTMLPAGE = "jsp/site/Portal.jsp?page=htmlpage&query=";
 
     /**
      * Returns the indexer service description
@@ -220,7 +222,7 @@ public class HtmlPageIndexer implements SearchIndexer
         doc.add( new Field( SearchItem.FIELD_TITLE, htmlpage.getDescription(  ), Field.Store.YES,
                 Field.Index.UN_TOKENIZED ) );
 
-        doc.add( new Field( SearchItem.FIELD_TYPE, HtmlPagePlugin.PLUGIN_NAME, Field.Store.YES, Field.Index.ANALYZED ) );
+        doc.add( new Field( SearchItem.FIELD_TYPE, HtmlPagePlugin.PLUGIN_NAME, Field.Store.YES, Field.Index.NOT_ANALYZED ) );
 
         // return the document
         return doc;
@@ -244,4 +246,23 @@ public class HtmlPageIndexer implements SearchIndexer
 
         return sbContentToIndex.toString(  );
     }
+
+    /**
+     * {@inheritDoc}
+     */
+	public List<String> getListType(  )
+	{
+		List<String> listType = new ArrayList<String>(  );
+		listType.add( HtmlPagePlugin.PLUGIN_NAME );
+		
+		return listType;
+	}
+	
+	/**
+     * {@inheritDoc}
+     */
+	public String getSpecificSearchAppUrl(  )
+	{
+		return JSP_SEARCH_HTMLPAGE;
+	}
 }

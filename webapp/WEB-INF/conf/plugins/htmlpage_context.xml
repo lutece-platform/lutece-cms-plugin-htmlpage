@@ -3,7 +3,9 @@
 
 <beans>
     
-   <!-- package sqlquery -->
-  <bean id="htmlPageDAO"  class="fr.paris.lutece.plugins.htmlpage.business.HtmlPageDAO" />   
+	<!-- package sqlquery -->
+	<bean id="htmlPageDAO"  class="fr.paris.lutece.plugins.htmlpage.business.HtmlPageDAO" />
+	<!-- Search Engine -->
+	<bean id="htmlpage.htmlpageSearchEngine" class="fr.paris.lutece.plugins.htmlpage.service.search.HtmlPageSearchEngine" />
   
 </beans>

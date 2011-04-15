@@ -5,10 +5,26 @@
 			<#list htmlpages_list as htmlpage >
 				<li><a href="jsp/site/Portal.jsp?page=htmlpage&htmlpage_id=${htmlpage.id}">${htmlpage.description}</a></li>
 			</#list>
+		<#else><#if result?exists>
+			<#list result as htmlpage >
+				<li><a href="${htmlpage.url}">${htmlpage.title}</a></li>
+			</#list>
 		<#else>
 			#i18n{htmlpage.page_htmlpage.messageListEmpty}
-		</#if>
+		</#if></#if>
 	</ul>
+	
+	<form method="post" action="jsp/site/Portal.jsp?page=htmlpage">
+    	#i18n{htmlpage.page_htmlpage.search} :
+        <#if query?exists>
+	       	<input type="text" name="query" size="20" value="${query}" />
+	    <#else>
+	   	   	<input type="text" name="query" size="20" value="" />
+	    </#if>
+	    <input type="hidden" name="page" value="htmlpage" />
+	    <input class="button" type="submit" value="#i18n{portal.util.labelOk}" />
+	</form>
+	
 </div>
 <div id="sidebar" class="span-6 append-1 prepend-top last">
 	${page_tree_menu?if_exists}        
