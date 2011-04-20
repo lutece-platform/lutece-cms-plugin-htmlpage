@@ -33,14 +33,15 @@
  */
 package fr.paris.lutece.plugins.htmlpage.business;
 
+import java.util.Collection;
+
 import fr.paris.lutece.plugins.htmlpage.service.search.HtmlPageIndexer;
+import fr.paris.lutece.plugins.htmlpage.utils.HtmlPageIndexerUtils;
 import fr.paris.lutece.portal.business.indexeraction.IndexerAction;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.search.IndexationService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
-
-import java.util.Collection;
 
 
 /**
@@ -72,8 +73,11 @@ public class HtmlPageHome
 
         if ( htmlpage.isEnabled(  ) )
         {
-            IndexationService.addIndexerAction( Integer.toString( htmlpage.getId(  ) ),
+        	String strIdHtmlPage = Integer.toString( htmlpage.getId(  ) );
+            IndexationService.addIndexerAction( strIdHtmlPage,
                 AppPropertiesService.getProperty( HtmlPageIndexer.PROPERTY_INDEXER_NAME ), IndexerAction.TASK_CREATE );
+            
+            HtmlPageIndexerUtils.addIndexerAction( strIdHtmlPage, IndexerAction.TASK_CREATE );
         }
 
         return htmlpage;
@@ -88,10 +92,13 @@ public class HtmlPageHome
      */
     public static HtmlPage update( HtmlPage htmlpage, Plugin plugin )
     {
+    	String strIdHtmlPage = Integer.toString( htmlpage.getId(  ) );
         if ( htmlpage.isEnabled(  ) )
         {
-            IndexationService.addIndexerAction( Integer.toString( htmlpage.getId(  ) ),
+            IndexationService.addIndexerAction( strIdHtmlPage,
                 AppPropertiesService.getProperty( HtmlPageIndexer.PROPERTY_INDEXER_NAME ), IndexerAction.TASK_MODIFY );
+            
+            HtmlPageIndexerUtils.addIndexerAction( strIdHtmlPage, IndexerAction.TASK_MODIFY );
         }
         else
         {
@@ -99,9 +106,11 @@ public class HtmlPageHome
 
             if ( oldPage != null )
             {
-                IndexationService.addIndexerAction( Integer.toString( htmlpage.getId(  ) ) + "_" +
+                IndexationService.addIndexerAction( strIdHtmlPage + "_" +
                     HtmlPageIndexer.SHORT_NAME,
                     AppPropertiesService.getProperty( HtmlPageIndexer.PROPERTY_INDEXER_NAME ), IndexerAction.TASK_DELETE );
+                
+                HtmlPageIndexerUtils.addIndexerAction( strIdHtmlPage, IndexerAction.TASK_DELETE );
             }
         }
 
@@ -121,9 +130,12 @@ public class HtmlPageHome
 
         if ( htmlpage.isEnabled(  ) )
         {
-            IndexationService.addIndexerAction( Integer.toString( htmlpage.getId(  ) ) + "_" +
+        	String strIdHtmlPage = Integer.toString( htmlpage.getId(  ) );
+            IndexationService.addIndexerAction( strIdHtmlPage + "_" +
                 HtmlPageIndexer.SHORT_NAME, AppPropertiesService.getProperty( HtmlPageIndexer.PROPERTY_INDEXER_NAME ),
                 IndexerAction.TASK_DELETE );
+            
+            HtmlPageIndexerUtils.addIndexerAction( strIdHtmlPage, IndexerAction.TASK_DELETE );
         }
     }
 
