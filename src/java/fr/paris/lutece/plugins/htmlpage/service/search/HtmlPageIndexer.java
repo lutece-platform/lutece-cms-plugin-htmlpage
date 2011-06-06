@@ -129,9 +129,20 @@ public class HtmlPageIndexer implements SearchIndexer
             url.addParameter( XPageAppService.PARAM_XPAGE_APP, HtmlPagePlugin.PLUGIN_NAME );
             url.addParameter( PARAMETER_HTMLPAGE_ID, htmlpage.getId(  ) );
 
-            org.apache.lucene.document.Document docHtmlPage = getDocument( htmlpage, url.getUrl(  ), plugin );
-
-            listDocuments.add( docHtmlPage );
+            org.apache.lucene.document.Document docHtmlPage = null;
+            try
+            {
+            	docHtmlPage = getDocument( htmlpage, url.getUrl(  ), plugin );
+            }
+            catch ( Exception e )
+            {
+            	String strMessage = "HtmlPage ID : " + htmlpage.getId(  );
+            	IndexationService.error( this, e, strMessage );
+            }
+            if ( docHtmlPage != null )
+            {
+            	listDocuments.add( docHtmlPage );
+            }
         }
         return listDocuments;
     }
