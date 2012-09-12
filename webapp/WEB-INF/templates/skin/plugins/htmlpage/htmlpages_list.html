@@ -1,31 +1,35 @@
-<div id="one-zone-first" class="span-15 prepend-1 append-1 prepend-top">
-	<h2 class="page-title">#i18n{htmlpage.page_htmlpage.pageTitle}</h2>
-	<ul>
-		<#if htmlpages_list?has_content>
-			<#list htmlpages_list as htmlpage >
-				<li><a href="jsp/site/Portal.jsp?page=htmlpage&htmlpage_id=${htmlpage.id}">${htmlpage.description}</a></li>
-			</#list>
-		<#else><#if result?exists>
-			<#list result as htmlpage >
-				<li><a href="${htmlpage.url}">${htmlpage.title}</a></li>
-			</#list>
-		<#else>
-			#i18n{htmlpage.page_htmlpage.messageListEmpty}
-		</#if></#if>
-	</ul>
-	
-	<form method="post" action="jsp/site/Portal.jsp?page=htmlpage">
-    	#i18n{htmlpage.page_htmlpage.search} :
-        <#if query?exists>
-	       	<input type="text" name="query" size="20" value="${query}" />
-	    <#else>
-	   	   	<input type="text" name="query" size="20" value="" />
-	    </#if>
-	    <input type="hidden" name="page" value="htmlpage" />
-	    <input class="button" type="submit" value="#i18n{portal.util.labelOk}" />
-	</form>
-	
+<div class="row">
+	<div class="span3">
+		${page_tree_menu?if_exists} 
+		<form class="form-search" method="post" action="jsp/site/Portal.jsp?page=htmlpage">
+			<input type="hidden" name="page" value="htmlpage" />
+			<label>#i18n{htmlpage.page_htmlpage.search} </label>:
+			<#if query?exists>
+				<input type="text" name="query" class="input-mini" value="${query}" />
+			<#else>
+				<input type="text" name="query" class="input-mini" value="" />
+			</#if>
+			<button class="btn btn-primary" type="submit" ><i class="icon-ok icon-white"></i>&nbsp;#i18n{portal.util.labelOk}</button>
+		</form>		
+	</div>
+	<div class="span8">
+	<fieldset>
+	<legend>#i18n{htmlpage.page_htmlpage.pageTitle}</legend>
+		<ul>
+			<#if htmlpages_list?has_content>
+				<#list htmlpages_list as htmlpage >
+					<li><a href="jsp/site/Portal.jsp?page=htmlpage&htmlpage_id=${htmlpage.id}">${htmlpage.description}</a></li>
+				</#list>
+			<#else><#if result?exists>
+				<#list result as htmlpage >
+					<li><a href="${htmlpage.url}">${htmlpage.title}</a></li>
+				</#list>
+			<#else>
+				#i18n{htmlpage.page_htmlpage.messageListEmpty}
+			</#if></#if>
+		</ul>
+		
+		</fieldset>
+	</div>
 </div>
-<div id="sidebar" class="span-6 append-1 prepend-top last">
-	${page_tree_menu?if_exists}        
-</div>
+

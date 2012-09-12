@@ -1,53 +1,56 @@
 <#include "/admin/util/editor/editor.html" />
-
-<div class="content-box" >
-    
-    <h2>#i18n{htmlpage.modify_htmlpage.tableLabel}</h2>
-    
-    <form method="post"  name="modify_htmlpage" id="modify_htmlpage" action="jsp/admin/plugins/htmlpage/DoModifyHtmlPage.jsp">
-        
-        <p>
-        	<label for="description" >#i18n{htmlpage.modify_htmlpage.rowTitleLabel} * : </label> 
-                <input type="hidden" name="id_htmlpage" value="${htmlpage.id}">
-        	<input type="text" id="description" name="description" size="60" maxlength="50" tabindex="1" value="${htmlpage.description}" />
-        </p>
-        <p>
-            <label for="status">#i18n{htmlpage.modify_htmlpage.labelStatus} :</label>
-            <select id="status" name="status" tabindex="2">
-                <#if htmlpage.status == 0 >
-                    <option value="0" selected="selected" >#i18n{htmlpage.modify_htmlpage.statusLabelEnabled}</option>
-                    <option value="1" >#i18n{htmlpage.modify_htmlpage.statusLabelDisabled}</option>
-                <#else>
-                    <option value="0" >#i18n{htmlpage.modify_htmlpage.statusLabelEnabled}</option>
-                    <option value="1" selected="selected" >#i18n{htmlpage.modify_htmlpage.statusLabelDisabled}</option>
-                </#if> 
-            </select>
-        </p>        
-        <p>
-            <label for="workgroup" >#i18n{htmlpage.modify_htmlpage.labelWorkgroupKey}*:</label>
-            <@combo name="workgroup" default_value="${htmlpage.workgroup}" items=workgroups_list />
-        </p>
-        <p>
-             <label for="role" >#i18n{htmlpage.modify_htmlpage.labelRole}*:</label>
-            <@combo name="role" default_value="${htmlpage.role}" items=roles_list />
-        </p>        
-        <p>
-            <label>#i18n{htmlpage.modify_htmlpage.labelHtmlContent}</label>
-        </p>
-        <p>
-            <div id="richtext" class="editor">
-                <textarea id="html_content" class="richtext" name="html_content" style="width:100%;" rows="20" cols="90" tabindex="2">
-                    ${htmlpage.htmlContent}
-                </textarea>
-            </div>
-        </p>
-              
-        <p>   
-        	<input type="submit" value="#i18n{htmlpage.modify_htmlpage.buttonModify}" class="button" tabindex="3" />
-        </p>
-        
-    </form>
-    
+<div class="row" >
+	<div class="span12" >
+	<fieldset>
+    <legend>#i18n{htmlpage.modify_htmlpage.tableLabel}</legend>
+		<form class="form-horizontal" method="post"  name="modify_htmlpage" id="modify_htmlpage" action="jsp/admin/plugins/htmlpage/DoModifyHtmlPage.jsp">
+			<input type="hidden" name="id_htmlpage" value="${htmlpage.id}">
+			<div class="control-group">
+			<label class="control-label" for="description" >#i18n{htmlpage.modify_htmlpage.rowTitleLabel} * : </label> 
+				<div class="controls">
+					<input type="text" id="description" name="description" size="60" maxlength="50" tabindex="1" value="${htmlpage.description}" />
+				</div>
+			</div>
+			<div class="control-group">
+			<label class="control-label" for="status">#i18n{htmlpage.modify_htmlpage.labelStatus} :</label>
+				<div class="controls">
+				<select id="status" name="status" tabindex="2">
+					<#if htmlpage.status == 0 >
+						<option value="0" selected="selected" >#i18n{htmlpage.modify_htmlpage.statusLabelEnabled}</option>
+						<option value="1" >#i18n{htmlpage.modify_htmlpage.statusLabelDisabled}</option>
+					<#else>
+						<option value="0" >#i18n{htmlpage.modify_htmlpage.statusLabelEnabled}</option>
+						<option value="1" selected="selected" >#i18n{htmlpage.modify_htmlpage.statusLabelDisabled}</option>
+					</#if> 
+				</select>
+			 </div>
+			</div>       
+			<div class="control-group">
+			<label class="control-label" for="workgroup" >#i18n{htmlpage.modify_htmlpage.labelWorkgroupKey}*:</label>
+				<div class="controls">
+					<@combo name="workgroup" default_value="${htmlpage.workgroup}" items=workgroups_list />
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="role" >#i18n{htmlpage.modify_htmlpage.labelRole}*:</label>
+					<div class="controls">
+						<@combo name="role" default_value="${htmlpage.role}" items=roles_list />
+					</div>
+			</div>
+			<div class="control-group">
+			<label class="control-label" > #i18n{htmlpage.modify_htmlpage.labelHtmlContent}</label>
+				<div class="controls">
+					<textarea id="html_content" class="richtext span10" name="html_content"  rows="20"  tabindex="2">
+						${htmlpage.htmlContent}
+					</textarea>
+				</div>
+			</div>
+			<div class="form-actions">
+				<button class="btn btn-primary" type="submit" >#i18n{htmlpage.modify_htmlpage.buttonModify}</button>
+			</div>
+        </form>
+    </fieldset>
+    </div>
 </div>
 
 

@@ -1,72 +1,49 @@
-
-<div class="content-box" >
-    <h2>#i18n{htmlpage.manage_htmlpage.tableLabel}</h2>
-    <form method="post" rm action="jsp/admin/plugins/htmlpage/ManageHtmlPage.jsp">
-     <@pagination paginator=paginator />
-        
-        <!-- Number of contact per page selector -->
-        #i18n{htmlpage.manage_htmlpage.labelItemsPerPage} :
-        <select name="items_per_page">
-            <#list [ "10" , "20" , "50" , "100" ] as nb>
-            <#if nb_items_per_page = nb >
-            <option selected="selected" value="${nb}">${nb}</option>
-            <#else>
-            <option value="${nb}">${nb}</option>
-            </#if>
-            </#list>
-        </select>
-        <input type="submit" class="button" value="#i18n{htmlpage.manage_htmlpage.buttonItemsPerPage}" />
-    </form>   
-    
-    <table>
-        <tr>
-            <th width="40%">#i18n{htmlpage.manage_htmlpage.columnTitleLabel}</th>
-            <th width="20%">#i18n{htmlpage.manage_htmlpage.columnTitleStatus}</th>
-            <th width="20%">#i18n{htmlpage.manage_htmlpage.workgroup}</th>
-            <th width="10%">&#160;</th>
-            <th width="10%">#i18n{htmlpage.manage_htmlpage.columnTitleActions}</th>
-        </tr>
-        
-        <#list htmlpage_list as htmlpage >
-        
-        <tr>
-            <td>
-                <a href="jsp/admin/plugins/htmlpage/ModifyHtmlPage.jsp?id_htmlpage=${htmlpage.id}" class="bullet-link">
-                    ${htmlpage.description}
-                </a>
-            </td>
-            <td>
-                <#if htmlpage.status == 0 >
-                <img src="images/admin/skin/enable.png" alt="#i18n{htmlpage.manage_htmlpage.statusLabelEnabled}" />
-                <#else>
-                <img src="images/admin/skin/disable.png" alt="#i18n{htmlpage.manage_htmlpage.statusLabelDisabled}" />
-                </#if>				
-            </td>
-            <td>
-                ${htmlpage.workgroup}
-            </td>     
-            <td  align="right">
-                <form method="post" action="jsp/admin/plugins/htmlpage/DoDuplicateHtmlPage.jsp">                        
-                    <input type="hidden" name="id_htmlpage" description="id_htmlpage" value="${htmlpage.id}"/>
-                    <input src="images/admin/skin/actions/duplicate.png" style="border: 0pt none ; vertical-align: bottom;" alt="#i18n{htmlpage.manage_htmlpage.actionDuplicate}" title="#i18n{htmlpage.manage_htmlpage.actionDuplicate}"  type="image">
-                </form>    
-            </td>
-            <td align="left">
-                <form method="post" action="jsp/admin/plugins/htmlpage/RemoveHtmlPage.jsp">                        
-                    <input type="hidden" name="id_htmlpage" description="id_htmlpage" value="${htmlpage.id}"/>
-                    <input type="hidden" name="description" description="description" value="${htmlpage.description}"/>
-                    <input src="images/admin/skin/actions/delete.png" style="border: 0pt none ; vertical-align: bottom;" alt="#i18n{htmlpage.manage_htmlpage.actionDelete}" title="#i18n{htmlpage.manage_htmlpage.actionDelete}"  type="image">                    
-                </form>     
-            </td>
-        </tr>					
-        </#list>
-        
-    </table>
-    
-    <form method="post"  action="jsp/admin/plugins/htmlpage/CreateHtmlPage.jsp">
-        <input type="submit" value="#i18n{htmlpage.manage_htmlpage.buttonAddHtmlPage}" class="button" />
-    </form>
-    
+<div class="row" >
+	<div class="span12" >
+	<fieldset>
+    <legend>
+		#i18n{htmlpage.manage_htmlpage.tableLabel}
+		<form class="form-inline pull-right" method="post"  action="jsp/admin/plugins/htmlpage/CreateHtmlPage.jsp">
+			<button class="btn btn-primary" type="submit" ><i class="icon-plus icon-white"></i>&nbsp;#i18n{htmlpage.manage_htmlpage.buttonAddHtmlPage}</button>
+		</form>
+	</legend>
+		<@pagination paginator=paginator />
+		<table class="table table-striped table-condensed">
+			<tr>
+				<th>#i18n{htmlpage.manage_htmlpage.columnTitleLabel}</th>
+				<th>#i18n{htmlpage.manage_htmlpage.columnTitleStatus}</th>
+				<th>#i18n{htmlpage.manage_htmlpage.workgroup}</th>
+				<th>#i18n{htmlpage.manage_htmlpage.columnTitleActions}</th>
+			</tr>
+			<#list htmlpage_list as htmlpage >
+			<tr>
+				<td>${htmlpage.description}</td>
+				<td>
+					<#if htmlpage.status == 0 >
+					<span class="label label-success"><i class="icon-ok-sign icon-white"></i> #i18n{portal.util.labelEnabled}</span>
+					<#else>
+					<span class="label label-important"><i class="icon-remove-sign icon-white"></i> #i18n{portal.util.labelDisabled}</span>
+					</#if>				
+				</td>
+				<td>${htmlpage.workgroup}</td>     
+				<td>
+					<a class="btn btn-primary btn-mini pull-left spaced" href="jsp/admin/plugins/htmlpage/ModifyHtmlPage.jsp?id_htmlpage=${htmlpage.id}"  title="null" >
+						<i class="icon-edit icon-white"></i>
+					</a>
+					<form class="form-inline pull-left spaced" method="post" action="jsp/admin/plugins/htmlpage/DoDuplicateHtmlPage.jsp">
+						<input type="hidden" name="id_htmlpage" description="id_htmlpage" value="${htmlpage.id}"/>
+						<button class="btn btn-primary btn-mini" type="submit" title="#i18n{htmlpage.manage_htmlpage.actionDuplicate}"><i class="icon-move icon-white"></i></button>
+					</form>    
+					<form class="form-inline  pull-left" method="post" action="jsp/admin/plugins/htmlpage/RemoveHtmlPage.jsp">
+						<input type="hidden" name="id_htmlpage" description="id_htmlpage" value="${htmlpage.id}"/>
+						<input type="hidden" name="description" description="description" value="${htmlpage.description}"/>
+						<button class="btn btn-danger btn-mini" type="submit" title="#i18n{htmlpage.manage_htmlpage.actionDelete}"><i class="icon-trash icon-white"></i></button>
+					</form>     
+				</td>
+			</tr>					
+			</#list>
+		</table>
+   </div>
 </div>
 
 
