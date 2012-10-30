@@ -3,7 +3,7 @@
     <!-- Plugin Informations -->
     <name>htmlpage</name>
     <class>fr.paris.lutece.portal.service.plugin.PluginDefaultImplementation</class>
-    <version>2.1.5</version>
+    <version>3.0.0</version>
     <documentation/>
     <installation/>
     <changes/>
