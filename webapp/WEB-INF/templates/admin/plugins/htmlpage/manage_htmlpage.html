@@ -17,7 +17,7 @@
 			</tr>
 			<#list htmlpage_list as htmlpage >
 			<tr>
-				<td>${htmlpage.description}</td>
+				<td>${htmlpage.description}&nbsp;<a href="jsp/site/Portal.jsp?page=htmlpage&amp;htmlpage_id=1" target="_blank"><i class="icon-globe"></i></a></td>
 				<td>
 					<#if htmlpage.status == 0 >
 					<span class="label label-success"><i class="icon-ok-sign icon-white"></i> #i18n{portal.util.labelEnabled}</span>
