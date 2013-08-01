@@ -6,13 +6,13 @@
 		<form class="form-horizontal" method="post"  name="modify_htmlpage" id="modify_htmlpage" action="jsp/admin/plugins/htmlpage/DoModifyHtmlPage.jsp">
 			<input type="hidden" name="id_htmlpage" value="${htmlpage.id}">
 			<div class="control-group">
-			<label class="control-label" for="description" >#i18n{htmlpage.modify_htmlpage.rowTitleLabel} * : </label> 
+			<label class="control-label" for="description" >#i18n{htmlpage.modify_htmlpage.rowTitleLabel} *</label> 
 				<div class="controls">
 					<input type="text" id="description" name="description" size="60" maxlength="50" tabindex="1" value="${htmlpage.description}" />
 				</div>
 			</div>
 			<div class="control-group">
-			<label class="control-label" for="status">#i18n{htmlpage.modify_htmlpage.labelStatus} :</label>
+			<label class="control-label" for="status">#i18n{htmlpage.modify_htmlpage.labelStatus}</label>
 				<div class="controls">
 				<select id="status" name="status" tabindex="2">
 					<#if htmlpage.status == 0 >
@@ -26,27 +26,27 @@
 			 </div>
 			</div>       
 			<div class="control-group">
-			<label class="control-label" for="workgroup" >#i18n{htmlpage.modify_htmlpage.labelWorkgroupKey}*:</label>
+			<label class="control-label" for="workgroup" >#i18n{htmlpage.modify_htmlpage.labelWorkgroupKey}*</label>
 				<div class="controls">
 					<@combo name="workgroup" default_value="${htmlpage.workgroup}" items=workgroups_list />
 				</div>
 			</div>
 			<div class="control-group">
-				<label class="control-label" for="role" >#i18n{htmlpage.modify_htmlpage.labelRole}*:</label>
+				<label class="control-label" for="role" >#i18n{htmlpage.modify_htmlpage.labelRole}*</label>
 					<div class="controls">
 						<@combo name="role" default_value="${htmlpage.role}" items=roles_list />
 					</div>
 			</div>
 			<div class="control-group">
-			<label class="control-label" > #i18n{htmlpage.modify_htmlpage.labelHtmlContent}</label>
+			<label class="control-label">#i18n{htmlpage.modify_htmlpage.labelHtmlContent}</label>
 				<div class="controls">
-					<textarea id="html_content" class="richtext span10" name="html_content"  rows="20"  tabindex="2">
-						${htmlpage.htmlContent}
-					</textarea>
+					<textarea id="html_content" class="richtext span10" name="html_content"  rows="20"  tabindex="2">${htmlpage.htmlContent}</textarea>
 				</div>
 			</div>
 			<div class="form-actions">
-				<button class="btn btn-primary btn-small" type="submit" >#i18n{htmlpage.modify_htmlpage.buttonModify}</button>
+				<button class="btn btn-primary btn-small" type="submit" >
+					<i class="icon-ok icon-white"></i> #i18n{htmlpage.modify_htmlpage.buttonModify}
+				</button>
 			</div>
         </form>
     </fieldset>

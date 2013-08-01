@@ -10,14 +10,13 @@
 		<@pagination paginator=paginator />
 		<table class="table table-striped table-condensed">
 			<tr>
-				<th>#i18n{htmlpage.manage_htmlpage.columnTitleLabel}</th>
 				<th>#i18n{htmlpage.manage_htmlpage.columnTitleStatus}</th>
+				<th>#i18n{htmlpage.manage_htmlpage.columnTitleLabel}</th>
 				<th>#i18n{htmlpage.manage_htmlpage.workgroup}</th>
 				<th>#i18n{htmlpage.manage_htmlpage.columnTitleActions}</th>
 			</tr>
 			<#list htmlpage_list as htmlpage >
 			<tr>
-				<td>${htmlpage.description}&nbsp;<a href="jsp/site/Portal.jsp?page=htmlpage&amp;htmlpage_id=1" target="_blank"><i class="icon-globe"></i></a></td>
 				<td>
 					<#if htmlpage.status == 0 >
 					<span class="label label-success"><i class="icon-ok-sign icon-white"></i> #i18n{portal.util.labelEnabled}</span>
@@ -25,9 +24,11 @@
 					<span class="label label-important"><i class="icon-remove-sign icon-white"></i> #i18n{portal.util.labelDisabled}</span>
 					</#if>				
 				</td>
+				<td>${htmlpage.description}&nbsp;<a href="jsp/site/Portal.jsp?page=htmlpage&amp;htmlpage_id=${htmlpage.id}" target="_blank"><i class="icon-globe"></i></a> <span class="pull-right"><strong>tag freemarker</strong> <code>{htmlpage_${htmlpage.id}!}</code></span>
+				</td>
 				<td>${htmlpage.workgroup}</td>     
 				<td>
-					<a class="btn btn-primary btn-small pull-left spaced" href="jsp/admin/plugins/htmlpage/ModifyHtmlPage.jsp?id_htmlpage=${htmlpage.id}"  title="null" >
+					<a class="btn btn-primary btn-small pull-left spaced" href="jsp/admin/plugins/htmlpage/ModifyHtmlPage.jsp?id_htmlpage=${htmlpage.id}"  title="#i18n{htmlpage.manage_htmlpage.actionEdit}" >
 						<i class="icon-edit icon-white"></i>
 					</a>
 					<form class="form-inline pull-left spaced" method="post" action="jsp/admin/plugins/htmlpage/DoDuplicateHtmlPage.jsp">

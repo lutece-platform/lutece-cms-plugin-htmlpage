@@ -5,13 +5,13 @@
     <legend>#i18n{htmlpage.create_htmlpage.tableLabel}</legend>
 		<form class="form-horizontal" method="post"  name="create_htmlpage" id="create_htmlpage" action="jsp/admin/plugins/htmlpage/DoCreateHtmlPage.jsp">
 			<div class="control-group">
-				<label class="control-label" for="description" >#i18n{htmlpage.create_htmlpage.rowTitleLabel} * : </label> 
-					<div class="controls">
-						<input type="text" id="description" name="description" size="60" maxlength="50" tabindex="1" />
+				<label class="control-label" for="description" >#i18n{htmlpage.create_htmlpage.rowTitleLabel} *</label> 
+				<div class="controls">
+					<input type="text" id="description" name="description" size="60" maxlength="50" tabindex="1" />
 				</div>
 			</div>
 			<div class="control-group">
-				<label class="control-label" for="status">#i18n{htmlpage.create_htmlpage.labelStatus} :</label>
+				<label class="control-label" for="status">#i18n{htmlpage.create_htmlpage.labelStatus}</label>
 				 <div class="controls">
 					<select id="status" name="status" tabindex="2">
 						<option value="0" selected="selected" >#i18n{htmlpage.create_htmlpage.statusLabelEnabled}</option>
@@ -20,13 +20,13 @@
 			</div>
 			</div>    
 			<div class="control-group">
-			<label class="control-label" for="workgroup" >#i18n{htmlpage.create_htmlpage.labelWorkgroupKey}*:</label>
+			<label class="control-label" for="workgroup" >#i18n{htmlpage.create_htmlpage.labelWorkgroupKey}*</label>
 					<div class="controls">
 						<@combo name="workgroup" default_value="all" items=workgroups_list />
 				</div>
 			</div>
 			<div class="control-group">
-				<label class="control-label" for="role" >#i18n{htmlpage.create_htmlpage.labelRole}*:</label>
+				<label class="control-label" for="role" >#i18n{htmlpage.create_htmlpage.labelRole}*</label>
 					<div class="controls">
 						<@combo name="role" default_value="none" items=roles_list />
 				</div>
