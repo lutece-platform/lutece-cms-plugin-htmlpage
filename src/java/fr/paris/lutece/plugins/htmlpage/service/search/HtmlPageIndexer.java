@@ -43,21 +43,27 @@ import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.search.IndexationService;
 import fr.paris.lutece.portal.service.search.SearchIndexer;
 import fr.paris.lutece.portal.service.search.SearchItem;
+import fr.paris.lutece.portal.service.util.AppException;
 import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.util.url.UrlItem;
 
-import org.apache.lucene.demo.html.HTMLParser;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
-
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
+import org.apache.lucene.document.TextField;
+import org.apache.tika.exception.TikaException;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.parser.ParseContext;
+import org.apache.tika.parser.html.HtmlParser;
+import org.apache.tika.sax.BodyContentHandler;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -81,20 +87,20 @@ public class HtmlPageIndexer implements SearchIndexer
      * Returns the indexer service description
      * @return The indexer service description
      */
-    public String getDescription(  )
+    public String getDescription( )
     {
         return AppPropertiesService.getProperty( PROPERTY_INDEXER_DESCRIPTION );
     }
 
     /**
      * Index all enabled HtmlPage
-     *@throws IOException exception
-     *@throws InterruptedException exception
-     *@throws SiteMessageException exception
+     * @throws IOException exception
+     * @throws InterruptedException exception
+     * @throws SiteMessageException exception
      */
-    public void indexDocuments(  ) throws IOException, InterruptedException, SiteMessageException
+    public void indexDocuments( ) throws IOException, InterruptedException, SiteMessageException
     {
-        String strPortalUrl = AppPathService.getPortalUrl(  );
+        String strPortalUrl = AppPathService.getPortalUrl( );
         Plugin plugin = PluginService.getPlugin( HtmlPagePlugin.PLUGIN_NAME );
 
         Collection<HtmlPage> listHtmlPages = HtmlPageHome.findEnabledHtmlPageList( plugin );
@@ -103,9 +109,9 @@ public class HtmlPageIndexer implements SearchIndexer
         {
             UrlItem url = new UrlItem( strPortalUrl );
             url.addParameter( XPageAppService.PARAM_XPAGE_APP, HtmlPagePlugin.PLUGIN_NAME );
-            url.addParameter( PARAMETER_HTMLPAGE_ID, htmlpage.getId(  ) );
+            url.addParameter( PARAMETER_HTMLPAGE_ID, htmlpage.getId( ) );
 
-            org.apache.lucene.document.Document docHtmlPage = getDocument( htmlpage, url.getUrl(  ), plugin );
+            org.apache.lucene.document.Document docHtmlPage = getDocument( htmlpage, url.getUrl( ), plugin );
             IndexationService.write( docHtmlPage );
         }
     }
@@ -115,33 +121,32 @@ public class HtmlPageIndexer implements SearchIndexer
      * @param strId the uid of the document
      * @return listDocuments the document list
      */
-    public List<Document> getDocuments( String strId )
-        throws IOException, InterruptedException, SiteMessageException
+    public List<Document> getDocuments( String strId ) throws IOException, InterruptedException, SiteMessageException
     {
-        ArrayList<org.apache.lucene.document.Document> listDocuments = new ArrayList<Document>(  );
-        String strPortalUrl = AppPathService.getPortalUrl(  );
+        ArrayList<org.apache.lucene.document.Document> listDocuments = new ArrayList<Document>( );
+        String strPortalUrl = AppPathService.getPortalUrl( );
         Plugin plugin = PluginService.getPlugin( HtmlPagePlugin.PLUGIN_NAME );
 
         HtmlPage htmlpage = HtmlPageHome.findEnabledHtmlPage( Integer.parseInt( strId ), plugin );
-        if( htmlpage != null )
+        if ( htmlpage != null )
         {
             UrlItem url = new UrlItem( strPortalUrl );
             url.addParameter( XPageAppService.PARAM_XPAGE_APP, HtmlPagePlugin.PLUGIN_NAME );
-            url.addParameter( PARAMETER_HTMLPAGE_ID, htmlpage.getId(  ) );
+            url.addParameter( PARAMETER_HTMLPAGE_ID, htmlpage.getId( ) );
 
             org.apache.lucene.document.Document docHtmlPage = null;
             try
             {
-            	docHtmlPage = getDocument( htmlpage, url.getUrl(  ), plugin );
+                docHtmlPage = getDocument( htmlpage, url.getUrl( ), plugin );
             }
             catch ( Exception e )
             {
-            	String strMessage = "HtmlPage ID : " + htmlpage.getId(  );
-            	IndexationService.error( this, e, strMessage );
+                String strMessage = "HtmlPage ID : " + htmlpage.getId( );
+                IndexationService.error( this, e, strMessage );
             }
             if ( docHtmlPage != null )
             {
-            	listDocuments.add( docHtmlPage );
+                listDocuments.add( docHtmlPage );
             }
         }
         return listDocuments;
@@ -150,7 +155,7 @@ public class HtmlPageIndexer implements SearchIndexer
     /**
      * {@inheritDoc}
      */
-    public String getName(  )
+    public String getName( )
     {
         return AppPropertiesService.getProperty( PROPERTY_INDEXER_NAME );
     }
@@ -158,7 +163,7 @@ public class HtmlPageIndexer implements SearchIndexer
     /**
      * {@inheritDoc}
      */
-    public String getVersion(  )
+    public String getVersion( )
     {
         return AppPropertiesService.getProperty( PROPERTY_INDEXER_VERSION );
     }
@@ -166,14 +171,14 @@ public class HtmlPageIndexer implements SearchIndexer
     /**
      * {@inheritDoc}
      */
-    public boolean isEnable(  )
+    public boolean isEnable( )
     {
         boolean bReturn = false;
         String strEnable = AppPropertiesService.getProperty( PROPERTY_INDEXER_ENABLE );
 
-        if ( ( strEnable != null ) &&
-                ( strEnable.equalsIgnoreCase( Boolean.TRUE.toString(  ) ) || strEnable.equals( ENABLE_VALUE_TRUE ) ) &&
-                PluginService.isPluginEnable( HtmlPagePlugin.PLUGIN_NAME ) )
+        if ( ( strEnable != null )
+                && ( strEnable.equalsIgnoreCase( Boolean.TRUE.toString( ) ) || strEnable.equals( ENABLE_VALUE_TRUE ) )
+                && PluginService.isPluginEnable( HtmlPagePlugin.PLUGIN_NAME ) )
         {
             bReturn = true;
         }
@@ -182,7 +187,8 @@ public class HtmlPageIndexer implements SearchIndexer
     }
 
     /**
-     * Builds a document which will be used by Lucene during the indexing of the pages of the site with the following
+     * Builds a document which will be used by Lucene during the indexing of the
+     * pages of the site with the following
      * fields : summary, uid, url, contents, title and description.
      * @return the built Document
      * @param strUrl The base URL for documents
@@ -190,50 +196,53 @@ public class HtmlPageIndexer implements SearchIndexer
      * @param plugin The {@link Plugin}
      * @throws IOException The IO Exception
      * @throws InterruptedException The InterruptedException
-     * @throws SiteMessageException occurs when a site message need to be displayed
+     * @throws SiteMessageException occurs when a site message need to be
+     *             displayed
      */
-    private Document getDocument( HtmlPage htmlpage, String strUrl, Plugin plugin )
-        throws IOException, InterruptedException, SiteMessageException
+    private Document getDocument( HtmlPage htmlpage, String strUrl, Plugin plugin ) throws IOException,
+            InterruptedException, SiteMessageException
     {
         // make a new, empty document
-        org.apache.lucene.document.Document doc = new org.apache.lucene.document.Document(  );
+        org.apache.lucene.document.Document doc = new org.apache.lucene.document.Document( );
 
         // Add the url as a field named "url".  Use an UnIndexed field, so
         // that the url is just stored with the question/answer, but is not searchable.
-        doc.add( new Field( SearchItem.FIELD_URL, strUrl, Field.Store.YES, Field.Index.UN_TOKENIZED ) );
+        doc.add( new Field( SearchItem.FIELD_URL, strUrl, TextField.TYPE_STORED ) );
 
         // Add the uid as a field, so that index can be incrementally maintained.
         // This field is not stored with question/answer, it is indexed, but it is not
         // tokenized prior to indexing.
-        String strIdHtmlPage = String.valueOf( htmlpage.getId(  ) );
-        doc.add( new Field( SearchItem.FIELD_UID, strIdHtmlPage + "_" + SHORT_NAME, Field.Store.NO,
-                Field.Index.UN_TOKENIZED ) );
+        String strIdHtmlPage = String.valueOf( htmlpage.getId( ) );
+        doc.add( new Field( SearchItem.FIELD_UID, strIdHtmlPage + "_" + SHORT_NAME, TextField.TYPE_NOT_STORED ) );
 
         String strContentToIndex = getContentToIndex( htmlpage );
-        StringReader readerPage = new StringReader( strContentToIndex );
-        HTMLParser parser = new HTMLParser( readerPage );
-
-        //the content of the question/answer is recovered in the parser because this one
-        //had replaced the encoded caracters (as &eacute;) by the corresponding special caracter (as ?)
-        Reader reader = parser.getReader(  );
-        int c;
-        StringBuffer sb = new StringBuffer(  );
-
-        while ( ( c = reader.read(  ) ) != -1 )
+        ContentHandler handler = new BodyContentHandler( );
+        Metadata metadata = new Metadata( );
+        try
         {
-            sb.append( String.valueOf( (char) c ) );
+            new HtmlParser( ).parse( new ByteArrayInputStream( strContentToIndex.getBytes( ) ), handler, metadata,
+                    new ParseContext( ) );
+        }
+        catch ( SAXException e )
+        {
+            throw new AppException( "Error during page parsing." );
+        }
+        catch ( TikaException e )
+        {
+            throw new AppException( "Error during page parsing." );
         }
 
-        reader.close(  );
+        //the content of the article is recovered in the parser because this one
+        //had replaced the encoded caracters (as &eacute;) by the corresponding special caracter (as ?)
+        StringBuilder sb = new StringBuilder( handler.toString( ) );
 
-        doc.add( new Field( SearchItem.FIELD_CONTENTS, sb.toString(  ), Field.Store.NO, Field.Index.TOKENIZED ) );
+        doc.add( new Field( SearchItem.FIELD_CONTENTS, sb.toString( ), TextField.TYPE_NOT_STORED ) );
 
         // Add the subject name as a separate Text field, so that it can be searched
         // separately.
-        doc.add( new Field( SearchItem.FIELD_TITLE, htmlpage.getDescription(  ), Field.Store.YES,
-                Field.Index.UN_TOKENIZED ) );
+        doc.add( new Field( SearchItem.FIELD_TITLE, htmlpage.getDescription( ), TextField.TYPE_STORED ) );
 
-        doc.add( new Field( SearchItem.FIELD_TYPE, HtmlPagePlugin.PLUGIN_NAME, Field.Store.YES, Field.Index.NOT_ANALYZED ) );
+        doc.add( new Field( SearchItem.FIELD_TYPE, HtmlPagePlugin.PLUGIN_NAME, TextField.TYPE_STORED ) );
 
         // return the document
         return doc;
@@ -246,34 +255,34 @@ public class HtmlPageIndexer implements SearchIndexer
      */
     private static String getContentToIndex( HtmlPage htmlpage )
     {
-        StringBuffer sbContentToIndex = new StringBuffer(  );
+        StringBuffer sbContentToIndex = new StringBuffer( );
 
         //index the title
-        sbContentToIndex.append( htmlpage.getDescription(  ) );
+        sbContentToIndex.append( htmlpage.getDescription( ) );
 
         sbContentToIndex.append( " " );
 
-        sbContentToIndex.append( htmlpage.getHtmlContent(  ) );
+        sbContentToIndex.append( htmlpage.getHtmlContent( ) );
 
-        return sbContentToIndex.toString(  );
+        return sbContentToIndex.toString( );
     }
 
     /**
      * {@inheritDoc}
      */
-	public List<String> getListType(  )
-	{
-		List<String> listType = new ArrayList<String>(  );
-		listType.add( HtmlPagePlugin.PLUGIN_NAME );
-		
-		return listType;
-	}
-	
-	/**
+    public List<String> getListType( )
+    {
+        List<String> listType = new ArrayList<String>( );
+        listType.add( HtmlPagePlugin.PLUGIN_NAME );
+
+        return listType;
+    }
+
+    /**
      * {@inheritDoc}
      */
-	public String getSpecificSearchAppUrl(  )
-	{
-		return JSP_SEARCH_HTMLPAGE;
-	}
+    public String getSpecificSearchAppUrl( )
+    {
+        return JSP_SEARCH_HTMLPAGE;
+    }
 }
