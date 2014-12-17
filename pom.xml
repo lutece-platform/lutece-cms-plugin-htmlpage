@@ -37,8 +37,8 @@
         <jiraComponentId>10191</jiraComponentId>
     </properties>
     <scm>
-        <connection>scm:svn:http://dev.lutece.paris.fr/svn/lutece/portal/trunk/plugins/cms/plugin-htmlpage</connection>
-        <developerConnection>scm:svn:https://dev.lutece.paris.fr/svn/lutece/portal/trunk/plugins/cms/plugin-htmlpage</developerConnection>
-        <url>http://dev.lutece.paris.fr/viewvc/lutece/portal/trunk/plugins/cms/plugin-htmlpage</url>
+        <connection>scm:git:https://github.com/lutece-platform/lutece-cms-plugin-htmlpage.git</connection>
+        <developerConnection>scm:git:https://github.com/lutece-platform/lutece-cms-plugin-htmlpage.git</developerConnection>
+        <url>https://github.com/lutece-platform/lutece-cms-plugin-htmlpage.git</url>
     </scm>
 </project>
