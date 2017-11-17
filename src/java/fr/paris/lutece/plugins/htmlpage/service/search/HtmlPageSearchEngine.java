@@ -26,6 +26,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.store.Directory;
 
 
 /**
@@ -46,9 +47,8 @@ public class HtmlPageSearchEngine implements SearchEngine
         ArrayList<SearchItem> listResults = new ArrayList<SearchItem>( );
         IndexSearcher searcher = null;
 
-        try
+        try( Directory directory = IndexationService.getDirectoryIndex( ) ; IndexReader ir = DirectoryReader.open( directory ) ; )
         {
-            IndexReader ir = DirectoryReader.open( IndexationService.getDirectoryIndex( ) );
             searcher = new IndexSearcher( ir );
 
             BooleanQuery.Builder queryBuilder = new BooleanQuery.Builder( );
