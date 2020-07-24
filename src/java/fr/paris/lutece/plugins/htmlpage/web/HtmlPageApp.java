@@ -46,6 +46,7 @@ import fr.paris.lutece.portal.service.search.SearchResult;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
+import fr.paris.lutece.portal.web.l10n.LocaleService;
 import fr.paris.lutece.portal.web.xpages.XPage;
 import fr.paris.lutece.portal.web.xpages.XPageApplication;
 import fr.paris.lutece.util.html.HtmlTemplate;
@@ -54,6 +55,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -158,7 +160,7 @@ public class HtmlPageApp implements XPageApplication
         model.put( MARK_RESULT, listResults );
         model.put( MARK_QUERY, strQuery );
 
-        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_XPAGE_HTMLPAGE_LISTS, request.getLocale( ),
+        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_XPAGE_HTMLPAGE_LISTS, getLocale( request ),
                 model );
         return template.getHtml( );
     }
@@ -180,7 +182,7 @@ public class HtmlPageApp implements XPageApplication
 
         model.put( MARK_HTMLPAGE_LIST, visibleHtmlPageList );
 
-        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_XPAGE_HTMLPAGE_LISTS, request.getLocale( ),
+        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_XPAGE_HTMLPAGE_LISTS, getLocale( request ),
                 model );
 
         return template.getHtml( );
@@ -218,8 +220,20 @@ public class HtmlPageApp implements XPageApplication
             SiteMessageService.setMessage( request, PROPERTY_MESSAGE_ERROR_HTMLPAGE, SiteMessage.TYPE_ERROR );
         }
 
-        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_XPAGE_HTMLPAGE, request.getLocale( ), model );
+        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_XPAGE_HTMLPAGE, getLocale( request ), model );
 
         return template.getHtml( );
+    }
+    
+    /**
+     * Default getLocale() implementation. Could be overriden
+     * 
+     * @param request
+     *            The HTTP request
+     * @return The Locale
+     */
+    public Locale getLocale( HttpServletRequest request )
+    {
+        return LocaleService.getContextUserLocale( request );
     }
 }
