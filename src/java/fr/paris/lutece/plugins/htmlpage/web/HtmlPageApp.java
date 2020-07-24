@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -61,7 +61,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 
-
 /**
  * This class manages HtmlPage page.
  */
@@ -108,13 +107,15 @@ public class HtmlPageApp implements XPageApplication
     }
 
     /**
-     * Returns the content of the page HtmlPage. It is composed by a form which
-     * to capture the data to send a message to
-     * a contact of the portal.
+     * Returns the content of the page HtmlPage. It is composed by a form which to capture the data to send a message to a contact of the portal.
+     * 
      * @return the Content of the page Contact
-     * @param request The http request
-     * @param nMode The current mode
-     * @param plugin The plugin object
+     * @param request
+     *            The http request
+     * @param nMode
+     *            The current mode
+     * @param plugin
+     *            The plugin object
      * @throws fr.paris.lutece.portal.service.message.SiteMessageException
      *             Message displayed if an exception occures
      */
@@ -156,21 +157,20 @@ public class HtmlPageApp implements XPageApplication
         SearchEngine engine = SpringContextService.getBean( BEAN_SEARCH_ENGINE );
         List<SearchResult> listResults = engine.getSearchResults( strQuery, request );
 
-        HashMap<String, Object> model = new HashMap<String, Object>( );
+        HashMap<String, Object> model = new HashMap<>( );
         model.put( MARK_RESULT, listResults );
         model.put( MARK_QUERY, strQuery );
 
-        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_XPAGE_HTMLPAGE_LISTS, getLocale( request ),
-                model );
+        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_XPAGE_HTMLPAGE_LISTS, getLocale( request ), model );
         return template.getHtml( );
     }
 
     private String getHtmlPagesLists( HttpServletRequest request ) throws SiteMessageException
     {
-        HashMap<String, Object> model = new HashMap<String, Object>( );
+        HashMap<String, Object> model = new HashMap<>( );
 
         Collection<HtmlPage> htmlPageList = HtmlPageHome.findEnabledHtmlPageList( _plugin );
-        Collection<HtmlPage> visibleHtmlPageList = new ArrayList<HtmlPage>( ); // filter the list of lists by role
+        Collection<HtmlPage> visibleHtmlPageList = new ArrayList<>( ); // filter the list of lists by role
 
         for ( HtmlPage htmlpage : htmlPageList )
         {
@@ -182,21 +182,23 @@ public class HtmlPageApp implements XPageApplication
 
         model.put( MARK_HTMLPAGE_LIST, visibleHtmlPageList );
 
-        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_XPAGE_HTMLPAGE_LISTS, getLocale( request ),
-                model );
+        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_XPAGE_HTMLPAGE_LISTS, getLocale( request ), model );
 
         return template.getHtml( );
     }
 
     /**
      * Returns the htmlpage page
-     * @param request The Html request
-     * @param plugin The plugin
+     * 
+     * @param request
+     *            The Html request
+     * @param plugin
+     *            The plugin
      * @return The Html template
      */
     private String getHtmlPage( HttpServletRequest request, String strHtmlPageId ) throws SiteMessageException
     {
-        HashMap<String, Object> model = new HashMap<String, Object>( );
+        HashMap<String, Object> model = new HashMap<>( );
 
         int nHtmlPageId = Integer.parseInt( strHtmlPageId );
         HtmlPage htmlpage = HtmlPageHome.findByPrimaryKey( nHtmlPageId, _plugin );
@@ -224,7 +226,7 @@ public class HtmlPageApp implements XPageApplication
 
         return template.getHtml( );
     }
-    
+
     /**
      * Default getLocale() implementation. Could be overriden
      * 

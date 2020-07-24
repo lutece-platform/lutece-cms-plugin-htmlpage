@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,61 +37,80 @@ import fr.paris.lutece.portal.service.plugin.Plugin;
 
 import java.util.Collection;
 
-
 /**
  * htmlPageInterface
+ * 
  * @author lenaini
  */
 public interface IHtmlPageDAO
 {
     /**
      * Delete a record from the table
-     * @param htmlpage The HtmlPage object
-     * @param plugin The plugin
+     * 
+     * @param htmlpage
+     *            The HtmlPage object
+     * @param plugin
+     *            The plugin
      */
     void delete( HtmlPage htmlpage, Plugin plugin );
 
     /**
      * Insert a new record in the table.
-     * @param htmlpage The htmlpage object
-     * @param plugin The plugin
+     * 
+     * @param htmlpage
+     *            The htmlpage object
+     * @param plugin
+     *            The plugin
      */
     void insert( HtmlPage htmlpage, Plugin plugin );
 
     /**
      * Load the data of HtmlPage from the table
-     * @param nHtmlPageId The identifier of HtmlPage
-     * @param plugin The plugin
+     * 
+     * @param nHtmlPageId
+     *            The identifier of HtmlPage
+     * @param plugin
+     *            The plugin
      * @return the instance of the HtmlPage
      */
     HtmlPage load( int nHtmlPageId, Plugin plugin );
 
     /**
      * Load the data of enabled HtmlPage from the table
-     * @param nHtmlPageId The identifier of HtmlPage
-     * @param plugin The plugin
+     * 
+     * @param nHtmlPageId
+     *            The identifier of HtmlPage
+     * @param plugin
+     *            The plugin
      * @return the instance of the HtmlPage
      */
     HtmlPage selectEnabledHtmlPage( int nHtmlPageId, Plugin plugin );
 
     /**
      * Load the list of htmlpages
-     * @param plugin The plugin
+     * 
+     * @param plugin
+     *            The plugin
      * @return The Collection of the HtmlPages
      */
     Collection<HtmlPage> selectAll( Plugin plugin );
 
     /**
      * Load the list of htmlpages with valid status
-     * @param plugin The plugin
+     * 
+     * @param plugin
+     *            The plugin
      * @return The Collection of the HtmlPages
      */
     Collection<HtmlPage> selectEnabledHtmlPageList( Plugin plugin );
 
     /**
      * Update the record in the table
-     * @param htmlpage The reference of htmlpage
-     * @param plugin The plugin
+     * 
+     * @param htmlpage
+     *            The reference of htmlpage
+     * @param plugin
+     *            The plugin
      */
     void store( HtmlPage htmlpage, Plugin plugin );
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -56,7 +56,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-
 /**
  *
  * @author lenaini
@@ -107,14 +106,16 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
     private static final String JSP_DO_REMOVE_HTMLPAGE = "jsp/admin/plugins/htmlpage/DoRemoveHtmlPage.jsp";
     private static final String JSP_REDIRECT_TO_MANAGE_HTMLPAGE = "ManageHtmlPage.jsp";
 
-    //Variables
+    // Variables
     private int _nDefaultItemsPerPage;
     private String _strCurrentPageIndex;
     private int _nItemsPerPage;
 
     /**
      * returns the template of the HtmlPageLists management
-     * @param request The HttpRequest
+     * 
+     * @param request
+     *            The HttpRequest
      * @return template of lists management
      */
     public String getManageHtmlPage( HttpServletRequest request )
@@ -123,52 +124,53 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
 
         _strCurrentPageIndex = Paginator.getPageIndex( request, Paginator.PARAMETER_PAGE_INDEX, _strCurrentPageIndex );
         _nDefaultItemsPerPage = AppPropertiesService.getPropertyInt( PROPERTY_DEFAULT_HTMLPAGE_LIST_PER_PAGE, 50 );
-        _nItemsPerPage = Paginator.getItemsPerPage( request, Paginator.PARAMETER_ITEMS_PER_PAGE, _nItemsPerPage,
-                _nDefaultItemsPerPage );
+        _nItemsPerPage = Paginator.getItemsPerPage( request, Paginator.PARAMETER_ITEMS_PER_PAGE, _nItemsPerPage, _nDefaultItemsPerPage );
 
-        Collection<HtmlPage> listHtmlPageList = HtmlPageHome.findAll( getPlugin(  ) );
-        listHtmlPageList = AdminWorkgroupService.getAuthorizedCollection( listHtmlPageList, getUser(  ) );
+        Collection<HtmlPage> listHtmlPageList = HtmlPageHome.findAll( getPlugin( ) );
+        listHtmlPageList = AdminWorkgroupService.getAuthorizedCollection( listHtmlPageList, getUser( ) );
 
-        Paginator paginator = new Paginator( (List<HtmlPage>) listHtmlPageList, _nItemsPerPage, getHomeUrl( request ),
-                PARAMETER_PAGE_INDEX, _strCurrentPageIndex );
+        Paginator paginator = new Paginator( (List<HtmlPage>) listHtmlPageList, _nItemsPerPage, getHomeUrl( request ), PARAMETER_PAGE_INDEX,
+                _strCurrentPageIndex );
 
-        Map<String, Object> model = new HashMap<String, Object>(  );
+        Map<String, Object> model = new HashMap<>( );
         model.put( MARK_NB_ITEMS_PER_PAGE, "" + _nItemsPerPage );
         model.put( MARK_PAGINATOR, paginator );
-        model.put( MARK_LIST_HTMLPAGE_LIST, paginator.getPageItems(  ) );
+        model.put( MARK_LIST_HTMLPAGE_LIST, paginator.getPageItems( ) );
 
-        HtmlTemplate templateList = AppTemplateService.getTemplate( TEMPLATE_MANAGE_HTMLPAGE, getLocale(  ), model );
+        HtmlTemplate templateList = AppTemplateService.getTemplate( TEMPLATE_MANAGE_HTMLPAGE, getLocale( ), model );
 
-        return getAdminPage( templateList.getHtml(  ) );
+        return getAdminPage( templateList.getHtml( ) );
     }
 
     /**
-      * Returns the form to create a htmlpage
-      *
-      * @param request The Http request
-      * @return the html code of the htmlpage form
-      */
+     * Returns the form to create a htmlpage
+     *
+     * @param request
+     *            The Http request
+     * @return the html code of the htmlpage form
+     */
     public String getCreateHtmlPage( HttpServletRequest request )
     {
         setPageTitleProperty( PROPERTY_PAGE_TITLE_CREATE );
 
-        Map<String, Object> model = new HashMap<String, Object>(  );
-        ReferenceList workgroupsList = AdminWorkgroupService.getUserWorkgroups( getUser(  ), getLocale(  ) );
+        Map<String, Object> model = new HashMap<>( );
+        ReferenceList workgroupsList = AdminWorkgroupService.getUserWorkgroups( getUser( ), getLocale( ) );
         model.put( MARK_WORKGROUPS_LIST, workgroupsList );
         model.put( MARK_WEBAPP_URL, AppPathService.getBaseUrl( request ) );
-        model.put( MARK_LOCALE, getLocale(  ) );
+        model.put( MARK_LOCALE, getLocale( ) );
         model.put( MARK_HTML_CONTENT, "" );
-        model.put( MARK_ROLES_LIST, RoleHome.getRolesList(  ) );
+        model.put( MARK_ROLES_LIST, RoleHome.getRolesList( ) );
 
-        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_CREATE_HTMLPAGE, getLocale(  ), model );
+        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_CREATE_HTMLPAGE, getLocale( ), model );
 
-        return getAdminPage( template.getHtml(  ) );
+        return getAdminPage( template.getHtml( ) );
     }
 
     /**
      * Process the data capture form of a new htmlpage
      *
-     * @param request The Http Request
+     * @param request
+     *            The Http Request
      * @return The Jsp URL of the process result
      */
     public String doCreateHtmlPage( HttpServletRequest request )
@@ -180,12 +182,12 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
         String strRole = request.getParameter( PARAMETER_HTMLPAGE_ROLE );
 
         // Mandatory fields
-        if ( ( strDescription == null ) || strDescription.trim(  ).equals( "" ) )
+        if ( ( strDescription == null ) || strDescription.trim( ).equals( "" ) )
         {
             return AdminMessageService.getMessageUrl( request, Messages.MANDATORY_FIELDS, AdminMessage.TYPE_STOP );
         }
 
-        HtmlPage htmlpage = new HtmlPage(  );
+        HtmlPage htmlpage = new HtmlPage( );
 
         htmlpage.setDescription( strDescription );
         htmlpage.setHtmlContent( strHtmlContent );
@@ -193,7 +195,7 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
         htmlpage.setWorkgroup( strWorkgroup );
         htmlpage.setRole( strRole );
 
-        HtmlPageHome.create( htmlpage, getPlugin(  ) );
+        HtmlPageHome.create( htmlpage, getPlugin( ) );
 
         // if the operation occurred well, redirects towards the list of the HtmlPages
         return JSP_REDIRECT_TO_MANAGE_HTMLPAGE;
@@ -202,23 +204,24 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
     /**
      * Process the data capture form of a new htmlpage from copy of other
      *
-     * @param request The Http Request
+     * @param request
+     *            The Http Request
      * @return The Jsp URL of the process result
      */
     public String doDuplicateHtmlPage( HttpServletRequest request )
     {
         int nId = Integer.parseInt( request.getParameter( PARAMETER_HTMLPAGE_ID ) );
 
-        HtmlPage htmlpage = HtmlPageHome.findByPrimaryKey( nId, getPlugin(  ) );
+        HtmlPage htmlpage = HtmlPageHome.findByPrimaryKey( nId, getPlugin( ) );
 
-        HtmlPage duplicateHtmlPage = new HtmlPage(  );
-        duplicateHtmlPage.setDescription( htmlpage.getDescription(  ) );
-        duplicateHtmlPage.setHtmlContent( htmlpage.getHtmlContent(  ) );
-        duplicateHtmlPage.setStatus( htmlpage.getStatus(  ) );
-        duplicateHtmlPage.setWorkgroup( htmlpage.getWorkgroup(  ) );
-        duplicateHtmlPage.setRole( htmlpage.getRole(  ) );
+        HtmlPage duplicateHtmlPage = new HtmlPage( );
+        duplicateHtmlPage.setDescription( htmlpage.getDescription( ) );
+        duplicateHtmlPage.setHtmlContent( htmlpage.getHtmlContent( ) );
+        duplicateHtmlPage.setStatus( htmlpage.getStatus( ) );
+        duplicateHtmlPage.setWorkgroup( htmlpage.getWorkgroup( ) );
+        duplicateHtmlPage.setRole( htmlpage.getRole( ) );
 
-        HtmlPageHome.create( duplicateHtmlPage, getPlugin(  ) );
+        HtmlPageHome.create( duplicateHtmlPage, getPlugin( ) );
 
         // if the operation occurred well, redirects towards the list of the HtmlPages
         return JSP_REDIRECT_TO_MANAGE_HTMLPAGE;
@@ -227,7 +230,8 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
     /**
      * Returns the form to update info about a htmlPage
      *
-     * @param request The Http request
+     * @param request
+     *            The Http request
      * @return The HTML form to update info
      */
     public String getModifyHtmlPage( HttpServletRequest request )
@@ -235,46 +239,46 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
         setPageTitleProperty( PROPERTY_PAGE_TITLE_MODIFY );
 
         int nId = Integer.parseInt( request.getParameter( PARAMETER_HTMLPAGE_ID ) );
-        HtmlPage htmlPage = HtmlPageHome.findByPrimaryKey( nId, getPlugin(  ) );
+        HtmlPage htmlPage = HtmlPageHome.findByPrimaryKey( nId, getPlugin( ) );
 
-        Map<String, Object> model = new HashMap<String, Object>(  );
-        ReferenceList workgroupsList = AdminWorkgroupService.getUserWorkgroups( getUser(  ), getLocale(  ) );
+        Map<String, Object> model = new HashMap<>( );
+        ReferenceList workgroupsList = AdminWorkgroupService.getUserWorkgroups( getUser( ), getLocale( ) );
         model.put( MARK_WORKGROUPS_LIST, workgroupsList );
         model.put( MARK_WEBAPP_URL, AppPathService.getBaseUrl( request ) );
-        model.put( MARK_LOCALE, getLocale(  ) );
+        model.put( MARK_LOCALE, getLocale( ) );
         model.put( MARK_HTMLPAGE, htmlPage );
-        model.put( MARK_ROLES_LIST, RoleHome.getRolesList(  ) );
+        model.put( MARK_ROLES_LIST, RoleHome.getRolesList( ) );
 
-        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_MODIFY_HTMLPAGE, getLocale(  ), model );
+        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_MODIFY_HTMLPAGE, getLocale( ), model );
 
-        return getAdminPage( template.getHtml(  ) );
+        return getAdminPage( template.getHtml( ) );
     }
 
     /**
      * Process the change form of a htmlPage
      *
-     * @param request The Http request
+     * @param request
+     *            The Http request
      * @return The Jsp URL of the process result
      */
     public String doModifyHtmlPage( HttpServletRequest request )
     {
         // Mandatory fields
-        if ( request.getParameter( PARAMETER_HTMLPAGE_DESCRIPTION ).equals( "" ) ||
-                request.getParameter( PARAMETER_HTMLPAGE_HTML_CONTENT ).equals( "" ) )
+        if ( request.getParameter( PARAMETER_HTMLPAGE_DESCRIPTION ).equals( "" ) || request.getParameter( PARAMETER_HTMLPAGE_HTML_CONTENT ).equals( "" ) )
         {
             return AdminMessageService.getMessageUrl( request, Messages.MANDATORY_FIELDS, AdminMessage.TYPE_STOP );
         }
 
         int nId = Integer.parseInt( request.getParameter( PARAMETER_HTMLPAGE_ID ) );
 
-        HtmlPage htmlPage = HtmlPageHome.findByPrimaryKey( nId, getPlugin(  ) );
+        HtmlPage htmlPage = HtmlPageHome.findByPrimaryKey( nId, getPlugin( ) );
         htmlPage.setDescription( request.getParameter( PARAMETER_HTMLPAGE_DESCRIPTION ) );
         htmlPage.setHtmlContent( request.getParameter( PARAMETER_HTMLPAGE_HTML_CONTENT ) );
         htmlPage.setStatus( Integer.parseInt( request.getParameter( PARAMETER_HTMLPAGE_STATUS ) ) );
         htmlPage.setWorkgroup( request.getParameter( PARAMETER_HTMLPAGE_WORKGROUP ) );
         htmlPage.setRole( request.getParameter( PARAMETER_HTMLPAGE_ROLE ) );
 
-        HtmlPageHome.update( htmlPage, getPlugin(  ) );
+        HtmlPageHome.update( htmlPage, getPlugin( ) );
 
         // if the operation occurred well, redirects towards the list of the HtmlPages
         return JSP_REDIRECT_TO_MANAGE_HTMLPAGE;
@@ -283,7 +287,8 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
     /**
      * Manages the removal form of a htmlPage whose identifier is in the http request
      *
-     * @param request The Http request
+     * @param request
+     *            The Http request
      * @return the html code to confirm
      */
     public String getConfirmRemoveHtmlPage( HttpServletRequest request )
@@ -294,24 +299,26 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
         url.addParameter( PARAMETER_HTMLPAGE_ID, nIdHtmlPage );
         url.addParameter( PARAMETER_ID_HTMLPAGE_LIST, request.getParameter( PARAMETER_ID_HTMLPAGE_LIST ) );
 
-        Object[] args = { request.getParameter( PARAMETER_HTMLPAGE_DESCRIPTION ) };
+        Object [ ] args = {
+                request.getParameter( PARAMETER_HTMLPAGE_DESCRIPTION )
+        };
 
-        return AdminMessageService.getMessageUrl( request, MESSAGE_CONFIRM_REMOVE_HTMLPAGE, args, url.getUrl(  ),
-            AdminMessage.TYPE_CONFIRMATION );
+        return AdminMessageService.getMessageUrl( request, MESSAGE_CONFIRM_REMOVE_HTMLPAGE, args, url.getUrl( ), AdminMessage.TYPE_CONFIRMATION );
     }
 
     /**
      * Treats the removal form of a htmlPage
      *
-     * @param request The Http request
+     * @param request
+     *            The Http request
      * @return the jsp URL to display the form to manage htmlPages
      */
     public String doRemoveHtmlPage( HttpServletRequest request )
     {
         int nIdHtmlPage = Integer.parseInt( request.getParameter( PARAMETER_HTMLPAGE_ID ) );
 
-        HtmlPage htmlPage = HtmlPageHome.findByPrimaryKey( nIdHtmlPage, getPlugin(  ) );
-        HtmlPageHome.remove( htmlPage, getPlugin(  ) );
+        HtmlPage htmlPage = HtmlPageHome.findByPrimaryKey( nIdHtmlPage, getPlugin( ) );
+        HtmlPageHome.remove( htmlPage, getPlugin( ) );
 
         // if the operation occurred well, redirects towards the list of the HtmlPages
         return JSP_REDIRECT_TO_MANAGE_HTMLPAGE;
