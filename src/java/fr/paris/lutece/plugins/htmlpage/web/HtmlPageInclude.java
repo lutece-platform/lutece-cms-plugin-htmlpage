@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -51,34 +51,37 @@ public class HtmlPageInclude implements PageInclude
 {
     /////////////////////////////////////////////////////////////////////////////////////////////
     // Constants
- 
+
     // Markers
     private static final String MARK_HTMLPAGE_MARKER_PREFIX = "htmlpage_";
-    
 
     /**
      * Substitue specific Freemarker markers in the page template.
-     * @param rootModel the HashMap containing markers to substitute
-     * @param data A PageData object containing applications data
-     * @param nMode The current mode
-     * @param request The HTTP request
+     * 
+     * @param rootModel
+     *            the HashMap containing markers to substitute
+     * @param data
+     *            A PageData object containing applications data
+     * @param nMode
+     *            The current mode
+     * @param request
+     *            The HTTP request
      */
     public void fillTemplate( Map<String, Object> rootModel, PageData data, int nMode, HttpServletRequest request )
     {
         if ( request != null )
         {
-            Plugin plugin = PluginService.getPlugin( HtmlPagePlugin.PLUGIN_NAME );                  
+            Plugin plugin = PluginService.getPlugin( HtmlPagePlugin.PLUGIN_NAME );
 
             for ( HtmlPage htmlpage : HtmlPageHome.findAll( plugin ) )
             {
-                int nStatus = htmlpage.getStatus(  );
-                if ( ( nStatus == 0 ) && ( HtmlPageUtil.isVisible( request, htmlpage.getRole(  ) ) ) )
+                int nStatus = htmlpage.getStatus( );
+                if ( ( nStatus == 0 ) && ( HtmlPageUtil.isVisible( request, htmlpage.getRole( ) ) ) )
                 {
-                    rootModel.put( MARK_HTMLPAGE_MARKER_PREFIX + htmlpage.getId(), htmlpage.getHtmlContent() );
+                    rootModel.put( MARK_HTMLPAGE_MARKER_PREFIX + htmlpage.getId( ), htmlpage.getHtmlContent( ) );
                 }
             }
         }
     }
 
 }
-
