@@ -1,23 +1,16 @@
 <#include "/admin/util/editor/editor.html" />
-<div class="row">
-	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-		<div class="box box-primary">
-			<div class="box-header">
-				<h3 class="box-title">#i18n{htmlpage.modify_htmlpage.tableLabel}</h3>
-			</div>
-			<div class="box-body">	
-				<form class="form-horizontal" method="post"  name="modify_htmlpage" id="modify_htmlpage" action="jsp/admin/plugins/htmlpage/DoModifyHtmlPage.jsp">
-					<input type="hidden" name="id_htmlpage" value="${htmlpage.id}">
-					<div class="form-group">
-					<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="description" >#i18n{htmlpage.modify_htmlpage.rowTitleLabel} *</label> 
-						<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-							<input type="text" class="form-control input-sm" id="description" name="description" size="60" maxlength="50" tabindex="1" value="${htmlpage.description}">
-						</div>
-					</div>
-					<div class="form-group">
-					<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="status">#i18n{htmlpage.modify_htmlpage.labelStatus}</label>
-						<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-						<select id="status" class="form-control input-sm" name="status" tabindex="2">
+<@row>
+	<@columns>
+		<@box>
+			<@boxHeader title='#i18n{htmlpage.modify_htmlpage.tableLabel}' />
+			<@boxBody>
+				<@tform method='post' name='modify_htmlpage' id='modify_htmlpage' action='jsp/admin/plugins/htmlpage/DoModifyHtmlPage.jsp'>
+					<@input type='hidden' name='id_htmlpage' value='${htmlpage.id}' />
+					<@formGroup labelFor='description' labelKey='#i18n{htmlpage.modify_htmlpage.rowTitleLabel}' mandatory=true>
+						<@input type='text' id='description' name='description' inputSize=60 maxlength=50 value='${htmlpage.description}' />
+					</@formGroup>
+					<@formGroup labelFor='status' labelKey='#i18n{htmlpage.modify_htmlpage.labelStatus}'>
+						<@select id='status' name='status'>
 							<#if htmlpage.status == 0 >
 								<option value="0" selected="selected" >#i18n{htmlpage.modify_htmlpage.statusLabelEnabled}</option>
 								<option value="1" >#i18n{htmlpage.modify_htmlpage.statusLabelDisabled}</option>
@@ -25,40 +18,24 @@
 								<option value="0" >#i18n{htmlpage.modify_htmlpage.statusLabelEnabled}</option>
 								<option value="1" selected="selected" >#i18n{htmlpage.modify_htmlpage.statusLabelDisabled}</option>
 							</#if> 
-						</select>
-					 </div>
-					</div>       
-					<div class="form-group">
-					<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="workgroup" >#i18n{htmlpage.modify_htmlpage.labelWorkgroupKey}*</label>
-						<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-							<@comboWithParams name="workgroup" default_value="${htmlpage.workgroup}" additionalParameters="class=\"form-control input-sm\"" items=workgroups_list />
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="role" >#i18n{htmlpage.modify_htmlpage.labelRole}*</label>
-							<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-								<@comboWithParams name="role" default_value="${htmlpage.role}" additionalParameters="class=\"form-control input-sm\"" items=roles_list />
-							</div>
-					</div>
-					<div class="form-group">
-					<label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3">#i18n{htmlpage.modify_htmlpage.labelHtmlContent}</label>
-						<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-							<textarea id="html_content" class="richtext form-control input-sm" name="html_content" rows="20" tabindex="2">${htmlpage.htmlContent}</textarea>
-						</div>
-					</div>
-					<div class="form-group">
-						<div class="col-xs-12 col-sm-12 col-md-offset-3 col-md-6 col-lg-offset-3 col-lg-6">
-							<button class="btn btn-primary btn-flat" type="submit" >
-								<i class="glyphicon glyphicon-ok"></i> #i18n{htmlpage.modify_htmlpage.buttonModify}
-							</button>
-							<a class="btn btn-default btn-flat" href="jsp/admin/plugins/htmlpage/ManageHtmlPage.jsp">
-								<i class="fa fa-close"></i>&nbsp;#i18n{portal.admin.message.buttonCancel}
-							</a>
-						</div>
-					</div>
-				</form>
-			</div>
-		</div>
-	</div>
-</div>
+						</@select>
+					</@formGroup>
+					<@formGroup labelFor='workgroup' labelKey='#i18n{htmlpage.modify_htmlpage.labelWorkgroupKey}' mandatory=true>
+						<@select name='workgroup' default_value='${htmlpage.workgroup}' items=workgroups_list />
+					</@formGroup>
+					<@formGroup labelFor='role' labelKey='#i18n{htmlpage.modify_htmlpage.labelRole}' mandatory=true>
+						<@select name='role' default_value='${htmlpage.role}' items=roles_list />
+					</@formGroup>
+					<@formGroup labelKey='#i18n{htmlpage.modify_htmlpage.labelHtmlContent}'>
+						<@input type='textarea' id='html_content' richtext=true name='html_content' rows=20>${htmlpage.htmlContent}</@input>
+					</@formGroup>
+					<@formGroup>
+						<@button type='submit' title='#i18n{htmlpage.modify_htmlpage.buttonModify}' buttonIcon='check' />
+						<@aButton href='jsp/admin/plugins/htmlpage/ManageHtmlPage.jsp' title='#i18n{portal.admin.message.buttonCancel}' buttonIcon='times' color='default' />
+					</@formGroup>
+				</@tform>
+			</@boxBody>
+		</@box>
+	</@columns>
+</@row>
 <@initEditor />
