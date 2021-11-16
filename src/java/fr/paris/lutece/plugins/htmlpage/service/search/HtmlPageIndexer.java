@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2021, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -65,7 +65,6 @@ import org.apache.tika.sax.BodyContentHandler;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
-
 /**
  * Indexer service for htmlPage Xpages
  */
@@ -75,7 +74,7 @@ public class HtmlPageIndexer implements SearchIndexer
     public static final String PROPERTY_INDEXER_NAME = "htmlpage.indexer.name";
     private static final String ENABLE_VALUE_TRUE = "1";
 
-    //    private static final String PROPERTY_PAGE_PATH_LABEL = "htmlpage.pagePathLabel";
+    // private static final String PROPERTY_PAGE_PATH_LABEL = "htmlpage.pagePathLabel";
     private static final String PROPERTY_INDEXER_DESCRIPTION = "htmlpage.indexer.description";
     private static final String PROPERTY_INDEXER_VERSION = "htmlpage.indexer.version";
     private static final String PROPERTY_INDEXER_ENABLE = "htmlpage.indexer.enable";
@@ -85,6 +84,7 @@ public class HtmlPageIndexer implements SearchIndexer
 
     /**
      * Returns the indexer service description
+     * 
      * @return The indexer service description
      */
     public String getDescription( )
@@ -94,9 +94,13 @@ public class HtmlPageIndexer implements SearchIndexer
 
     /**
      * Index all enabled HtmlPage
-     * @throws IOException exception
-     * @throws InterruptedException exception
-     * @throws SiteMessageException exception
+     * 
+     * @throws IOException
+     *             exception
+     * @throws InterruptedException
+     *             exception
+     * @throws SiteMessageException
+     *             exception
      */
     public void indexDocuments( ) throws IOException, InterruptedException, SiteMessageException
     {
@@ -118,7 +122,9 @@ public class HtmlPageIndexer implements SearchIndexer
 
     /**
      * Return a list of lucene document for incremental indexing
-     * @param strId the uid of the document
+     * 
+     * @param strId
+     *            the uid of the document
      * @return listDocuments the document list
      */
     public List<Document> getDocuments( String strId ) throws IOException, InterruptedException, SiteMessageException
@@ -139,7 +145,7 @@ public class HtmlPageIndexer implements SearchIndexer
             {
                 docHtmlPage = getDocument( htmlpage, url.getUrl( ), plugin );
             }
-            catch ( Exception e )
+            catch( Exception e )
             {
                 String strMessage = "HtmlPage ID : " + htmlpage.getId( );
                 IndexationService.error( this, e, strMessage );
@@ -176,8 +182,7 @@ public class HtmlPageIndexer implements SearchIndexer
         boolean bReturn = false;
         String strEnable = AppPropertiesService.getProperty( PROPERTY_INDEXER_ENABLE );
 
-        if ( ( strEnable != null )
-                && ( strEnable.equalsIgnoreCase( Boolean.TRUE.toString( ) ) || strEnable.equals( ENABLE_VALUE_TRUE ) )
+        if ( ( strEnable != null ) && ( strEnable.equalsIgnoreCase( Boolean.TRUE.toString( ) ) || strEnable.equals( ENABLE_VALUE_TRUE ) )
                 && PluginService.isPluginEnable( HtmlPagePlugin.PLUGIN_NAME ) )
         {
             bReturn = true;
@@ -187,25 +192,29 @@ public class HtmlPageIndexer implements SearchIndexer
     }
 
     /**
-     * Builds a document which will be used by Lucene during the indexing of the
-     * pages of the site with the following
-     * fields : summary, uid, url, contents, title and description.
+     * Builds a document which will be used by Lucene during the indexing of the pages of the site with the following fields : summary, uid, url, contents,
+     * title and description.
+     * 
      * @return the built Document
-     * @param strUrl The base URL for documents
-     * @param htmlpage the page to index
-     * @param plugin The {@link Plugin}
-     * @throws IOException The IO Exception
-     * @throws InterruptedException The InterruptedException
-     * @throws SiteMessageException occurs when a site message need to be
-     *             displayed
+     * @param strUrl
+     *            The base URL for documents
+     * @param htmlpage
+     *            the page to index
+     * @param plugin
+     *            The {@link Plugin}
+     * @throws IOException
+     *             The IO Exception
+     * @throws InterruptedException
+     *             The InterruptedException
+     * @throws SiteMessageException
+     *             occurs when a site message need to be displayed
      */
-    private Document getDocument( HtmlPage htmlpage, String strUrl, Plugin plugin ) throws IOException,
-            InterruptedException, SiteMessageException
+    private Document getDocument( HtmlPage htmlpage, String strUrl, Plugin plugin ) throws IOException, InterruptedException, SiteMessageException
     {
         // make a new, empty document
         org.apache.lucene.document.Document doc = new org.apache.lucene.document.Document( );
 
-        // Add the url as a field named "url".  Use an UnIndexed field, so
+        // Add the url as a field named "url". Use an UnIndexed field, so
         // that the url is just stored with the question/answer, but is not searchable.
         doc.add( new Field( SearchItem.FIELD_URL, strUrl, TextField.TYPE_STORED ) );
 
@@ -220,20 +229,19 @@ public class HtmlPageIndexer implements SearchIndexer
         Metadata metadata = new Metadata( );
         try
         {
-            new HtmlParser( ).parse( new ByteArrayInputStream( strContentToIndex.getBytes( ) ), handler, metadata,
-                    new ParseContext( ) );
+            new HtmlParser( ).parse( new ByteArrayInputStream( strContentToIndex.getBytes( ) ), handler, metadata, new ParseContext( ) );
         }
-        catch ( SAXException e )
+        catch( SAXException e )
         {
             throw new AppException( "Error during page parsing." );
         }
-        catch ( TikaException e )
+        catch( TikaException e )
         {
             throw new AppException( "Error during page parsing." );
         }
 
-        //the content of the article is recovered in the parser because this one
-        //had replaced the encoded caracters (as &eacute;) by the corresponding special caracter (as ?)
+        // the content of the article is recovered in the parser because this one
+        // had replaced the encoded caracters (as &eacute;) by the corresponding special caracter (as ?)
         StringBuilder sb = new StringBuilder( handler.toString( ) );
 
         doc.add( new Field( SearchItem.FIELD_CONTENTS, sb.toString( ), TextField.TYPE_NOT_STORED ) );
@@ -250,14 +258,16 @@ public class HtmlPageIndexer implements SearchIndexer
 
     /**
      * Set the Content to index
-     * @param htmlpage The htmlpage to index
+     * 
+     * @param htmlpage
+     *            The htmlpage to index
      * @return The content to index
      */
     private static String getContentToIndex( HtmlPage htmlpage )
     {
         StringBuffer sbContentToIndex = new StringBuffer( );
 
-        //index the title
+        // index the title
         sbContentToIndex.append( htmlpage.getDescription( ) );
 
         sbContentToIndex.append( " " );

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2021, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,23 +35,22 @@ package fr.paris.lutece.plugins.htmlpage.service;
 
 import fr.paris.lutece.plugins.htmlpage.business.HtmlPage;
 
-
 /**
- * This Service manages contactListt actions (create, delete, modify ...)
- * and notify listeners.
+ * This Service manages contactListt actions (create, delete, modify ...) and notify listeners.
+ * 
  * @author lenaini
  */
 public class HtmlPageService
 {
-    private static HtmlPageService _singleton = new HtmlPageService(  );
+    private static HtmlPageService _singleton = new HtmlPageService( );
 
     /**
-    * Initializes the Housing service
-    *
-    */
-    public void init(  )
+     * Initializes the Housing service
+     *
+     */
+    public void init( )
     {
-        HtmlPage.init(  );
+        HtmlPage.init( );
     }
 
     /**
@@ -59,10 +58,9 @@ public class HtmlPageService
      *
      * @return The instance of the singleton
      */
-    public static HtmlPageService getInstance(  )
+    public static HtmlPageService getInstance( )
     {
         return _singleton;
     }
-
 
 }

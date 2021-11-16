@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2021, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -43,9 +43,9 @@ import fr.paris.lutece.portal.service.search.IndexationService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 
-
 /**
  * This class provides instances management methods (create, find, ...) for Htmlpage objects
+ * 
  * @author lenaini
  */
 public class HtmlPageHome
@@ -56,27 +56,29 @@ public class HtmlPageHome
     /**
      * Private constructor - this class need not be instantiated
      */
-    private HtmlPageHome(  )
+    private HtmlPageHome( )
     {
     }
 
     /**
-      * Creation of an instance of htmlpage
-      *
-      * @param htmlpage The instance of the htmlpage which contains the informations to store
-      * @param plugin The Plugin object
-      * @return The  instance of htmlpage which has been created with its primary key.
-      */
+     * Creation of an instance of htmlpage
+     *
+     * @param htmlpage
+     *            The instance of the htmlpage which contains the informations to store
+     * @param plugin
+     *            The Plugin object
+     * @return The instance of htmlpage which has been created with its primary key.
+     */
     public static HtmlPage create( HtmlPage htmlpage, Plugin plugin )
     {
         _dao.insert( htmlpage, plugin );
 
-        if ( htmlpage.isEnabled(  ) )
+        if ( htmlpage.isEnabled( ) )
         {
-        	String strIdHtmlPage = Integer.toString( htmlpage.getId(  ) );
-            IndexationService.addIndexerAction( strIdHtmlPage,
-                AppPropertiesService.getProperty( HtmlPageIndexer.PROPERTY_INDEXER_NAME ), IndexerAction.TASK_CREATE );
-            
+            String strIdHtmlPage = Integer.toString( htmlpage.getId( ) );
+            IndexationService.addIndexerAction( strIdHtmlPage, AppPropertiesService.getProperty( HtmlPageIndexer.PROPERTY_INDEXER_NAME ),
+                    IndexerAction.TASK_CREATE );
+
             HtmlPageIndexerUtils.addIndexerAction( strIdHtmlPage, IndexerAction.TASK_CREATE );
         }
 
@@ -86,30 +88,31 @@ public class HtmlPageHome
     /**
      * Update of the htmlpage which is specified in parameter
      *
-     * @param htmlpage The instance of the htmlpage which contains the data to store
-     * @param plugin The Plugin object
-     * @return The instance of the  htmlpage which has been updated
+     * @param htmlpage
+     *            The instance of the htmlpage which contains the data to store
+     * @param plugin
+     *            The Plugin object
+     * @return The instance of the htmlpage which has been updated
      */
     public static HtmlPage update( HtmlPage htmlpage, Plugin plugin )
     {
-    	String strIdHtmlPage = Integer.toString( htmlpage.getId(  ) );
-        if ( htmlpage.isEnabled(  ) )
+        String strIdHtmlPage = Integer.toString( htmlpage.getId( ) );
+        if ( htmlpage.isEnabled( ) )
         {
-            IndexationService.addIndexerAction( strIdHtmlPage,
-                AppPropertiesService.getProperty( HtmlPageIndexer.PROPERTY_INDEXER_NAME ), IndexerAction.TASK_MODIFY );
-            
+            IndexationService.addIndexerAction( strIdHtmlPage, AppPropertiesService.getProperty( HtmlPageIndexer.PROPERTY_INDEXER_NAME ),
+                    IndexerAction.TASK_MODIFY );
+
             HtmlPageIndexerUtils.addIndexerAction( strIdHtmlPage, IndexerAction.TASK_MODIFY );
         }
         else
         {
-            HtmlPage oldPage = findEnabledHtmlPage( htmlpage.getId(  ), plugin );
+            HtmlPage oldPage = findEnabledHtmlPage( htmlpage.getId( ), plugin );
 
             if ( oldPage != null )
             {
-                IndexationService.addIndexerAction( strIdHtmlPage + "_" +
-                    HtmlPageIndexer.SHORT_NAME,
-                    AppPropertiesService.getProperty( HtmlPageIndexer.PROPERTY_INDEXER_NAME ), IndexerAction.TASK_DELETE );
-                
+                IndexationService.addIndexerAction( strIdHtmlPage + "_" + HtmlPageIndexer.SHORT_NAME,
+                        AppPropertiesService.getProperty( HtmlPageIndexer.PROPERTY_INDEXER_NAME ), IndexerAction.TASK_DELETE );
+
                 HtmlPageIndexerUtils.addIndexerAction( strIdHtmlPage, IndexerAction.TASK_DELETE );
             }
         }
@@ -121,20 +124,22 @@ public class HtmlPageHome
 
     /**
      * Remove the Htmlpage whose identifier is specified in parameter
-     * @param htmlpage The Htmlpage object to remove
-     * @param plugin The Plugin object
+     * 
+     * @param htmlpage
+     *            The Htmlpage object to remove
+     * @param plugin
+     *            The Plugin object
      */
     public static void remove( HtmlPage htmlpage, Plugin plugin )
     {
         _dao.delete( htmlpage, plugin );
 
-        if ( htmlpage.isEnabled(  ) )
+        if ( htmlpage.isEnabled( ) )
         {
-        	String strIdHtmlPage = Integer.toString( htmlpage.getId(  ) );
-            IndexationService.addIndexerAction( strIdHtmlPage + "_" +
-                HtmlPageIndexer.SHORT_NAME, AppPropertiesService.getProperty( HtmlPageIndexer.PROPERTY_INDEXER_NAME ),
-                IndexerAction.TASK_DELETE );
-            
+            String strIdHtmlPage = Integer.toString( htmlpage.getId( ) );
+            IndexationService.addIndexerAction( strIdHtmlPage + "_" + HtmlPageIndexer.SHORT_NAME,
+                    AppPropertiesService.getProperty( HtmlPageIndexer.PROPERTY_INDEXER_NAME ), IndexerAction.TASK_DELETE );
+
             HtmlPageIndexerUtils.addIndexerAction( strIdHtmlPage, IndexerAction.TASK_DELETE );
         }
     }
@@ -144,8 +149,11 @@ public class HtmlPageHome
 
     /**
      * Returns an instance of a htmlpage whose identifier is specified in parameter
-     * @param nKey The Primary key of the htmlpage
-     * @param plugin The Plugin object
+     * 
+     * @param nKey
+     *            The Primary key of the htmlpage
+     * @param plugin
+     *            The Plugin object
      * @return An instance of htmlpage
      */
     public static HtmlPage findByPrimaryKey( int nKey, Plugin plugin )
@@ -155,7 +163,9 @@ public class HtmlPageHome
 
     /**
      * Returns a collection of htmlpages objects
-     * @param plugin The Plugin object
+     * 
+     * @param plugin
+     *            The Plugin object
      * @return A collection of htmlpages
      */
     public static Collection<HtmlPage> findAll( Plugin plugin )
@@ -164,9 +174,12 @@ public class HtmlPageHome
     }
 
     /**
-     * Returns  htmlpage object with valid status
-     * @param nKey the page id
-     * @param plugin The Plugin object
+     * Returns htmlpage object with valid status
+     * 
+     * @param nKey
+     *            the page id
+     * @param plugin
+     *            The Plugin object
      * @return A htmlpage
      */
     public static HtmlPage findEnabledHtmlPage( int nKey, Plugin plugin )
@@ -176,7 +189,9 @@ public class HtmlPageHome
 
     /**
      * Returns a collection of htmlpages objects with valid status
-     * @param plugin The Plugin object
+     * 
+     * @param plugin
+     *            The Plugin object
      * @return A collection of htmlpages
      */
     public static Collection<HtmlPage> findEnabledHtmlPageList( Plugin plugin )

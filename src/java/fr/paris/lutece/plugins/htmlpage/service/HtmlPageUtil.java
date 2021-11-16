@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2021, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -48,23 +48,24 @@ public class HtmlPageUtil
 
     /**
      * Checks if the page is visible for the current user
-     * @param request The HTTP request
+     * 
+     * @param request
+     *            The HTTP request
      * @return true if the page could be shown to the user
      */
     public static boolean isVisible( HttpServletRequest request, String strRole )
     {
-        if ( ( strRole == null ) || ( strRole.trim(  ).equals( EMPTY_STRING ) ) )
+        if ( ( strRole == null ) || ( strRole.trim( ).equals( EMPTY_STRING ) ) )
         {
             return true;
         }
 
-        if ( !strRole.equals( HtmlPage.ROLE_NONE ) && SecurityService.isAuthenticationEnable(  ) )
+        if ( !strRole.equals( HtmlPage.ROLE_NONE ) && SecurityService.isAuthenticationEnable( ) )
         {
-            return SecurityService.getInstance(  ).isUserInRole( request, strRole );
+            return SecurityService.getInstance( ).isUserInRole( request, strRole );
         }
 
         return true;
     }
-
 
 }

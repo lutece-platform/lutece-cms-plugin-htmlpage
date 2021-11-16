@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2021, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -59,7 +59,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 
-
 /**
  * This class manages HtmlPage page.
  */
@@ -106,13 +105,15 @@ public class HtmlPageApp implements XPageApplication
     }
 
     /**
-     * Returns the content of the page HtmlPage. It is composed by a form which
-     * to capture the data to send a message to
-     * a contact of the portal.
+     * Returns the content of the page HtmlPage. It is composed by a form which to capture the data to send a message to a contact of the portal.
+     * 
      * @return the Content of the page Contact
-     * @param request The http request
-     * @param nMode The current mode
-     * @param plugin The plugin object
+     * @param request
+     *            The http request
+     * @param nMode
+     *            The current mode
+     * @param plugin
+     *            The plugin object
      * @throws fr.paris.lutece.portal.service.message.SiteMessageException
      *             Message displayed if an exception occures
      */
@@ -158,8 +159,7 @@ public class HtmlPageApp implements XPageApplication
         model.put( MARK_RESULT, listResults );
         model.put( MARK_QUERY, strQuery );
 
-        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_XPAGE_HTMLPAGE_LISTS, request.getLocale( ),
-                model );
+        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_XPAGE_HTMLPAGE_LISTS, request.getLocale( ), model );
         return template.getHtml( );
     }
 
@@ -180,16 +180,18 @@ public class HtmlPageApp implements XPageApplication
 
         model.put( MARK_HTMLPAGE_LIST, visibleHtmlPageList );
 
-        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_XPAGE_HTMLPAGE_LISTS, request.getLocale( ),
-                model );
+        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_XPAGE_HTMLPAGE_LISTS, request.getLocale( ), model );
 
         return template.getHtml( );
     }
 
     /**
      * Returns the htmlpage page
-     * @param request The Html request
-     * @param plugin The plugin
+     * 
+     * @param request
+     *            The Html request
+     * @param plugin
+     *            The plugin
      * @return The Html template
      */
     private String getHtmlPage( HttpServletRequest request, String strHtmlPageId ) throws SiteMessageException

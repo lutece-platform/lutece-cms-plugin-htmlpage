@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2021, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -13,7 +13,7 @@
  *     and the following disclaimer in the documentation and/or other materials
  *     provided with the distribution.
  *
- *  3. Neither the description of 'Mairie de Paris' nor 'Lutece' nor the descriptions of its
+ *  3. Neither the name of 'Mairie de Paris' nor 'Lutece' nor the names of its
  *     contributors may be used to endorse or promote products derived from
  *     this software without specific prior written permission.
  *
@@ -38,9 +38,9 @@ import fr.paris.lutece.portal.service.workgroup.AdminWorkgroupResource;
 import fr.paris.lutece.portal.service.workgroup.AdminWorkgroupService;
 import fr.paris.lutece.portal.service.workgroup.WorkgroupRemovalListenerService;
 
-
 /**
  * This class represents business object HtmlPage
+ * 
  * @author lenaini
  */
 public class HtmlPage implements AdminWorkgroupResource
@@ -61,20 +61,20 @@ public class HtmlPage implements AdminWorkgroupResource
     private String _strRole;
 
     /** Creates a new instance of HtmlPage */
-    public HtmlPage(  )
+    public HtmlPage( )
     {
     }
 
     /**
-    * Initialize the HtmlPageList
-    */
-    public static void init(  )
+     * Initialize the HtmlPageList
+     */
+    public static void init( )
     {
         // Create removal listeners and register them
         if ( _listenerWorkgroup == null )
         {
-            _listenerWorkgroup = new HtmlPageWorkgroupRemovalListener(  );
-            WorkgroupRemovalListenerService.getService(  ).registerListener( _listenerWorkgroup );
+            _listenerWorkgroup = new HtmlPageWorkgroupRemovalListener( );
+            WorkgroupRemovalListenerService.getService( ).registerListener( _listenerWorkgroup );
         }
     }
 
@@ -83,7 +83,7 @@ public class HtmlPage implements AdminWorkgroupResource
      *
      * @return the htmlpage identifier
      */
-    public int getId(  )
+    public int getId( )
     {
         return _nId;
     }
@@ -91,7 +91,8 @@ public class HtmlPage implements AdminWorkgroupResource
     /**
      * Sets the identifier of the htmlpage to the specified integer.
      *
-     * @param nId the new identifier
+     * @param nId
+     *            the new identifier
      */
     public void setId( int nId )
     {
@@ -103,7 +104,7 @@ public class HtmlPage implements AdminWorkgroupResource
      *
      * @return the htmlpage description
      */
-    public String getDescription(  )
+    public String getDescription( )
     {
         return _strDescription;
     }
@@ -111,7 +112,8 @@ public class HtmlPage implements AdminWorkgroupResource
     /**
      * Sets the description of the htmlpage to the specified string.
      *
-     * @param strDescription the new description
+     * @param strDescription
+     *            the new description
      */
     public void setDescription( String strDescription )
     {
@@ -123,7 +125,7 @@ public class HtmlPage implements AdminWorkgroupResource
      *
      * @return the htmlpage htmlcontent
      */
-    public String getHtmlContent(  )
+    public String getHtmlContent( )
     {
         return _strHtmlContent;
     }
@@ -131,7 +133,8 @@ public class HtmlPage implements AdminWorkgroupResource
     /**
      * Sets the htmlcontent of the htmlpage to the specified string.
      *
-     * @param strHtmlContent the new htmlcontent
+     * @param strHtmlContent
+     *            the new htmlcontent
      */
     public void setHtmlContent( String strHtmlContent )
     {
@@ -143,7 +146,7 @@ public class HtmlPage implements AdminWorkgroupResource
      *
      * @return the htmlpage status
      */
-    public int getStatus(  )
+    public int getStatus( )
     {
         return _nStatus;
     }
@@ -151,7 +154,8 @@ public class HtmlPage implements AdminWorkgroupResource
     /**
      * Sets the description of the htmlpage to the specified string.
      *
-     * @param strDescription the new description
+     * @param strDescription
+     *            the new description
      */
     public void setStatus( int nStatus )
     {
@@ -160,17 +164,20 @@ public class HtmlPage implements AdminWorkgroupResource
 
     /**
      * Gets the contactList role
+     * 
      * @return contactList's role as a String
      * @since v1.1
      */
-    public String getRole(  )
+    public String getRole( )
     {
         return _strRole;
     }
 
     /**
      * allows the contact List to be saw by a role
-     * @param strRole The role that can see the contact list
+     * 
+     * @param strRole
+     *            The role that can see the contact list
      */
     public void setRole( String strRole )
     {
@@ -182,16 +189,19 @@ public class HtmlPage implements AdminWorkgroupResource
 
     /**
      * Return the WorkgroupKey Contact Label
+     * 
      * @return The label of the selected Workgroup Key
      */
-    public String getWorkgroupKey(  )
+    public String getWorkgroupKey( )
     {
         return _strWorkgroupKey;
     }
 
     /**
      * Sets the description of the Contact with the specified String
-     * @param strWorkgroupKey The workgroup key
+     * 
+     * @param strWorkgroupKey
+     *            The workgroup key
      */
     public void setWorkgroupKey( String strWorkgroupKey )
     {
@@ -200,23 +210,26 @@ public class HtmlPage implements AdminWorkgroupResource
 
     /**
      * Returns the workgroup
+     * 
      * @return The workgroup
      */
-    public String getWorkgroup(  )
+    public String getWorkgroup( )
     {
         return _strAdminWorkgroup;
     }
 
     /**
      * Sets the workgroup
-     * @param strAdminWorkgroup The workgroup
+     * 
+     * @param strAdminWorkgroup
+     *            The workgroup
      */
     public void setWorkgroup( String strAdminWorkgroup )
     {
         _strAdminWorkgroup = AdminWorkgroupService.normalizeWorkgroupKey( strAdminWorkgroup );
     }
 
-    public boolean isEnabled(  )
+    public boolean isEnabled( )
     {
         return ( _nStatus == ENABLED );
     }
