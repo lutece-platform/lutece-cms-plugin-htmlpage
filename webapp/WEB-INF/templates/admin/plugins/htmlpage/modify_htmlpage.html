@@ -2,7 +2,7 @@
 <@row>
 	<@columns>
 		<@box>
-			<@boxHeader title='#i18n{htmlpage.modify_htmlpage.tableLabel}' />
+			
 			<@boxBody>
 				<@tform method='post' name='modify_htmlpage' id='modify_htmlpage' action='jsp/admin/plugins/htmlpage/DoModifyHtmlPage.jsp'>
 					<@input type='hidden' name='id_htmlpage' value='${htmlpage.id}' />
@@ -30,8 +30,8 @@
 						<@input type='textarea' id='html_content' richtext=true name='html_content' rows=20>${htmlpage.htmlContent}</@input>
 					</@formGroup>
 					<@formGroup>
-						<@button type='submit' title='#i18n{htmlpage.modify_htmlpage.buttonModify}' buttonIcon='check' />
-						<@aButton href='jsp/admin/plugins/htmlpage/ManageHtmlPage.jsp' title='#i18n{portal.admin.message.buttonCancel}' buttonIcon='times' color='default' />
+						<@button type='submit' title='#i18n{htmlpage.modify_htmlpage.buttonModify}' buttonIcon='check' size='' />
+						<@aButton href='jsp/admin/plugins/htmlpage/ManageHtmlPage.jsp' title='#i18n{portal.admin.message.buttonCancel}' buttonIcon='times' color='default' size='' />
 					</@formGroup>
 				</@tform>
 			</@boxBody>
