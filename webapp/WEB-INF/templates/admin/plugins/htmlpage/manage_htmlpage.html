@@ -3,7 +3,7 @@
 		<@box>
 			<@boxHeader title='#i18n{htmlpage.manage_htmlpage.tableLabel}' skipHeader=true >
 				<@tform type='inline' method='post' action='jsp/admin/plugins/htmlpage/CreateHtmlPage.jsp'>
-					<@button type='submit' title='#i18n{htmlpage.manage_htmlpage.buttonAddHtmlPage}' buttonIcon='plus-square' size='sm' />
+					<@button type='submit' title='#i18n{htmlpage.manage_htmlpage.buttonAddHtmlPage}' hideTitle=['all'] buttonIcon='plus-square' size='sm' />
 				</@tform>
 			</@boxHeader>
 			<@boxBody>
@@ -23,13 +23,13 @@
 						<@td><strong><code class="copy-content"><#noparse>$</#noparse>{htmlpage_${htmlpage.id}!}</code></strong></@td>     
 						<@td><#if htmlpage.status == 0 ><@tag color='success'><@icon style='check' /> #i18n{portal.util.labelEnabled}</@tag><#else><@tag color='danger'><@icon style='times' /> #i18n{portal.util.labelDisabled}</@tag></#if></@td>
 						<@td>${htmlpage.workgroup}</@td>     
-						<@td>
+						<@td flex=true>
 							<@aButton href='jsp/admin/plugins/htmlpage/ModifyHtmlPage.jsp?id_htmlpage=${htmlpage.id}'  title='#i18n{htmlpage.manage_htmlpage.actionEdit}' buttonIcon='edit' size='sm' hideTitle=['all'] />
-							<@tform type='inline' method='post' action='jsp/admin/plugins/htmlpage/DoDuplicateHtmlPage.jsp'>
+							<@tform method='post' action='jsp/admin/plugins/htmlpage/DoDuplicateHtmlPage.jsp'>
 								<@input type='hidden' name='id_htmlpage' id='id_htmlpage' value='${htmlpage.id}' />
 								<@button type='submit' title='#i18n{htmlpage.manage_htmlpage.actionDuplicate}' buttonIcon='copy' hideTitle=['all'] size='sm' />
 							</@tform>
-							<@tform type='inline' method='post' action='jsp/admin/plugins/htmlpage/RemoveHtmlPage.jsp'>
+							<@tform method='post' action='jsp/admin/plugins/htmlpage/RemoveHtmlPage.jsp'>
 								<@input type='hidden' name='id_htmlpage' value='${htmlpage.id}' />
 								<@input type='hidden' name='description' value='${htmlpage.description}' />
 								<@button type='submit' title='#i18n{htmlpage.manage_htmlpage.actionDelete}' hideTitle=['all'] buttonIcon='trash' color='danger' size='sm' />
@@ -42,4 +42,4 @@
 		</@box>
 	</@columns>
 </@row>
-<@copyElementToClipboard />
+<@copyElementToClipboard selector='.copy-content' class='"copy-icon"' />
