@@ -2,6 +2,7 @@
 <@row>
 	<@columns>
 		<@box>
+			<@boxHeader title='#i18n{htmlpage.create_htmlpage.tableLabel}' skipHeader=true />
 			<@boxBody>
 				<@tform method='post' name='create_htmlpage' id='create_htmlpage' action='jsp/admin/plugins/htmlpage/DoCreateHtmlPage.jsp'>
 					<@formGroup labelFor='description' labelKey='#i18n{htmlpage.create_htmlpage.rowTitleLabel}' mandatory=true> 
@@ -23,13 +24,12 @@
 						<@input type='textarea' id='html_content' richtext=true name='html_content' rows=20>${html_content}</@input>
 					</@formGroup>
 					<@formGroup>
-						<@button type='submit' buttonIcon='check' title='#i18n{htmlpage.create_htmlpage.buttonValidate}' size='' />
-						<@aButton href='jsp/admin/plugins/htmlpage/ManageHtmlPage.jsp' buttonIcon='close' title='#i18n{portal.admin.message.buttonCancel}' color='default' size='' />
+						<@button type='submit' buttonIcon='check' title='#i18n{htmlpage.create_htmlpage.buttonValidate}' />
+						<@aButton href='jsp/admin/plugins/htmlpage/ManageHtmlPage.jsp' buttonIcon='close' title='#i18n{portal.admin.message.buttonCancel}' color='default' />
 					</@formGroup>
 				</@tform>
 			</@boxBody>
 		</@box>
 	</@columns>
 </@row>
-
 <@initEditor />
