@@ -79,7 +79,7 @@ public class HtmlPageSearchEngine implements SearchEngine
      */
     public List<SearchResult> getSearchResults( String strQuery, HttpServletRequest request )
     {
-        ArrayList<SearchItem> listResults = new ArrayList<SearchItem>( );
+        ArrayList<SearchItem> listResults = new ArrayList<>( );
         IndexSearcher searcher = null;
 
         try ( Directory directory = IndexationService.getDirectoryIndex( ) ; IndexReader ir = DirectoryReader.open( directory ) ; )
@@ -128,7 +128,7 @@ public class HtmlPageSearchEngine implements SearchEngine
      */
     private List<SearchResult> convertList( List<SearchItem> listSource )
     {
-        List<SearchResult> listDest = new ArrayList<SearchResult>( );
+        List<SearchResult> listDest = new ArrayList<>( );
 
         for ( SearchItem item : listSource )
         {

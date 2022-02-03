@@ -55,6 +55,7 @@ public class HtmlPagePlugin extends PluginDefaultImplementation
     /**
      * Initialize the plugin HtmlPage
      */
+    @Override
     public void init( )
     {
         HtmlPageService.getInstance( ).init( );

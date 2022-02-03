@@ -129,7 +129,7 @@ public class HtmlPageIndexer implements SearchIndexer
      */
     public List<Document> getDocuments( String strId ) throws IOException, InterruptedException, SiteMessageException
     {
-        ArrayList<org.apache.lucene.document.Document> listDocuments = new ArrayList<Document>( );
+        ArrayList<org.apache.lucene.document.Document> listDocuments = new ArrayList<>( );
         String strPortalUrl = AppPathService.getPortalUrl( );
         Plugin plugin = PluginService.getPlugin( HtmlPagePlugin.PLUGIN_NAME );
 
@@ -209,7 +209,7 @@ public class HtmlPageIndexer implements SearchIndexer
      * @throws SiteMessageException
      *             occurs when a site message need to be displayed
      */
-    private Document getDocument( HtmlPage htmlpage, String strUrl, Plugin plugin ) throws IOException, InterruptedException, SiteMessageException
+    private Document getDocument( HtmlPage htmlpage, String strUrl, Plugin plugin ) throws IOException
     {
         // make a new, empty document
         org.apache.lucene.document.Document doc = new org.apache.lucene.document.Document( );
@@ -231,11 +231,7 @@ public class HtmlPageIndexer implements SearchIndexer
         {
             new HtmlParser( ).parse( new ByteArrayInputStream( strContentToIndex.getBytes( ) ), handler, metadata, new ParseContext( ) );
         }
-        catch( SAXException e )
-        {
-            throw new AppException( "Error during page parsing." );
-        }
-        catch( TikaException e )
+        catch( SAXException | TikaException e )
         {
             throw new AppException( "Error during page parsing." );
         }
@@ -282,7 +278,7 @@ public class HtmlPageIndexer implements SearchIndexer
      */
     public List<String> getListType( )
     {
-        List<String> listType = new ArrayList<String>( );
+        List<String> listType = new ArrayList<>( );
         listType.add( HtmlPagePlugin.PLUGIN_NAME );
 
         return listType;
