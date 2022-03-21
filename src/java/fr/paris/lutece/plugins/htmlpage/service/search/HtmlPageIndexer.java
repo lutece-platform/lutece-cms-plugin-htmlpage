@@ -56,6 +56,8 @@ import java.util.List;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.FieldType;
+import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
@@ -211,18 +213,24 @@ public class HtmlPageIndexer implements SearchIndexer
      */
     private Document getDocument( HtmlPage htmlpage, String strUrl, Plugin plugin ) throws IOException, InterruptedException, SiteMessageException
     {
+    	  FieldType ft = new FieldType( StringField.TYPE_STORED );
+          ft.setOmitNorms( false );
+
+          FieldType ftNotStored = new FieldType( StringField.TYPE_NOT_STORED );
+          ftNotStored.setOmitNorms( false );
+          ftNotStored.setTokenized( false );
+
         // make a new, empty document
         org.apache.lucene.document.Document doc = new org.apache.lucene.document.Document( );
 
         // Add the url as a field named "url". Use an UnIndexed field, so
         // that the url is just stored with the question/answer, but is not searchable.
-        doc.add( new Field( SearchItem.FIELD_URL, strUrl, TextField.TYPE_STORED ) );
+        doc.add( new Field( SearchItem.FIELD_URL, strUrl, ft ) );
 
         // Add the uid as a field, so that index can be incrementally maintained.
         // This field is not stored with question/answer, it is indexed, but it is not
         // tokenized prior to indexing.
-        String strIdHtmlPage = String.valueOf( htmlpage.getId( ) );
-        doc.add( new Field( SearchItem.FIELD_UID, strIdHtmlPage + "_" + SHORT_NAME, TextField.TYPE_NOT_STORED ) );
+        doc.add( new Field( SearchItem.FIELD_UID, htmlpage.getId( ) + "_" + SHORT_NAME, ftNotStored) );
 
         String strContentToIndex = getContentToIndex( htmlpage );
         ContentHandler handler = new BodyContentHandler( );
@@ -248,9 +256,9 @@ public class HtmlPageIndexer implements SearchIndexer
 
         // Add the subject name as a separate Text field, so that it can be searched
         // separately.
-        doc.add( new Field( SearchItem.FIELD_TITLE, htmlpage.getDescription( ), TextField.TYPE_STORED ) );
+        doc.add( new Field( SearchItem.FIELD_TITLE, htmlpage.getDescription( ), ft ) );
 
-        doc.add( new Field( SearchItem.FIELD_TYPE, HtmlPagePlugin.PLUGIN_NAME, TextField.TYPE_STORED ) );
+        doc.add( new Field( SearchItem.FIELD_TYPE, HtmlPagePlugin.PLUGIN_NAME, ft ) );
 
         // return the document
         return doc;
