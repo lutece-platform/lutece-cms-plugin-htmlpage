@@ -213,12 +213,12 @@ public class HtmlPageIndexer implements SearchIndexer
      */
     private Document getDocument( HtmlPage htmlpage, String strUrl, Plugin plugin ) throws IOException, InterruptedException, SiteMessageException
     {
-    	  FieldType ft = new FieldType( StringField.TYPE_STORED );
-          ft.setOmitNorms( false );
+        FieldType ft = new FieldType( StringField.TYPE_STORED );
+        ft.setOmitNorms( false );
 
-          FieldType ftNotStored = new FieldType( StringField.TYPE_NOT_STORED );
-          ftNotStored.setOmitNorms( false );
-          ftNotStored.setTokenized( false );
+        FieldType ftNotStored = new FieldType( StringField.TYPE_NOT_STORED );
+        ftNotStored.setOmitNorms( false );
+        ftNotStored.setTokenized( false );
 
         // make a new, empty document
         org.apache.lucene.document.Document doc = new org.apache.lucene.document.Document( );
@@ -230,7 +230,7 @@ public class HtmlPageIndexer implements SearchIndexer
         // Add the uid as a field, so that index can be incrementally maintained.
         // This field is not stored with question/answer, it is indexed, but it is not
         // tokenized prior to indexing.
-        doc.add( new Field( SearchItem.FIELD_UID, htmlpage.getId( ) + "_" + SHORT_NAME, ftNotStored) );
+        doc.add( new Field( SearchItem.FIELD_UID, htmlpage.getId( ) + "_" + SHORT_NAME, ftNotStored ) );
 
         String strContentToIndex = getContentToIndex( htmlpage );
         ContentHandler handler = new BodyContentHandler( );
