@@ -155,7 +155,7 @@ public class HtmlPageApp implements XPageApplication
         SearchEngine engine = SpringContextService.getBean( BEAN_SEARCH_ENGINE );
         List<SearchResult> listResults = engine.getSearchResults( strQuery, request );
 
-        HashMap<String, Object> model = new HashMap<String, Object>( );
+        HashMap<String, Object> model = new HashMap<>( );
         model.put( MARK_RESULT, listResults );
         model.put( MARK_QUERY, strQuery );
 
@@ -163,12 +163,12 @@ public class HtmlPageApp implements XPageApplication
         return template.getHtml( );
     }
 
-    private String getHtmlPagesLists( HttpServletRequest request ) throws SiteMessageException
+    private String getHtmlPagesLists( HttpServletRequest request )
     {
-        HashMap<String, Object> model = new HashMap<String, Object>( );
+        HashMap<String, Object> model = new HashMap<>( );
 
         Collection<HtmlPage> htmlPageList = HtmlPageHome.findEnabledHtmlPageList( _plugin );
-        Collection<HtmlPage> visibleHtmlPageList = new ArrayList<HtmlPage>( ); // filter the list of lists by role
+        Collection<HtmlPage> visibleHtmlPageList = new ArrayList<>( ); // filter the list of lists by role
 
         for ( HtmlPage htmlpage : htmlPageList )
         {
@@ -196,7 +196,7 @@ public class HtmlPageApp implements XPageApplication
      */
     private String getHtmlPage( HttpServletRequest request, String strHtmlPageId ) throws SiteMessageException
     {
-        HashMap<String, Object> model = new HashMap<String, Object>( );
+        HashMap<String, Object> model = new HashMap<>( );
 
         int nHtmlPageId = Integer.parseInt( strHtmlPageId );
         HtmlPage htmlpage = HtmlPageHome.findByPrimaryKey( nHtmlPageId, _plugin );

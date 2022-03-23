@@ -51,7 +51,7 @@ import fr.paris.lutece.portal.service.util.AppPropertiesService;
 public class HtmlPageHome
 {
     // Static variable pointed at the DAO instance
-    private static IHtmlPageDAO _dao = (IHtmlPageDAO) SpringContextService.getPluginBean( "htmlpage", "htmlPageDAO" );
+    private static IHtmlPageDAO _dao = SpringContextService.getBean( "htmlPageDAO" );
 
     /**
      * Private constructor - this class need not be instantiated

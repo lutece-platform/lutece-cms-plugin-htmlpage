@@ -129,10 +129,10 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
         Collection<HtmlPage> listHtmlPageList = HtmlPageHome.findAll( getPlugin( ) );
         listHtmlPageList = AdminWorkgroupService.getAuthorizedCollection( listHtmlPageList, getUser( ) );
 
-        Paginator paginator = new Paginator( (List<HtmlPage>) listHtmlPageList, _nItemsPerPage, getHomeUrl( request ), PARAMETER_PAGE_INDEX,
+        Paginator<HtmlPage> paginator = new Paginator<>( (List<HtmlPage>) listHtmlPageList, _nItemsPerPage, getHomeUrl( request ), PARAMETER_PAGE_INDEX,
                 _strCurrentPageIndex );
 
-        Map<String, Object> model = new HashMap<String, Object>( );
+        Map<String, Object> model = new HashMap<>( );
         model.put( MARK_NB_ITEMS_PER_PAGE, "" + _nItemsPerPage );
         model.put( MARK_PAGINATOR, paginator );
         model.put( MARK_LIST_HTMLPAGE_LIST, paginator.getPageItems( ) );
@@ -153,7 +153,7 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
     {
         setPageTitleProperty( PROPERTY_PAGE_TITLE_CREATE );
 
-        Map<String, Object> model = new HashMap<String, Object>( );
+        Map<String, Object> model = new HashMap<>( );
         ReferenceList workgroupsList = AdminWorkgroupService.getUserWorkgroups( getUser( ), getLocale( ) );
         model.put( MARK_WORKGROUPS_LIST, workgroupsList );
         model.put( MARK_WEBAPP_URL, AppPathService.getBaseUrl( request ) );
@@ -241,7 +241,7 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
         int nId = Integer.parseInt( request.getParameter( PARAMETER_HTMLPAGE_ID ) );
         HtmlPage htmlPage = HtmlPageHome.findByPrimaryKey( nId, getPlugin( ) );
 
-        Map<String, Object> model = new HashMap<String, Object>( );
+        Map<String, Object> model = new HashMap<>( );
         ReferenceList workgroupsList = AdminWorkgroupService.getUserWorkgroups( getUser( ), getLocale( ) );
         model.put( MARK_WORKGROUPS_LIST, workgroupsList );
         model.put( MARK_WEBAPP_URL, AppPathService.getBaseUrl( request ) );
