@@ -10,5 +10,7 @@ CREATE TABLE htmlpage (
   status INT DEFAULT 0 NOT NULL,
   workgroup_key varchar(50) DEFAULT 'all' NOT NULL,  
   role varchar(50) DEFAULT 'none' NOT NULL,  
+  date_start TIMESTAMP NULL,
+  date_end TIMESTAMP NULL,
   PRIMARY KEY (id_htmlpage)
 );

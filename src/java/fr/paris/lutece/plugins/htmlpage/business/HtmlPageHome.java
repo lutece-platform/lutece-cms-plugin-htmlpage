@@ -35,6 +35,7 @@ package fr.paris.lutece.plugins.htmlpage.business;
 
 import java.util.Collection;
 
+import fr.paris.lutece.plugins.htmlpage.service.HtmlPageService;
 import fr.paris.lutece.plugins.htmlpage.service.search.HtmlPageIndexer;
 import fr.paris.lutece.plugins.htmlpage.utils.HtmlPageIndexerUtils;
 import fr.paris.lutece.portal.business.indexeraction.IndexerAction;
@@ -106,7 +107,7 @@ public class HtmlPageHome
         }
         else
         {
-            HtmlPage oldPage = findEnabledHtmlPage( htmlpage.getId( ), plugin );
+            HtmlPage oldPage = HtmlPageService.getInstance( ).getEnableHtmlPage( Integer.parseInt( strIdHtmlPage ) );
 
             if ( oldPage != null )
             {

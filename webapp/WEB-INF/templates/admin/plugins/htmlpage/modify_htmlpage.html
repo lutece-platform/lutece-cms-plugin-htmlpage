@@ -10,21 +10,29 @@
 						<@input type='text' id='description' name='description' inputSize=60 maxlength=50 value='${htmlpage.description}' />
 					</@formGroup>
 					<@formGroup labelFor='status' labelKey='#i18n{htmlpage.modify_htmlpage.labelStatus}'>
-						<@select id='status' name='status'>
-							<#if htmlpage.status == 0 >
-								<option value="0" selected="selected" >#i18n{htmlpage.modify_htmlpage.statusLabelEnabled}</option>
-								<option value="1" >#i18n{htmlpage.modify_htmlpage.statusLabelDisabled}</option>
-							<#else>
-								<option value="0" >#i18n{htmlpage.modify_htmlpage.statusLabelEnabled}</option>
-								<option value="1" selected="selected" >#i18n{htmlpage.modify_htmlpage.statusLabelDisabled}</option>
-							</#if> 
-						</@select>
+						<@select id='status' name='status' items=status_list default_value='${htmlpage.status}'/>
 					</@formGroup>
 					<@formGroup labelFor='workgroup' labelKey='#i18n{htmlpage.modify_htmlpage.labelWorkgroupKey}' mandatory=true>
 						<@select name='workgroup' default_value='${htmlpage.workgroup}' items=workgroups_list />
 					</@formGroup>
 					<@formGroup labelFor='role' labelKey='#i18n{htmlpage.modify_htmlpage.labelRole}' mandatory=true>
 						<@select name='role' default_value='${htmlpage.role}' items=roles_list />
+					</@formGroup>
+					<@formGroup labelFor='dateStart' id='fgDateStart' labelKey='#i18n{htmlpage.modify_htmlpage.labelDateStart}'>
+						<@inputGroup>
+							<@input type='datetime' name='date_start' id='dateStart' value='${(htmlpage.dateStart?string.iso)!}' />
+							<@inputGroupItem type='text'>
+								<@icon style='calendar' />
+							</@inputGroupItem>
+						</@inputGroup>
+					</@formGroup>
+					<@formGroup labelFor='dateEnd' id='fgDateEnd' labelKey='#i18n{htmlpage.modify_htmlpage.labelDateEnd}'>
+						<@inputGroup>
+							<@input type='datetime' name='date_end' id='dateEnd' value='${(htmlpage.dateEnd?string.iso)!}' />
+							<@inputGroupItem type='text'>
+								<@icon style='calendar' />
+							</@inputGroupItem>
+						</@inputGroup>
 					</@formGroup>
 					<@formGroup labelKey='#i18n{htmlpage.modify_htmlpage.labelHtmlContent}'>
 						<@input type='textarea' id='html_content' richtext=true name='html_content' rows=20>${htmlpage.htmlContent}</@input>
@@ -39,3 +47,40 @@
 	</@columns>
 </@row>
 <@initEditor />
+<script>
+$(function(){
+	var status = $('#status').val();
+	if(status == 0 || status == 1 ){
+		$('#fgDateStart').hide();
+		$('#fgDateEnd').hide();
+		$('#dateStart').val("");
+		$('#dateEnd').val("");
+		$('#dateStart').prop('required', false);
+		$('#dateEnd').prop('required', false);
+	}
+	if( status == 2  ){
+		$('#fgDateStart').show();
+		$('#fgDateEnd').show();
+		$('#dateStart').prop('required', true);
+		$('#dateEnd').prop('required', true);
+	}
+	
+	$('#status').change( function(){
+		var statusVal = $(this).val() ;
+		if(statusVal == 0 || statusVal == 1 ){
+			$('#fgDateStart').hide();
+			$('#fgDateEnd').hide();
+			$('#dateStart').val("");
+			$('#dateEnd').val("");
+			$('#dateStart').prop('required', false);
+			$('#dateEnd').prop('required', false);
+		}
+		if( statusVal == 2  ){
+			$('#fgDateStart').show();
+			$('#fgDateEnd').show();
+			$('#dateStart').prop('required', true);
+			$('#dateEnd').prop('required', true);
+		}
+	});
+})
+</script>

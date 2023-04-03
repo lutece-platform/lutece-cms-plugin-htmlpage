@@ -35,6 +35,8 @@ package fr.paris.lutece.plugins.htmlpage.web;
 
 import fr.paris.lutece.plugins.htmlpage.business.HtmlPage;
 import fr.paris.lutece.plugins.htmlpage.business.HtmlPageHome;
+import fr.paris.lutece.plugins.htmlpage.service.EnumStatus;
+import fr.paris.lutece.plugins.htmlpage.utils.HtmlPageUtil;
 import fr.paris.lutece.portal.business.role.RoleHome;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
@@ -49,12 +51,15 @@ import fr.paris.lutece.util.html.HtmlTemplate;
 import fr.paris.lutece.util.html.Paginator;
 import fr.paris.lutece.util.url.UrlItem;
 
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -75,7 +80,9 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
 
     // Messages
     private static final String MESSAGE_CONFIRM_REMOVE_HTMLPAGE = "htmlpage.message.confirmRemoveHtmlPage";
-
+    private static final String MESSAGE_INVALID_DATE_START = "htmlpage.message.invalidDateStart";
+    private static final String MESSAGE_INVALID_DATE_END = "htmlpage.message.invalidDateEnd";
+    
     // Markers
     private static final String MARK_LIST_HTMLPAGE_LIST = "htmlpage_list";
     private static final String MARK_NB_ITEMS_PER_PAGE = "nb_items_per_page";
@@ -86,6 +93,7 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
     private static final String MARK_HTMLPAGE = "htmlpage";
     private static final String MARK_ROLES_LIST = "roles_list";
     private static final String MARK_PAGINATOR = "paginator";
+    private static final String MARK_STATUS = "status_list";
 
     // parameters
     private static final String PARAMETER_HTMLPAGE_ID = "id_htmlpage";
@@ -96,7 +104,9 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
     private static final String PARAMETER_ID_HTMLPAGE_LIST = "htmlpage_list_id";
     private static final String PARAMETER_HTMLPAGE_ROLE = "role";
     private static final String PARAMETER_PAGE_INDEX = "page_index";
-
+    private static final String PARAMETER_HTMLPAGE_DATE_START = "date_start";
+    private static final String PARAMETER_HTMLPAGE_DATE_END = "date_end";
+    
     // templates
     private static final String TEMPLATE_MANAGE_HTMLPAGE = "/admin/plugins/htmlpage/manage_htmlpage.html";
     private static final String TEMPLATE_CREATE_HTMLPAGE = "/admin/plugins/htmlpage/create_htmlpage.html";
@@ -160,6 +170,7 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
         model.put( MARK_LOCALE, getLocale( ) );
         model.put( MARK_HTML_CONTENT, "" );
         model.put( MARK_ROLES_LIST, RoleHome.getRolesList( ) );
+        model.put( MARK_STATUS, EnumStatus.getReferenceList( ) );
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_CREATE_HTMLPAGE, getLocale( ), model );
 
@@ -194,6 +205,26 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
         htmlpage.setStatus( Integer.parseInt( strStatus ) );
         htmlpage.setWorkgroup( strWorkgroup );
         htmlpage.setRole( strRole );
+        
+        String strDateStart = request.getParameter( PARAMETER_HTMLPAGE_DATE_START );
+        String strDateEnd = request.getParameter( PARAMETER_HTMLPAGE_DATE_END );
+        
+        Timestamp dateStart = HtmlPageUtil.convertToTimestamp( strDateStart );
+        Timestamp dateEnd = HtmlPageUtil.convertToTimestamp( strDateEnd );
+
+        if ( StringUtils.isNotEmpty( strDateStart ) && dateStart == null )
+        {
+            return AdminMessageService.getMessageUrl( request, MESSAGE_INVALID_DATE_START, AdminMessage.TYPE_STOP );
+        }
+        
+        if (  StringUtils.isNotEmpty( strDateEnd ) && dateEnd == null  )
+        {
+            return AdminMessageService.getMessageUrl( request, MESSAGE_INVALID_DATE_END, AdminMessage.TYPE_STOP );
+        }
+           
+            
+		htmlpage.setDateStart( dateStart );
+		htmlpage.setDateEnd( dateEnd );
 
         HtmlPageHome.create( htmlpage, getPlugin( ) );
 
@@ -248,7 +279,8 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
         model.put( MARK_LOCALE, getLocale( ) );
         model.put( MARK_HTMLPAGE, htmlPage );
         model.put( MARK_ROLES_LIST, RoleHome.getRolesList( ) );
-
+        model.put( MARK_STATUS, EnumStatus.getReferenceList( ) );
+        
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_MODIFY_HTMLPAGE, getLocale( ), model );
 
         return getAdminPage( template.getHtml( ) );
@@ -277,6 +309,25 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
         htmlPage.setStatus( Integer.parseInt( request.getParameter( PARAMETER_HTMLPAGE_STATUS ) ) );
         htmlPage.setWorkgroup( request.getParameter( PARAMETER_HTMLPAGE_WORKGROUP ) );
         htmlPage.setRole( request.getParameter( PARAMETER_HTMLPAGE_ROLE ) );
+
+        String strDateStart = request.getParameter( PARAMETER_HTMLPAGE_DATE_START );
+        String strDateEnd = request.getParameter( PARAMETER_HTMLPAGE_DATE_END );
+        
+        Timestamp dateStart = HtmlPageUtil.convertToTimestamp( strDateStart );
+        Timestamp dateEnd = HtmlPageUtil.convertToTimestamp( strDateEnd );
+
+        if ( StringUtils.isNotEmpty( strDateStart ) && dateStart == null )
+        {
+            return AdminMessageService.getMessageUrl( request, MESSAGE_INVALID_DATE_START, AdminMessage.TYPE_STOP );
+        }
+        
+        if (  StringUtils.isNotEmpty( strDateEnd ) && dateEnd == null  )
+        {
+            return AdminMessageService.getMessageUrl( request, MESSAGE_INVALID_DATE_END, AdminMessage.TYPE_STOP );
+        }
+            
+		htmlPage.setDateStart( dateStart );
+		htmlPage.setDateEnd( dateEnd );
 
         HtmlPageHome.update( htmlPage, getPlugin( ) );
 

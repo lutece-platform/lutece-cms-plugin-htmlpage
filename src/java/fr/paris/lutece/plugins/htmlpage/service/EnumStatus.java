@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2022, City of Paris
+ * Copyright (c) 2002-2023, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,39 +31,62 @@
  *
  * License 1.0
  */
-/*
- * HtmlPageListPlugin.java
- *
- * Created on 2 juillet 2008, 10:52
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
- */
 package fr.paris.lutece.plugins.htmlpage.service;
 
-import fr.paris.lutece.portal.service.plugin.Plugin;
-import fr.paris.lutece.portal.service.plugin.PluginDefaultImplementation;
-import fr.paris.lutece.portal.service.plugin.PluginService;
+import fr.paris.lutece.util.ReferenceList;
 
 /**
- * The HtmlPage Plugin
  * 
- * @author lenaini
+ * EnumStatus
+ *
  */
-public class HtmlPagePlugin extends PluginDefaultImplementation
+public enum EnumStatus
 {
-    public static final String PLUGIN_NAME = "htmlpage";
+    disabled( 0, "#i18n{htmlpage.create_htmlpage.statusLabelDisabled}" ),
+    enabled( 1, "#i18n{htmlpage.create_htmlpage.statusLabelEnabled}" ),
+    conditioned( 2, "#i18n{htmlpage.create_htmlpage.statusLabelConditioned}" );
+
+    private int    _nId;
+    private String _strLabel;
 
     /**
-     * Initialize the plugin HtmlPage
+     * Private constructor
+     * @param nId
+     * @param strLabel
      */
-    public void init( )
+    private EnumStatus( int nId, String strLabel )
     {
-        HtmlPageService.getInstance( ).init( );
+        _nId = nId;
+        _strLabel = strLabel;
+    }
+
+    /**
+     * @return the _nId
+     */
+    public int getId( )
+    {
+        return _nId;
+    }
+
+    /**
+     * @return the _strLabel
+     */
+    public String getLabel( )
+    {
+        return _strLabel;
     }
     
-    public static Plugin getPlugin ( )
+    /**
+     * ReferenceList of EnumStatus
+     * @return referenceList of EnumStatus
+     */
+    public static ReferenceList getReferenceList ( )
     {
-        return PluginService.getPlugin( PLUGIN_NAME );
+        ReferenceList refList = new ReferenceList( );
+        for ( EnumStatus status : EnumStatus.values( ) )
+        {
+            refList.addItem( status.getId( ), status.getLabel( ) );
+        }
+        return refList;
     }
 }
