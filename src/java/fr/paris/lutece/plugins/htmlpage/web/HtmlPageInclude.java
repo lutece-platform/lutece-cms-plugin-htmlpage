@@ -34,13 +34,12 @@
 package fr.paris.lutece.plugins.htmlpage.web;
 
 import fr.paris.lutece.plugins.htmlpage.business.HtmlPage;
-import fr.paris.lutece.plugins.htmlpage.business.HtmlPageHome;
-import fr.paris.lutece.plugins.htmlpage.service.HtmlPagePlugin;
-import fr.paris.lutece.plugins.htmlpage.service.HtmlPageUtil;
+import fr.paris.lutece.plugins.htmlpage.service.HtmlPageService;
+import fr.paris.lutece.plugins.htmlpage.utils.HtmlPageUtil;
 import fr.paris.lutece.portal.service.content.PageData;
 import fr.paris.lutece.portal.service.includes.PageInclude;
-import fr.paris.lutece.portal.service.plugin.Plugin;
-import fr.paris.lutece.portal.service.plugin.PluginService;
+import fr.paris.lutece.portal.service.util.AppPropertiesService;
+
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
@@ -54,7 +53,12 @@ public class HtmlPageInclude implements PageInclude
 
     // Markers
     private static final String MARK_HTMLPAGE_MARKER_PREFIX = "htmlpage_";
+    
+    // Properties
+    private static final String PROPERTY_ENABLE_API_REST = "htmlpage.page_include.api_rest.enable";
 
+    private static boolean _bEnableApiRest =  AppPropertiesService.getPropertyBoolean( PROPERTY_ENABLE_API_REST, false );
+    
     /**
      * Substitue specific Freemarker markers in the page template.
      * 
@@ -69,14 +73,11 @@ public class HtmlPageInclude implements PageInclude
      */
     public void fillTemplate( Map<String, Object> rootModel, PageData data, int nMode, HttpServletRequest request )
     {
-        if ( request != null )
+        if ( !_bEnableApiRest && request != null )
         {
-            Plugin plugin = PluginService.getPlugin( HtmlPagePlugin.PLUGIN_NAME );
-
-            for ( HtmlPage htmlpage : HtmlPageHome.findAll( plugin ) )
+            for ( HtmlPage htmlpage : HtmlPageService.getInstance( ).getHtmlPageListCache( ) )
             {
-                int nStatus = htmlpage.getStatus( );
-                if ( ( nStatus == 0 ) && ( HtmlPageUtil.isVisible( request, htmlpage.getRole( ) ) ) )
+                if( HtmlPageUtil.isVisible( request, htmlpage.getRole( ) ) )
                 {
                     rootModel.put( MARK_HTMLPAGE_MARKER_PREFIX + htmlpage.getId( ), htmlpage.getHtmlContent( ) );
                 }

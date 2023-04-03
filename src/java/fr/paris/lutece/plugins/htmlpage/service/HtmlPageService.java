@@ -33,16 +33,20 @@
  */
 package fr.paris.lutece.plugins.htmlpage.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import fr.paris.lutece.plugins.htmlpage.business.HtmlPage;
+import fr.paris.lutece.plugins.htmlpage.business.HtmlPageHome;
+import fr.paris.lutece.plugins.htmlpage.utils.HtmlPageUtil;
 
 /**
- * This Service manages contactListt actions (create, delete, modify ...) and notify listeners.
  * 
- * @author lenaini
+ * HtmlPageService
  */
-public class HtmlPageService
+public class HtmlPageService implements IHtmlPageService
 {
-    private static HtmlPageService _singleton = new HtmlPageService( );
+    private static HtmlPageService _singleton;
 
     /**
      * Initializes the Housing service
@@ -60,7 +64,70 @@ public class HtmlPageService
      */
     public static HtmlPageService getInstance( )
     {
+        if ( _singleton == null )
+        {
+            _singleton = new HtmlPageService( );
+        }
         return _singleton;
+    }
+
+    @Override
+    public HtmlPage getHtmlPageCache( int nId )
+    {
+        HtmlPage htmlPage = PublicHtmlPageCacheService.getService( ).getHtmlPageCache( String.valueOf( nId ) );
+        
+        if ( htmlPage == null || !HtmlPageUtil.isActivedPageHtml( htmlPage ))
+        {
+            htmlPage = getEnableHtmlPage( nId );
+            
+            if ( htmlPage != null && !HtmlPageUtil.isRoleExist( htmlPage.getRole( ) ))
+            {
+                PublicHtmlPageCacheService.getService( ).addHtmlPageCache( htmlPage );
+            }           
+        }
+        return htmlPage;
+    }
+
+    @Override
+    public List<HtmlPage> getHtmlPageListCache( )
+    {
+        List<HtmlPage> htmlPageList = PublicHtmlPageCacheService.getService( ).getHtmlPageListCache(  );
+        
+        if ( htmlPageList == null )
+        {
+            htmlPageList = getEnabledHtmlPageList( );
+            
+            if ( htmlPageList != null )
+            {
+                PublicHtmlPageCacheService.getService( ).addHtmlPageCache( htmlPageList );
+            }           
+        }
+        return htmlPageList;
+    }
+
+    @Override
+    public HtmlPage getEnableHtmlPage( int nId )
+    {
+        HtmlPage htmlPage = HtmlPageHome.findByPrimaryKey( nId, HtmlPagePlugin.getPlugin( ) );
+        
+        return HtmlPageUtil.isActivedPageHtml( htmlPage ) ? htmlPage : null;
+    }
+
+    @Override
+    public List<HtmlPage> getEnabledHtmlPageList( )
+    {
+        List<HtmlPage> enablehtmlPageList = new ArrayList<>( );
+        List<HtmlPage> htmlPageList = ( List<HtmlPage> ) HtmlPageHome.findAll( HtmlPagePlugin.getPlugin( ) );
+       
+        for ( HtmlPage htmlPage : htmlPageList )
+        {
+            if ( HtmlPageUtil.isActivedPageHtml( htmlPage ) )
+            {
+                enablehtmlPageList.add( htmlPage );
+            }
+        }
+        
+        return enablehtmlPageList;
     }
 
 }

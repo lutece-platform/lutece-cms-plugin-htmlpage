@@ -36,6 +36,7 @@ package fr.paris.lutece.plugins.htmlpage.service.search;
 import fr.paris.lutece.plugins.htmlpage.business.HtmlPage;
 import fr.paris.lutece.plugins.htmlpage.business.HtmlPageHome;
 import fr.paris.lutece.plugins.htmlpage.service.HtmlPagePlugin;
+import fr.paris.lutece.plugins.htmlpage.service.HtmlPageService;
 import fr.paris.lutece.portal.service.content.XPageAppService;
 import fr.paris.lutece.portal.service.message.SiteMessageException;
 import fr.paris.lutece.portal.service.plugin.Plugin;
@@ -109,7 +110,7 @@ public class HtmlPageIndexer implements SearchIndexer
         String strPortalUrl = AppPathService.getPortalUrl( );
         Plugin plugin = PluginService.getPlugin( HtmlPagePlugin.PLUGIN_NAME );
 
-        Collection<HtmlPage> listHtmlPages = HtmlPageHome.findEnabledHtmlPageList( plugin );
+        Collection<HtmlPage> listHtmlPages = HtmlPageService.getInstance( ).getEnabledHtmlPageList( );
 
         for ( HtmlPage htmlpage : listHtmlPages )
         {
@@ -135,7 +136,7 @@ public class HtmlPageIndexer implements SearchIndexer
         String strPortalUrl = AppPathService.getPortalUrl( );
         Plugin plugin = PluginService.getPlugin( HtmlPagePlugin.PLUGIN_NAME );
 
-        HtmlPage htmlpage = HtmlPageHome.findEnabledHtmlPage( Integer.parseInt( strId ), plugin );
+        HtmlPage htmlpage = HtmlPageService.getInstance( ).getEnableHtmlPage( Integer.parseInt( strId ) );
         if ( htmlpage != null )
         {
             UrlItem url = new UrlItem( strPortalUrl );

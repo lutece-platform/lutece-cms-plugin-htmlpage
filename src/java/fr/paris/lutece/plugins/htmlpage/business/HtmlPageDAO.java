@@ -48,13 +48,13 @@ public class HtmlPageDAO implements IHtmlPageDAO
 {
     // Constants
     private static final String SQL_QUERY_NEWPK = "SELECT max( id_htmlpage ) FROM htmlpage ";
-    private static final String SQL_QUERY_SELECT = "SELECT id_htmlpage, description, html_content, status, workgroup_key, role FROM htmlpage WHERE id_htmlpage = ? ";
-    private static final String SQL_QUERY_SELECTALL = "SELECT id_htmlpage, description, html_content, status, workgroup_key, role FROM htmlpage ORDER BY description, id_htmlpage DESC";
-    private static final String SQL_QUERY_SELECT_ENABLED = "SELECT id_htmlpage, description, html_content, status, workgroup_key, role FROM htmlpage WHERE id_htmlpage = ? AND status = 0 ";
-    private static final String SQL_QUERY_SELECT_ENABLED_HTMLPAGE_LIST = "SELECT id_htmlpage, description, html_content, status, workgroup_key, role FROM htmlpage WHERE status = 0 ORDER BY description, id_htmlpage DESC";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO htmlpage ( id_htmlpage , description, html_content, status, workgroup_key, role )  VALUES ( ?, ?, ?, ?, ?, ? ) ";
+    private static final String SQL_QUERY_SELECT = "SELECT id_htmlpage, description, html_content, status, workgroup_key, role, date_start, date_end FROM htmlpage WHERE id_htmlpage = ? ";
+    private static final String SQL_QUERY_SELECTALL = "SELECT id_htmlpage, description, html_content, status, workgroup_key, role, date_start, date_end FROM htmlpage ORDER BY description, id_htmlpage DESC";
+    private static final String SQL_QUERY_SELECT_ENABLED = "SELECT id_htmlpage, description, html_content, status, workgroup_key, role, date_start, date_end FROM htmlpage WHERE id_htmlpage = ? AND status = 0 ";
+    private static final String SQL_QUERY_SELECT_ENABLED_HTMLPAGE_LIST = "SELECT id_htmlpage, description, html_content, status, workgroup_key, role, date_start, date_end FROM htmlpage WHERE status = 0 ORDER BY description, id_htmlpage DESC";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO htmlpage ( id_htmlpage , description, html_content, status, workgroup_key, role, date_start, date_end )  VALUES ( ?, ?, ?, ?, ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM htmlpage WHERE id_htmlpage = ? ";
-    private static final String SQL_QUERY_UPDATE = "UPDATE htmlpage SET description = ? , html_content = ?, status = ?, workgroup_key = ?, role = ?  WHERE id_htmlpage = ?  ";
+    private static final String SQL_QUERY_UPDATE = "UPDATE htmlpage SET description = ? , html_content = ?, status = ?, workgroup_key = ?, role = ?, date_start = ?, date_end = ? WHERE id_htmlpage = ?  ";
 
     ///////////////////////////////////////////////////////////////////////////////////////
     // Access methods to data
@@ -68,22 +68,22 @@ public class HtmlPageDAO implements IHtmlPageDAO
      */
     private int newPrimaryKey( Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_NEWPK, plugin );
-        daoUtil.executeQuery( );
-
-        int nKey;
-
-        if ( !daoUtil.next( ) )
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_NEWPK, plugin ) )
         {
-            // if the table is empty
-            nKey = 1;
+            daoUtil.executeQuery( );
+    
+            int nKey;
+    
+            if ( !daoUtil.next( ) )
+            {
+                // if the table is empty
+                nKey = 1;
+            }
+    
+            nKey = daoUtil.getInt( 1 ) + 1;  
+    
+            return nKey;
         }
-
-        nKey = daoUtil.getInt( 1 ) + 1;
-
-        daoUtil.free( );
-
-        return nKey;
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -99,17 +99,20 @@ public class HtmlPageDAO implements IHtmlPageDAO
      */
     public void insert( HtmlPage htmlpage, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, plugin );
-        htmlpage.setId( newPrimaryKey( plugin ) );
-        daoUtil.setInt( 1, htmlpage.getId( ) );
-        daoUtil.setString( 2, htmlpage.getDescription( ) );
-        daoUtil.setString( 3, htmlpage.getHtmlContent( ) );
-        daoUtil.setInt( 4, htmlpage.getStatus( ) );
-        daoUtil.setString( 5, htmlpage.getWorkgroup( ) );
-        daoUtil.setString( 6, htmlpage.getRole( ) );
-
-        daoUtil.executeUpdate( );
-        daoUtil.free( );
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, plugin ) )
+        {
+            htmlpage.setId( newPrimaryKey( plugin ) );
+            daoUtil.setInt( 1, htmlpage.getId( ) );
+            daoUtil.setString( 2, htmlpage.getDescription( ) );
+            daoUtil.setString( 3, htmlpage.getHtmlContent( ) );
+            daoUtil.setInt( 4, htmlpage.getStatus( ) );
+            daoUtil.setString( 5, htmlpage.getWorkgroup( ) );
+            daoUtil.setString( 6, htmlpage.getRole( ) );
+            daoUtil.setTimestamp(7, htmlpage.getDateStart( ) );
+            daoUtil.setTimestamp(8, htmlpage.getDateEnd( ) );
+            
+            daoUtil.executeUpdate( );
+        }
     }
 
     /**
@@ -123,26 +126,28 @@ public class HtmlPageDAO implements IHtmlPageDAO
      */
     public HtmlPage load( int nHtmlPageId, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin );
-        daoUtil.setInt( 1, nHtmlPageId );
-        daoUtil.executeQuery( );
-
-        HtmlPage htmlpage = null;
-
-        if ( daoUtil.next( ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin ) )
         {
-            htmlpage = new HtmlPage( );
-            htmlpage.setId( daoUtil.getInt( 1 ) );
-            htmlpage.setDescription( daoUtil.getString( 2 ) );
-            htmlpage.setHtmlContent( daoUtil.getString( 3 ) );
-            htmlpage.setStatus( daoUtil.getInt( 4 ) );
-            htmlpage.setWorkgroup( daoUtil.getString( 5 ) );
-            htmlpage.setRole( daoUtil.getString( 6 ) );
+            daoUtil.setInt( 1, nHtmlPageId );
+            daoUtil.executeQuery( );
+    
+            HtmlPage htmlpage = null;
+    
+            if ( daoUtil.next( ) )
+            {
+                htmlpage = new HtmlPage( );
+                htmlpage.setId( daoUtil.getInt( 1 ) );
+                htmlpage.setDescription( daoUtil.getString( 2 ) );
+                htmlpage.setHtmlContent( daoUtil.getString( 3 ) );
+                htmlpage.setStatus( daoUtil.getInt( 4 ) );
+                htmlpage.setWorkgroup( daoUtil.getString( 5 ) );
+                htmlpage.setRole( daoUtil.getString( 6 ) );
+                htmlpage.setDateStart( daoUtil.getTimestamp( 7 ) );
+                htmlpage.setDateEnd( daoUtil.getTimestamp( 8 ) );
+            }
+        
+            return htmlpage;
         }
-
-        daoUtil.free( );
-
-        return htmlpage;
     }
 
     /**
@@ -155,10 +160,11 @@ public class HtmlPageDAO implements IHtmlPageDAO
      */
     public void delete( HtmlPage htmlpage, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin );
-        daoUtil.setInt( 1, htmlpage.getId( ) );
-        daoUtil.executeUpdate( );
-        daoUtil.free( );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin ) )
+        {
+            daoUtil.setInt( 1, htmlpage.getId( ) );
+            daoUtil.executeUpdate( );
+        }
     }
 
     /**
@@ -171,18 +177,22 @@ public class HtmlPageDAO implements IHtmlPageDAO
      */
     public void store( HtmlPage htmlpage, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin );
-        int nHtmlPageId = htmlpage.getId( );
-
-        daoUtil.setString( 1, htmlpage.getDescription( ) );
-        daoUtil.setString( 2, htmlpage.getHtmlContent( ) );
-        daoUtil.setInt( 3, htmlpage.getStatus( ) );
-        daoUtil.setString( 4, htmlpage.getWorkgroup( ) );
-        daoUtil.setString( 5, htmlpage.getRole( ) );
-        daoUtil.setInt( 6, nHtmlPageId );
-
-        daoUtil.executeUpdate( );
-        daoUtil.free( );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin ) )
+        {
+            int nHtmlPageId = htmlpage.getId( );
+    
+            daoUtil.setString( 1, htmlpage.getDescription( ) );
+            daoUtil.setString( 2, htmlpage.getHtmlContent( ) );
+            daoUtil.setInt( 3, htmlpage.getStatus( ) );
+            daoUtil.setString( 4, htmlpage.getWorkgroup( ) );
+            daoUtil.setString( 5, htmlpage.getRole( ) );
+            daoUtil.setTimestamp( 6, htmlpage.getDateStart( ) );
+            daoUtil.setTimestamp( 7, htmlpage.getDateEnd( ) );
+           
+            daoUtil.setInt( 8, nHtmlPageId );
+    
+            daoUtil.executeUpdate( );
+        }
     }
 
     /**
@@ -195,24 +205,27 @@ public class HtmlPageDAO implements IHtmlPageDAO
     public Collection<HtmlPage> selectAll( Plugin plugin )
     {
         Collection<HtmlPage> htmlpageList = new ArrayList<HtmlPage>( );
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin );
-        daoUtil.executeQuery( );
-
-        while ( daoUtil.next( ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin ) )
         {
-            HtmlPage htmlpage = new HtmlPage( );
-            htmlpage.setId( daoUtil.getInt( 1 ) );
-            htmlpage.setDescription( daoUtil.getString( 2 ) );
-            htmlpage.setHtmlContent( daoUtil.getString( 3 ) );
-            htmlpage.setStatus( daoUtil.getInt( 4 ) );
-            htmlpage.setWorkgroup( daoUtil.getString( 5 ) );
-            htmlpage.setRole( daoUtil.getString( 6 ) );
-            htmlpageList.add( htmlpage );
+            daoUtil.executeQuery( );
+    
+            while ( daoUtil.next( ) )
+            {
+                HtmlPage htmlpage = new HtmlPage( );
+                htmlpage.setId( daoUtil.getInt( 1 ) );
+                htmlpage.setDescription( daoUtil.getString( 2 ) );
+                htmlpage.setHtmlContent( daoUtil.getString( 3 ) );
+                htmlpage.setStatus( daoUtil.getInt( 4 ) );
+                htmlpage.setWorkgroup( daoUtil.getString( 5 ) );
+                htmlpage.setRole( daoUtil.getString( 6 ) );
+                htmlpage.setDateStart( daoUtil.getTimestamp( 7 ) );
+                htmlpage.setDateEnd( daoUtil.getTimestamp( 8 ) );
+                
+                htmlpageList.add( htmlpage );
+            }
+
+            return htmlpageList;
         }
-
-        daoUtil.free( );
-
-        return htmlpageList;
     }
 
     /**
@@ -226,26 +239,28 @@ public class HtmlPageDAO implements IHtmlPageDAO
      */
     public HtmlPage selectEnabledHtmlPage( int nHtmlPageId, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_ENABLED, plugin );
-        daoUtil.setInt( 1, nHtmlPageId );
-        daoUtil.executeQuery( );
-
-        HtmlPage htmlpage = null;
-
-        if ( daoUtil.next( ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_ENABLED, plugin ) )
         {
-            htmlpage = new HtmlPage( );
-            htmlpage.setId( daoUtil.getInt( 1 ) );
-            htmlpage.setDescription( daoUtil.getString( 2 ) );
-            htmlpage.setHtmlContent( daoUtil.getString( 3 ) );
-            htmlpage.setStatus( daoUtil.getInt( 4 ) );
-            htmlpage.setWorkgroup( daoUtil.getString( 5 ) );
-            htmlpage.setRole( daoUtil.getString( 6 ) );
+            daoUtil.setInt( 1, nHtmlPageId );
+            daoUtil.executeQuery( );
+    
+            HtmlPage htmlpage = null;
+    
+            if ( daoUtil.next( ) )
+            {
+                htmlpage = new HtmlPage( );
+                htmlpage.setId( daoUtil.getInt( 1 ) );
+                htmlpage.setDescription( daoUtil.getString( 2 ) );
+                htmlpage.setHtmlContent( daoUtil.getString( 3 ) );
+                htmlpage.setStatus( daoUtil.getInt( 4 ) );
+                htmlpage.setWorkgroup( daoUtil.getString( 5 ) );
+                htmlpage.setRole( daoUtil.getString( 6 ) );
+                htmlpage.setDateStart( daoUtil.getTimestamp( 7 ) );
+                htmlpage.setDateEnd( daoUtil.getTimestamp( 8 ) );
+            }
+      
+            return htmlpage;
         }
-
-        daoUtil.free( );
-
-        return htmlpage;
     }
 
     /**
@@ -258,23 +273,25 @@ public class HtmlPageDAO implements IHtmlPageDAO
     public Collection<HtmlPage> selectEnabledHtmlPageList( Plugin plugin )
     {
         Collection<HtmlPage> htmlpageList = new ArrayList<HtmlPage>( );
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_ENABLED_HTMLPAGE_LIST, plugin );
-        daoUtil.executeQuery( );
-
-        while ( daoUtil.next( ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_ENABLED_HTMLPAGE_LIST, plugin ) )
         {
-            HtmlPage htmlpage = new HtmlPage( );
-            htmlpage.setId( daoUtil.getInt( 1 ) );
-            htmlpage.setDescription( daoUtil.getString( 2 ) );
-            htmlpage.setHtmlContent( daoUtil.getString( 3 ) );
-            htmlpage.setStatus( daoUtil.getInt( 4 ) );
-            htmlpage.setWorkgroup( daoUtil.getString( 5 ) );
-            htmlpage.setRole( daoUtil.getString( 6 ) );
-            htmlpageList.add( htmlpage );
+            daoUtil.executeQuery( );
+    
+            while ( daoUtil.next( ) )
+            {
+                HtmlPage htmlpage = new HtmlPage( );
+                htmlpage.setId( daoUtil.getInt( 1 ) );
+                htmlpage.setDescription( daoUtil.getString( 2 ) );
+                htmlpage.setHtmlContent( daoUtil.getString( 3 ) );
+                htmlpage.setStatus( daoUtil.getInt( 4 ) );
+                htmlpage.setWorkgroup( daoUtil.getString( 5 ) );
+                htmlpage.setRole( daoUtil.getString( 6 ) );
+                htmlpage.setDateStart( daoUtil.getTimestamp( 7 ) );
+                htmlpage.setDateEnd( daoUtil.getTimestamp( 8 ) );
+                htmlpageList.add( htmlpage );
+            }
+            
+            return htmlpageList;
         }
-
-        daoUtil.free( );
-
-        return htmlpageList;
     }
 }

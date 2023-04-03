@@ -33,6 +33,8 @@
  */
 package fr.paris.lutece.plugins.htmlpage.business;
 
+import java.sql.Timestamp;
+
 import fr.paris.lutece.plugins.htmlpage.service.HtmlPageWorkgroupRemovalListener;
 import fr.paris.lutece.portal.service.workgroup.AdminWorkgroupResource;
 import fr.paris.lutece.portal.service.workgroup.AdminWorkgroupService;
@@ -59,6 +61,8 @@ public class HtmlPage implements AdminWorkgroupResource
     private String _strWorkgroupKey;
     private String _strAdminWorkgroup;
     private String _strRole;
+    private Timestamp _dateStart;
+    private Timestamp _dateEnd;
 
     /** Creates a new instance of HtmlPage */
     public HtmlPage( )
@@ -233,4 +237,38 @@ public class HtmlPage implements AdminWorkgroupResource
     {
         return ( _nStatus == ENABLED );
     }
+
+	/**
+	 * @return the _dateStart
+	 */
+	public Timestamp getDateStart( )
+	{
+		return _dateStart;
+	}
+
+	/**
+	 * @param dateStart the _dateStart to set
+	 */
+	public void setDateStart( Timestamp dateStart )
+	{
+		this._dateStart = dateStart;
+	}
+
+	/**
+	 * @return the _dateEnd
+	 */
+	public Timestamp getDateEnd( )
+	{
+		return _dateEnd;
+	}
+
+	/**
+	 * @param dateEnd the _dateEnd to set
+	 */
+	public void setDateEnd( Timestamp dateEnd )
+	{
+		this._dateEnd = dateEnd;
+	}
+    
+    
 }

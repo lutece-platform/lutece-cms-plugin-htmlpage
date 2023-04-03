@@ -20,7 +20,7 @@
 					<#list htmlpage_list as htmlpage >
 					<@tr>
 						<@td><@link href='jsp/site/Portal.jsp?page=htmlpage&amp;htmlpage_id=${htmlpage.id}' target='_blank' title=htmlpage.description ><@icon style='link mr-2 me-2' /></@link> ${htmlpage.description} </@td>
-						<@td><#if htmlpage.status == 0 ><@tag color='success'><@icon style='check' /> #i18n{portal.util.labelEnabled}</@tag><#else><@tag color='danger'><@icon style='times' /> #i18n{portal.util.labelDisabled}</@tag></#if></@td>
+						<@td><#if htmlpage.status == 1 ><@tag color='success'><@icon style='check' /> #i18n{portal.util.labelEnabled}</@tag><#elseif htmlpage.status == 0><@tag color='danger'><@icon style='times' /> #i18n{portal.util.labelDisabled}</@tag><#elseif htmlpage.status == 2><@tag color='secondary'><@icon style='check' /> #i18n{htmlpage.modify_htmlpage.statusLabelConditioned}</@tag></#if></@td>
 						<@td><strong><code class="copy-content"><#noparse>$</#noparse>{htmlpage_${htmlpage.id}!}</code></strong></@td>     
 						<@td>${htmlpage.workgroup}</@td>     
 						<@td flex=true>

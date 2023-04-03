@@ -34,8 +34,8 @@
 package fr.paris.lutece.plugins.htmlpage.web;
 
 import fr.paris.lutece.plugins.htmlpage.business.HtmlPage;
-import fr.paris.lutece.plugins.htmlpage.business.HtmlPageHome;
-import fr.paris.lutece.plugins.htmlpage.service.HtmlPageUtil;
+import fr.paris.lutece.plugins.htmlpage.service.HtmlPageService;
+import fr.paris.lutece.plugins.htmlpage.utils.HtmlPageUtil;
 import fr.paris.lutece.portal.service.message.SiteMessage;
 import fr.paris.lutece.portal.service.message.SiteMessageException;
 import fr.paris.lutece.portal.service.message.SiteMessageService;
@@ -167,12 +167,12 @@ public class HtmlPageApp implements XPageApplication
     {
         HashMap<String, Object> model = new HashMap<String, Object>( );
 
-        Collection<HtmlPage> htmlPageList = HtmlPageHome.findEnabledHtmlPageList( _plugin );
+        Collection<HtmlPage> htmlPageList = HtmlPageService.getInstance( ).getHtmlPageListCache( );
         Collection<HtmlPage> visibleHtmlPageList = new ArrayList<HtmlPage>( ); // filter the list of lists by role
 
         for ( HtmlPage htmlpage : htmlPageList )
         {
-            if ( HtmlPageUtil.isVisible( request, htmlpage.getRole( ) ) )
+            if( HtmlPageUtil.isVisible( request, htmlpage.getRole( ) ) )
             {
                 visibleHtmlPageList.add( htmlpage );
             }
@@ -199,13 +199,11 @@ public class HtmlPageApp implements XPageApplication
         HashMap<String, Object> model = new HashMap<String, Object>( );
 
         int nHtmlPageId = Integer.parseInt( strHtmlPageId );
-        HtmlPage htmlpage = HtmlPageHome.findByPrimaryKey( nHtmlPageId, _plugin );
+        HtmlPage htmlpage = HtmlPageService.getInstance( ).getHtmlPageCache( nHtmlPageId );
 
         if ( htmlpage != null )
         {
-            int nStatus = htmlpage.getStatus( );
-
-            if ( ( nStatus == 0 ) && ( HtmlPageUtil.isVisible( request, htmlpage.getRole( ) ) ) )
+            if ( HtmlPageUtil.isVisible( request, htmlpage.getRole( ) ) )
             {
                 model.put( MARK_HTMLPAGE, htmlpage );
                 model.put( MARK_PAGE, _plugin.getName( ) );
