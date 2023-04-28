@@ -1,13 +1,4 @@
-var _id;
-var _idDefault;
-var _idDiv;
 var _baseUrl = document.getElementsByTagName('base')[0].href;
-
-function init( id, idDefault, idDiv ){
-	_id = id;
-	_idDefault = idDefault;
-	_idDiv = idDiv;
-}
 
 function setBaseUrl( baseUrl )
 {
@@ -16,9 +7,9 @@ function setBaseUrl( baseUrl )
 	}
 }
 
-function getContentHtmlPage(  ){
-    var url = _baseUrl + "rest/htmlpage-api/v1/htmlpage/" + _id;
-    var data = {id_default:_idDefault};
+function getContentHtmlPage( id, idDefault, idDiv  ){
+    var url = _baseUrl + "rest/htmlpage-api/v1/htmlpage/" + id;
+    var data = {id_default:idDefault};
     $.ajax({
         url: url,
         type: "GET",
@@ -26,7 +17,7 @@ function getContentHtmlPage(  ){
         data: data,
         success: function (data) {
             if ( data.status == 'OK' ) {
-            	$("#"+ _idDiv ).html( data.result );
+            	$("#"+ idDiv ).html( data.result );
             }
         },
         error: function (jqXHR, textStatus, errorThrown) {
