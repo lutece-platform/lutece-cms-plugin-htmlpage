@@ -24,16 +24,32 @@
 						<@td><strong><code class="copy-content"><#noparse>$</#noparse>{htmlpage_${htmlpage.id}!}</code></strong></@td>     
 						<@td>${htmlpage.workgroup}</@td>     
 						<@td flex=true>
-							<@aButton href='jsp/admin/plugins/htmlpage/ModifyHtmlPage.jsp?id_htmlpage=${htmlpage.id}'  title='#i18n{htmlpage.manage_htmlpage.actionEdit}' buttonIcon='edit' size='sm' hideTitle=['all'] />
-							<@tform method='post' action='jsp/admin/plugins/htmlpage/DoDuplicateHtmlPage.jsp'>
-								<@input type='hidden' name='id_htmlpage' id='id_htmlpage' value='${htmlpage.id}' />
-								<@button type='submit' title='#i18n{htmlpage.manage_htmlpage.actionDuplicate}' buttonIcon='copy' hideTitle=['all'] size='sm' />
-							</@tform>
-							<@tform method='post' action='jsp/admin/plugins/htmlpage/RemoveHtmlPage.jsp'>
-								<@input type='hidden' name='id_htmlpage' value='${htmlpage.id}' />
-								<@input type='hidden' name='description' value='${htmlpage.description}' />
-								<@button type='submit' title='#i18n{htmlpage.manage_htmlpage.actionDelete}' hideTitle=['all'] buttonIcon='trash' color='danger' size='sm' />
-							</@tform>     
+							<@div class='d-inline-flex'>
+								<@tform method='post' action='jsp/admin/plugins/htmlpage/DoDuplicateHtmlPage.jsp'>
+									<@input type='hidden' name='id_htmlpage' id='id_htmlpage' value='${htmlpage.id}' />
+									<@aButton href='jsp/admin/plugins/htmlpage/ModifyHtmlPage.jsp?id_htmlpage=${htmlpage.id}' title='#i18n{htmlpage.manage_htmlpage.actionEdit}' buttonIcon='edit' size='sm' hideTitle=['all'] />
+									<@button type='submit' title='#i18n{htmlpage.manage_htmlpage.actionDuplicate}' buttonIcon='copy' hideTitle=['all'] size='sm'/>
+								</@tform>
+								<@tform method='post' action='jsp/admin/plugins/htmlpage/RemoveHtmlPage.jsp'>
+									<@input type='hidden' name='id_htmlpage' value='${htmlpage.id}' />
+									<@input type='hidden' name='description' value='${htmlpage.description}' />
+									<@button type='submit' title='#i18n{htmlpage.manage_htmlpage.actionDelete}' hideTitle=['all'] buttonIcon='trash' color='danger' size='sm' />
+								</@tform>     
+							</@div>
+						</@td>
+						<@td flex=true>
+							<@div class='d-inline-flex'>
+								<@tform method='post' action='jsp/admin/plugins/htmlpage/DoDuplicateHtmlPage.jsp'>
+									<@input type='hidden' name='id_htmlpage' id='id_htmlpage' value='${htmlpage.id}' />
+									<@aButton href='jsp/admin/plugins/htmlpage/ModifyHtmlPage.jsp?id_htmlpage=${htmlpage.id}' title='#i18n{htmlpage.manage_htmlpage.actionEdit}' buttonIcon='edit' size='sm' hideTitle=['all'] />
+									<@button type='submit' title='#i18n{htmlpage.manage_htmlpage.actionDuplicate}' buttonIcon='copy' hideTitle=['all'] size='sm'/>
+								</@tform>
+								<@tform method='post' action='jsp/admin/plugins/htmlpage/RemoveHtmlPage.jsp'>
+									<@input type='hidden' name='id_htmlpage' value='${htmlpage.id}' />
+									<@input type='hidden' name='description' value='${htmlpage.description}' />
+									<@button type='submit' title='#i18n{htmlpage.manage_htmlpage.actionDelete}' hideTitle=['all'] buttonIcon='trash' color='danger' size='sm' />
+								</@tform>     
+							</@div>
 						</@td>
 					</@tr>					
 					</#list>
