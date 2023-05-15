@@ -1,7 +1,7 @@
-<#macro getHtmlPage id='' idDefault='' idDiv='' baseUrl=''>
-	<script type="text/javascript" src="js/plugins/htmlpage/htmlpage-rest.js"></script>
-	<script>
-		setBaseUrl( '${baseUrl!}' );
-		getContentHtmlPage( '${id!}', '${idDefault!}', '${idDiv!}' );
-	</script>
+<#macro getHtmlPage id='' idDefault='' idDiv='' divClass='' baseUrl='' >
+<script type="text/javascript" src="js/plugins/htmlpage/htmlpage-rest.js"></script>
+<script>
+setBaseUrl( '${baseUrl!}' );
+getContentHtmlPage( '${id!}', '${idDefault!}', '${idDiv!}'<#if divClass !=''>, '${divClass}'</#if> );
+</script>
 </#macro>
