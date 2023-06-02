@@ -88,6 +88,8 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
     private static final String MARK_NB_ITEMS_PER_PAGE = "nb_items_per_page";
     private static final String MARK_WORKGROUPS_LIST = "workgroups_list";
     private static final String MARK_WEBAPP_URL = "webapp_url";
+    private static final String MARK_PROD_URL = "prod_url";
+    
     private static final String MARK_LOCALE = "locale";
     private static final String MARK_HTML_CONTENT = "html_content";
     private static final String MARK_HTMLPAGE = "htmlpage";
@@ -167,6 +169,7 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
         ReferenceList workgroupsList = AdminWorkgroupService.getUserWorkgroups( getUser( ), getLocale( ) );
         model.put( MARK_WORKGROUPS_LIST, workgroupsList );
         model.put( MARK_WEBAPP_URL, AppPathService.getBaseUrl( request ) );
+        model.put( MARK_PROD_URL, AppPathService.getProdUrl(request) );
         model.put( MARK_LOCALE, getLocale( ) );
         model.put( MARK_HTML_CONTENT, "" );
         model.put( MARK_ROLES_LIST, RoleHome.getRolesList( ) );
@@ -276,6 +279,7 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
         ReferenceList workgroupsList = AdminWorkgroupService.getUserWorkgroups( getUser( ), getLocale( ) );
         model.put( MARK_WORKGROUPS_LIST, workgroupsList );
         model.put( MARK_WEBAPP_URL, AppPathService.getBaseUrl( request ) );
+        model.put( MARK_PROD_URL, AppPathService.getProdUrl(request) );
         model.put( MARK_LOCALE, getLocale( ) );
         model.put( MARK_HTMLPAGE, htmlPage );
         model.put( MARK_ROLES_LIST, RoleHome.getRolesList( ) );
