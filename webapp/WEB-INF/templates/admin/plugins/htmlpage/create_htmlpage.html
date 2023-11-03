@@ -1,71 +1,74 @@
-<#include "/admin/util/editor/editor.html" />
-<@row>
-	<@columns>
-		<@box>
-			<@boxHeader title='#i18n{htmlpage.create_htmlpage.tableLabel}' skipHeader=true />
-			<@boxBody>
-				<@tform method='post' name='create_htmlpage' id='create_htmlpage' action='jsp/admin/plugins/htmlpage/DoCreateHtmlPage.jsp'>
-					<@formGroup labelFor='description' labelKey='#i18n{htmlpage.create_htmlpage.rowTitleLabel}' mandatory=true> 
-						<@input type='text' id='description' name='description' inputSize=60 maxlength=50 />
-					</@formGroup>
-					<@formGroup labelFor='status' labelKey='#i18n{htmlpage.create_htmlpage.labelStatus}'>
-						<@select id='status' name='status' items=status_list default_value='1' />
-					</@formGroup>    
-					<@formGroup labelFor='workgroup' labelKey='#i18n{htmlpage.create_htmlpage.labelWorkgroupKey}' mandatory=true>
-						<@select name='workgroup' default_value='all' items=workgroups_list />
-					</@formGroup>
-					<@formGroup labelFor='role' labelKey='#i18n{htmlpage.create_htmlpage.labelRole}' mandatory=true>
-						<@select name='role' default_value='none' items=roles_list />
-					</@formGroup>
-					<@formGroup labelFor='dateStart' id='fgDateStart' labelKey='#i18n{htmlpage.create_htmlpage.labelDateStart}'>
-						<@inputGroup>
-							<@input type='datetime' name='date_start' id='dateStart' />
-							<@inputGroupItem type='text'>
-								<@icon style='calendar' />
-							</@inputGroupItem>
-						</@inputGroup>
-					</@formGroup>
-					<@formGroup labelFor='dateEnd' id='fgDateEnd' labelKey='#i18n{htmlpage.create_htmlpage.labelDateEnd}'>
-						<@inputGroup>
-							<@input type='datetime' name='date_end' id='dateEnd' />
-							<@inputGroupItem type='text'>
-								<@icon style='calendar' />
-							</@inputGroupItem>
-						</@inputGroup>
-					</@formGroup>
-					<@formGroup labelKey='#i18n{htmlpage.create_htmlpage.labelHtmlContent}'>
-						<@input type='textarea' id='html_content' richtext=true name='html_content' rows=20>${html_content}</@input>
-					</@formGroup>
-					<@formGroup>
-						<@button type='submit' buttonIcon='check' title='#i18n{htmlpage.create_htmlpage.buttonValidate}' />
-						<@aButton href='jsp/admin/plugins/htmlpage/ManageHtmlPage.jsp' buttonIcon='times' title='#i18n{portal.admin.message.buttonCancel}' color='default' />
-					</@formGroup>
-				</@tform>
-			</@boxBody>
-		</@box>
-	</@columns>
-</@row>
+<#include '/admin/util/editor/editor.html' />
+<@pageContainer>
+	<@pageColumn>
+		<@pageHeader title='#i18n{htmlpage.create_htmlpage.tableLabel}' />
+		<@tform method='post' name='create_htmlpage' id='create_htmlpage' action='jsp/admin/plugins/htmlpage/DoCreateHtmlPage.jsp' boxed=true id='create_html_page'>
+			<@formGroup labelFor='description' labelKey='#i18n{htmlpage.create_htmlpage.rowTitleLabel}' mandatory=true> 
+				<@input type='text' id='description' name='description' inputSize=60 maxlength=50 />
+			</@formGroup>
+			<@formGroup labelFor='status' labelKey='#i18n{htmlpage.create_htmlpage.labelStatus}'>
+				<@select id='status' name='status' items=status_list default_value='1' />
+			</@formGroup>    
+			<@formGroup labelFor='workgroup' labelKey='#i18n{htmlpage.create_htmlpage.labelWorkgroupKey}' mandatory=true>
+				<@select name='workgroup' default_value='all' items=workgroups_list />
+			</@formGroup>
+			<@formGroup labelFor='role' labelKey='#i18n{htmlpage.create_htmlpage.labelRole}' mandatory=true>
+				<@select name='role' default_value='none' items=roles_list />
+			</@formGroup>
+			<@formGroup labelFor='dateStart' id='fgDateStart' labelKey='#i18n{htmlpage.create_htmlpage.labelDateStart}'>
+				<@inputGroup>
+					<@input type='datetime' name='date_start' id='dateStart' />
+					<@inputGroupItem type='text'>
+						<@icon style='calendar' />
+					</@inputGroupItem>
+				</@inputGroup>
+			</@formGroup>
+			<@formGroup labelFor='dateEnd' id='fgDateEnd' labelKey='#i18n{htmlpage.create_htmlpage.labelDateEnd}'>
+				<@inputGroup>
+					<@input type='datetime' name='date_end' id='dateEnd' />
+					<@inputGroupItem type='text'>
+						<@icon style='calendar' />
+					</@inputGroupItem>
+				</@inputGroup>
+			</@formGroup>
+			<@formGroup labelKey='#i18n{htmlpage.create_htmlpage.labelHtmlContent}'>
+				<@input type='textarea' id='html_content' richtext=true name='html_content' rows=20>${html_content}</@input>
+			</@formGroup>
+			<@formGroup>
+				<@button type='submit' buttonIcon='check' title='#i18n{htmlpage.create_htmlpage.buttonValidate}' />
+				<@aButton href='jsp/admin/plugins/htmlpage/ManageHtmlPage.jsp' buttonIcon='times' title='#i18n{portal.admin.message.buttonCancel}' color='default' />
+			</@formGroup>
+		</@tform>
+	</@pageColumn>
+</@pageContainer>
 <@initEditor />
 <script>
-$(function(){
-	$('#fgDateStart').hide();
-	$('#fgDateEnd').hide();
-	
-	$('#status').change( function(){
-		if($(this).val() == 0 || $(this).val() == 1 ){
-			$('#fgDateStart').hide();
-			$('#fgDateEnd').hide();
-			$('#dateStart').val("");
-			$('#dateEnd').val("");
-			$('#dateStart').prop('required', false);
-			$('#dateEnd').prop('required', false);
+	document.addEventListener("DOMContentLoaded", function () {
+	  var fgDateStart = document.getElementById('fgDateStart');
+	  var fgDateEnd = document.getElementById('fgDateEnd');
+	  var status = document.getElementById('status');
+	  var dateStart = document.getElementById('dateStart');
+	  var dateEnd = document.getElementById('dateEnd');
+
+	  fgDateStart.style.display = 'none';
+	  fgDateEnd.style.display = 'none';
+
+	  status.addEventListener('change', function () {
+		if (this.value == 0 || this.value == 1) {
+		  fgDateStart.style.display = 'none';
+		  fgDateEnd.style.display = 'none';
+		  dateStart.value = "";
+		  dateEnd.value = "";
+		  dateStart.required = false;
+		  dateEnd.required = false;
 		}
-		if( $(this).val() == 2  ){
-			$('#fgDateStart').show();
-			$('#fgDateEnd').show();
-			$('#dateStart').prop('required', true);
-			$('#dateEnd').prop('required', true);
+		if (this.value == 2) {
+		  fgDateStart.style.display = 'block';
+		  fgDateEnd.style.display = 'block';
+		  dateStart.required = true;
+		  dateEnd.required = true;
 		}
+	  });
 	});
-})
 </script>
+
