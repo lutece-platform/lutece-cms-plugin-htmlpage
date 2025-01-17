@@ -44,7 +44,9 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.Document;
@@ -66,6 +68,8 @@ import org.apache.lucene.store.Directory;
  * HtmlPageSearchEngine
  * 
  */
+@ApplicationScoped
+@Named( "htmlpage.htmlpageSearchEngine" )
 public class HtmlPageSearchEngine implements SearchEngine
 {
     /**
@@ -141,7 +145,7 @@ public class HtmlPageSearchEngine implements SearchEngine
             }
             catch( ParseException e )
             {
-                AppLogService.error( "Bad Date Format for indexed item \"" + item.getTitle( ) + "\" : " + e.getMessage( ) );
+                AppLogService.error( "Bad Date Format for indexed item \"{}\" : {}", item.getTitle( ), e.getMessage( ) );
             }
 
             result.setUrl( item.getUrl( ) );

@@ -34,9 +34,8 @@
 package fr.paris.lutece.plugins.htmlpage.service.search;
 
 import fr.paris.lutece.plugins.htmlpage.business.HtmlPage;
-import fr.paris.lutece.plugins.htmlpage.business.HtmlPageHome;
 import fr.paris.lutece.plugins.htmlpage.service.HtmlPagePlugin;
-import fr.paris.lutece.plugins.htmlpage.service.HtmlPageService;
+import fr.paris.lutece.plugins.htmlpage.service.IHtmlPageService;
 import fr.paris.lutece.portal.service.content.XPageAppService;
 import fr.paris.lutece.portal.service.message.SiteMessageException;
 import fr.paris.lutece.portal.service.plugin.Plugin;
@@ -44,12 +43,11 @@ import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.search.IndexationService;
 import fr.paris.lutece.portal.service.search.SearchIndexer;
 import fr.paris.lutece.portal.service.search.SearchItem;
-import fr.paris.lutece.portal.service.util.AppException;
 import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.util.url.UrlItem;
+import jakarta.enterprise.inject.spi.CDI;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -60,13 +58,7 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
-import org.apache.tika.exception.TikaException;
-import org.apache.tika.metadata.Metadata;
-import org.apache.tika.parser.ParseContext;
-import org.apache.tika.parser.html.HtmlParser;
-import org.apache.tika.sax.BodyContentHandler;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
+import org.jsoup.Jsoup;
 
 /**
  * Indexer service for htmlPage Xpages
@@ -84,6 +76,7 @@ public class HtmlPageIndexer implements SearchIndexer
     public static final String PROPERTY_INDEX_TYPE_PAGE = "htmlpage";
     private static final String PARAMETER_HTMLPAGE_ID = "htmlpage_id";
     private static final String JSP_SEARCH_HTMLPAGE = "jsp/site/Portal.jsp?page=htmlpage&query=";
+    private static IHtmlPageService _htmlPageService = CDI.current().select(IHtmlPageService.class).get();
 
     /**
      * Returns the indexer service description
@@ -110,7 +103,7 @@ public class HtmlPageIndexer implements SearchIndexer
         String strPortalUrl = AppPathService.getPortalUrl( );
         Plugin plugin = PluginService.getPlugin( HtmlPagePlugin.PLUGIN_NAME );
 
-        Collection<HtmlPage> listHtmlPages = HtmlPageService.getInstance( ).getEnabledHtmlPageList( );
+        Collection<HtmlPage> listHtmlPages = _htmlPageService.getEnabledHtmlPageList( );
 
         for ( HtmlPage htmlpage : listHtmlPages )
         {
@@ -136,7 +129,7 @@ public class HtmlPageIndexer implements SearchIndexer
         String strPortalUrl = AppPathService.getPortalUrl( );
         Plugin plugin = PluginService.getPlugin( HtmlPagePlugin.PLUGIN_NAME );
 
-        HtmlPage htmlpage = HtmlPageService.getInstance( ).getEnableHtmlPage( Integer.parseInt( strId ) );
+        HtmlPage htmlpage = _htmlPageService.getEnableHtmlPage( Integer.parseInt( strId ) );
         if ( htmlpage != null )
         {
             UrlItem url = new UrlItem( strPortalUrl );
@@ -233,25 +226,11 @@ public class HtmlPageIndexer implements SearchIndexer
         // tokenized prior to indexing.
         doc.add( new Field( SearchItem.FIELD_UID, htmlpage.getId( ) + "_" + SHORT_NAME, ftNotStored ) );
 
-        String strContentToIndex = getContentToIndex( htmlpage );
-        ContentHandler handler = new BodyContentHandler( );
-        Metadata metadata = new Metadata( );
-        try
-        {
-            new HtmlParser( ).parse( new ByteArrayInputStream( strContentToIndex.getBytes( ) ), handler, metadata, new ParseContext( ) );
-        }
-        catch( SAXException e )
-        {
-            throw new AppException( "Error during page parsing." );
-        }
-        catch( TikaException e )
-        {
-            throw new AppException( "Error during page parsing." );
-        }
+        org.jsoup.nodes.Document jsoupDocument = Jsoup.parse( getContentToIndex( htmlpage ) );
 
         // the content of the article is recovered in the parser because this one
-        // had replaced the encoded caracters (as &eacute;) by the corresponding special caracter (as ?)
-        StringBuilder sb = new StringBuilder( handler.toString( ) );
+        // had replaced the encoded characters (as &eacute;) by the corresponding special character (as ?)
+        StringBuilder sb = new StringBuilder( jsoupDocument.text( ) );
 
         doc.add( new Field( SearchItem.FIELD_CONTENTS, sb.toString( ), TextField.TYPE_NOT_STORED ) );
 

@@ -41,6 +41,7 @@
  */
 package fr.paris.lutece.plugins.htmlpage.service;
 
+import fr.paris.lutece.plugins.htmlpage.business.HtmlPage;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginDefaultImplementation;
 import fr.paris.lutece.portal.service.plugin.PluginService;
@@ -59,7 +60,7 @@ public class HtmlPagePlugin extends PluginDefaultImplementation
      */
     public void init( )
     {
-        HtmlPageService.getInstance( ).init( );
+        HtmlPage.init( );
     }
     
     public static Plugin getPlugin ( )

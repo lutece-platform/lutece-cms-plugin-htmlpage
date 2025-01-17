@@ -33,19 +33,36 @@
  */
 package fr.paris.lutece.plugins.htmlpage.utils;
 
+import fr.paris.lutece.plugins.workflowcore.business.event.EventAction;
+import fr.paris.lutece.plugins.workflowcore.business.event.Type;
 import fr.paris.lutece.portal.business.event.ResourceEvent;
 import fr.paris.lutece.portal.business.indexeraction.IndexerAction;
-import fr.paris.lutece.portal.service.event.ResourceEventManager;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Event;
+import jakarta.inject.Inject;
 
 /**
  * 
  * HtmlPageIndexerUtils
  *
  */
+@ApplicationScoped
 public class HtmlPageIndexerUtils
 {
     // Indexed resource type name
     public static final String CONSTANT_TYPE_RESOURCE = "HTMLPAGE_HTMLPAGE";
+    
+    @Inject
+    @Type( EventAction.CREATE )
+    private Event<ResourceEvent> _createResourceEvent;
+    
+    @Inject
+    @Type( EventAction.UPDATE )
+    private Event<ResourceEvent> _modifyResourceEvent;
+    
+    @Inject
+    @Type( EventAction.REMOVE )
+    private Event<ResourceEvent> _deleteResourceEvent;
 
     /**
      * Warn that a action has been done.
@@ -55,24 +72,26 @@ public class HtmlPageIndexerUtils
      * @param nIdTask
      *            the key of the action to do
      */
-    public static void addIndexerAction( String strIdResource, int nIdTask )
+    public void addIndexerAction( String strIdResource, int nIdTask )
     {
         ResourceEvent event = new ResourceEvent( );
         event.setIdResource( String.valueOf( strIdResource ) );
         event.setTypeResource( CONSTANT_TYPE_RESOURCE );
+                      
         switch( nIdTask )
         {
             case IndexerAction.TASK_CREATE:
-                ResourceEventManager.fireAddedResource( event );
+            	_createResourceEvent.fire( event );
                 break;
             case IndexerAction.TASK_MODIFY:
-                ResourceEventManager.fireUpdatedResource( event );
+            	_modifyResourceEvent.fire( event );
                 break;
             case IndexerAction.TASK_DELETE:
-                ResourceEventManager.fireDeletedResource( event );
+            	_deleteResourceEvent.fire( event );
                 break;
             default:
                 break;
         }
     }
+    
 }

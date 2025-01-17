@@ -33,9 +33,11 @@
  */
 package fr.paris.lutece.plugins.htmlpage.web;
 
+import fr.paris.lutece.api.user.User;
 import fr.paris.lutece.plugins.htmlpage.business.HtmlPage;
 import fr.paris.lutece.plugins.htmlpage.business.HtmlPageHome;
 import fr.paris.lutece.plugins.htmlpage.service.EnumStatus;
+import fr.paris.lutece.plugins.htmlpage.service.IHtmlPageService;
 import fr.paris.lutece.plugins.htmlpage.utils.HtmlPageUtil;
 import fr.paris.lutece.portal.business.role.RoleHome;
 import fr.paris.lutece.portal.service.message.AdminMessage;
@@ -57,7 +59,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.SessionScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -65,6 +70,8 @@ import org.apache.commons.lang3.StringUtils;
  *
  * @author lenaini
  */
+@SessionScoped
+@Named
 public class HtmlPageJspBean extends PluginAdminPageJspBean
 {
     // Right
@@ -122,6 +129,9 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
     private int _nDefaultItemsPerPage;
     private String _strCurrentPageIndex;
     private int _nItemsPerPage;
+    
+    @Inject 
+    private IHtmlPageService _htmlPageService;
 
     /**
      * returns the template of the HtmlPageLists management
@@ -139,7 +149,8 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
         _nItemsPerPage = Paginator.getItemsPerPage( request, Paginator.PARAMETER_ITEMS_PER_PAGE, _nItemsPerPage, _nDefaultItemsPerPage );
 
         Collection<HtmlPage> listHtmlPageList = HtmlPageHome.findAll( getPlugin( ) );
-        listHtmlPageList = AdminWorkgroupService.getAuthorizedCollection( listHtmlPageList, getUser( ) );
+        User currentUser = getUser( );
+        listHtmlPageList = AdminWorkgroupService.getAuthorizedCollection( listHtmlPageList, currentUser );
 
         Paginator paginator = new Paginator( (List<HtmlPage>) listHtmlPageList, _nItemsPerPage, getHomeUrl( request ), PARAMETER_PAGE_INDEX,
                 _strCurrentPageIndex );
@@ -229,7 +240,7 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
 		htmlpage.setDateStart( dateStart );
 		htmlpage.setDateEnd( dateEnd );
 
-        HtmlPageHome.create( htmlpage, getPlugin( ) );
+		_htmlPageService.create( htmlpage, getPlugin( ) );
 
         // if the operation occurred well, redirects towards the list of the HtmlPages
         return JSP_REDIRECT_TO_MANAGE_HTMLPAGE;
@@ -255,7 +266,7 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
         duplicateHtmlPage.setWorkgroup( htmlpage.getWorkgroup( ) );
         duplicateHtmlPage.setRole( htmlpage.getRole( ) );
 
-        HtmlPageHome.create( duplicateHtmlPage, getPlugin( ) );
+        _htmlPageService.create( duplicateHtmlPage, getPlugin( ) );
 
         // if the operation occurred well, redirects towards the list of the HtmlPages
         return JSP_REDIRECT_TO_MANAGE_HTMLPAGE;
@@ -333,7 +344,7 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
 		htmlPage.setDateStart( dateStart );
 		htmlPage.setDateEnd( dateEnd );
 
-        HtmlPageHome.update( htmlPage, getPlugin( ) );
+        _htmlPageService.update( htmlPage, getPlugin( ) );
 
         // if the operation occurred well, redirects towards the list of the HtmlPages
         return JSP_REDIRECT_TO_MANAGE_HTMLPAGE;
@@ -373,7 +384,7 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
         int nIdHtmlPage = Integer.parseInt( request.getParameter( PARAMETER_HTMLPAGE_ID ) );
 
         HtmlPage htmlPage = HtmlPageHome.findByPrimaryKey( nIdHtmlPage, getPlugin( ) );
-        HtmlPageHome.remove( htmlPage, getPlugin( ) );
+        _htmlPageService.remove( htmlPage, getPlugin( ) );
 
         // if the operation occurred well, redirects towards the list of the HtmlPages
         return JSP_REDIRECT_TO_MANAGE_HTMLPAGE;

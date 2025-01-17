@@ -3,7 +3,7 @@
     <!-- Plugin Informations -->
     <name>htmlpage</name>
     <class>fr.paris.lutece.portal.service.plugin.PluginDefaultImplementation</class>
-    <version>5.1.5-SNAPSHOT</version>
+    <version>6.0.0-SNAPSHOT</version>
     <documentation/>
     <installation/>
     <changes/>
@@ -39,12 +39,11 @@
             <feature-documentation-url>jsp/admin/documentation/AdminDocumentation.jsp?doc=admin-htmlpage</feature-documentation-url>
         </admin-feature>
     </admin-features>
-    
+       
     <!-- Xpage configuration -->
     <applications>
         <application>
             <application-id>htmlpage</application-id>
-            <application-class>fr.paris.lutece.plugins.htmlpage.web.HtmlPageApp</application-class>
         </application>
     </applications>
     

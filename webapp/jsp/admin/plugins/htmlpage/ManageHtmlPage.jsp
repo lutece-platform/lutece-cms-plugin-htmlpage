@@ -1,9 +1,9 @@
 <%@ page errorPage="../../ErrorPage.jsp" %>
 <jsp:include page="../../AdminHeader.jsp" />
 
-<jsp:useBean id="htmlpage" scope="session" class="fr.paris.lutece.plugins.htmlpage.web.HtmlPageJspBean" />
+<%@page import="fr.paris.lutece.plugins.htmlpage.web.HtmlPageJspBean"%>
 
-<% htmlpage.init( request, htmlpage.RIGHT_MANAGE_HTMLPAGE ); %>
-<%= htmlpage.getManageHtmlPage ( request ) %>
+${ htmlPageJspBean.init( pageContext.request, HtmlPageJspBean.RIGHT_MANAGE_HTMLPAGE ) }
+${ htmlPageJspBean.getManageHtmlPage ( pageContext.request ) }
 
 <%@ include file="../../AdminFooter.jsp" %>

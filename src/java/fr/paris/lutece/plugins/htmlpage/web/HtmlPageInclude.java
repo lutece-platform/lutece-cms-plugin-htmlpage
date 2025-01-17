@@ -41,7 +41,9 @@ import fr.paris.lutece.portal.service.includes.PageInclude;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
+
+import jakarta.enterprise.inject.spi.CDI;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * This class manages HtmlPage include.
@@ -75,7 +77,7 @@ public class HtmlPageInclude implements PageInclude
     {
         if ( !_bEnableApiRest && request != null )
         {
-            for ( HtmlPage htmlpage : HtmlPageService.getInstance( ).getHtmlPageListCache( ) )
+            for ( HtmlPage htmlpage : CDI.current( ).select( HtmlPageService.class ).get( ).getHtmlPageListCache( ) )
             {
                 if( HtmlPageUtil.isVisible( request, htmlpage.getRole( ) ) )
                 {
