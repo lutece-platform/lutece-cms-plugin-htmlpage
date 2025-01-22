@@ -60,6 +60,7 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
+import org.apache.lucene.index.IndexOptions;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
@@ -217,6 +218,10 @@ public class HtmlPageIndexer implements SearchIndexer
         FieldType ft = new FieldType( StringField.TYPE_STORED );
         ft.setOmitNorms( false );
 
+        FieldType ftdfp = new FieldType( StringField.TYPE_STORED ); //Flags : Idfp
+        ftdfp.setOmitNorms( false );
+        ftdfp.setIndexOptions( IndexOptions.DOCS_AND_FREQS_AND_POSITIONS );
+
         FieldType ftNotStored = new FieldType( StringField.TYPE_NOT_STORED );
         ftNotStored.setOmitNorms( false );
         ftNotStored.setTokenized( false );
@@ -257,7 +262,7 @@ public class HtmlPageIndexer implements SearchIndexer
 
         // Add the subject name as a separate Text field, so that it can be searched
         // separately.
-        doc.add( new Field( SearchItem.FIELD_TITLE, htmlpage.getDescription( ), ft ) );
+        doc.add( new Field( SearchItem.FIELD_TITLE, htmlpage.getDescription( ), ftdfp ) );
 
         doc.add( new Field( SearchItem.FIELD_TYPE, HtmlPagePlugin.PLUGIN_NAME, ft ) );
 
