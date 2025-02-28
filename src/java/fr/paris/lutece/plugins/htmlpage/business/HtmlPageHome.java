@@ -35,14 +35,8 @@ package fr.paris.lutece.plugins.htmlpage.business;
 
 import java.util.Collection;
 
-import fr.paris.lutece.plugins.htmlpage.service.HtmlPageService;
-import fr.paris.lutece.plugins.htmlpage.service.search.HtmlPageIndexer;
-import fr.paris.lutece.plugins.htmlpage.utils.HtmlPageIndexerUtils;
-import fr.paris.lutece.portal.business.indexeraction.IndexerAction;
 import fr.paris.lutece.portal.service.plugin.Plugin;
-import fr.paris.lutece.portal.service.search.IndexationService;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
-import fr.paris.lutece.portal.service.util.AppPropertiesService;
+import jakarta.enterprise.inject.spi.CDI;
 
 /**
  * This class provides instances management methods (create, find, ...) for Htmlpage objects
@@ -52,7 +46,7 @@ import fr.paris.lutece.portal.service.util.AppPropertiesService;
 public class HtmlPageHome
 {
     // Static variable pointed at the DAO instance
-    private static IHtmlPageDAO _dao = (IHtmlPageDAO) SpringContextService.getPluginBean( "htmlpage", "htmlPageDAO" );
+	private static IHtmlPageDAO _dao = CDI.current( ).select( IHtmlPageDAO.class ).get( );
 
     /**
      * Private constructor - this class need not be instantiated
@@ -70,20 +64,9 @@ public class HtmlPageHome
      *            The Plugin object
      * @return The instance of htmlpage which has been created with its primary key.
      */
-    public static HtmlPage create( HtmlPage htmlpage, Plugin plugin )
+    public static void create( HtmlPage htmlpage, Plugin plugin )
     {
-        _dao.insert( htmlpage, plugin );
-
-        if ( htmlpage.isEnabled( ) )
-        {
-            String strIdHtmlPage = Integer.toString( htmlpage.getId( ) );
-            IndexationService.addIndexerAction( strIdHtmlPage, AppPropertiesService.getProperty( HtmlPageIndexer.PROPERTY_INDEXER_NAME ),
-                    IndexerAction.TASK_CREATE );
-
-            HtmlPageIndexerUtils.addIndexerAction( strIdHtmlPage, IndexerAction.TASK_CREATE );
-        }
-
-        return htmlpage;
+        _dao.insert( htmlpage, plugin );        
     }
 
     /**
@@ -95,32 +78,9 @@ public class HtmlPageHome
      *            The Plugin object
      * @return The instance of the htmlpage which has been updated
      */
-    public static HtmlPage update( HtmlPage htmlpage, Plugin plugin )
+    public static void update( HtmlPage htmlpage, Plugin plugin )
     {
-        String strIdHtmlPage = Integer.toString( htmlpage.getId( ) );
-        if ( htmlpage.isEnabled( ) )
-        {
-            IndexationService.addIndexerAction( strIdHtmlPage, AppPropertiesService.getProperty( HtmlPageIndexer.PROPERTY_INDEXER_NAME ),
-                    IndexerAction.TASK_MODIFY );
-
-            HtmlPageIndexerUtils.addIndexerAction( strIdHtmlPage, IndexerAction.TASK_MODIFY );
-        }
-        else
-        {
-            HtmlPage oldPage = HtmlPageService.getInstance( ).getEnableHtmlPage( Integer.parseInt( strIdHtmlPage ) );
-
-            if ( oldPage != null )
-            {
-                IndexationService.addIndexerAction( strIdHtmlPage + "_" + HtmlPageIndexer.SHORT_NAME,
-                        AppPropertiesService.getProperty( HtmlPageIndexer.PROPERTY_INDEXER_NAME ), IndexerAction.TASK_DELETE );
-
-                HtmlPageIndexerUtils.addIndexerAction( strIdHtmlPage, IndexerAction.TASK_DELETE );
-            }
-        }
-
         _dao.store( htmlpage, plugin );
-
-        return htmlpage;
     }
 
     /**
@@ -134,15 +94,6 @@ public class HtmlPageHome
     public static void remove( HtmlPage htmlpage, Plugin plugin )
     {
         _dao.delete( htmlpage, plugin );
-
-        if ( htmlpage.isEnabled( ) )
-        {
-            String strIdHtmlPage = Integer.toString( htmlpage.getId( ) );
-            IndexationService.addIndexerAction( strIdHtmlPage + "_" + HtmlPageIndexer.SHORT_NAME,
-                    AppPropertiesService.getProperty( HtmlPageIndexer.PROPERTY_INDEXER_NAME ), IndexerAction.TASK_DELETE );
-
-            HtmlPageIndexerUtils.addIndexerAction( strIdHtmlPage, IndexerAction.TASK_DELETE );
-        }
     }
 
     ///////////////////////////////////////////////////////////////////////////

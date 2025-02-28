@@ -2,9 +2,9 @@
 
 <jsp:include page="../../AdminHeader.jsp" />
 
-<jsp:useBean id="htmlpage" scope="session" class="fr.paris.lutece.plugins.htmlpage.web.HtmlPageJspBean" />
+<%@page import="fr.paris.lutece.plugins.htmlpage.web.HtmlPageJspBean"%>
 
-<% htmlpage.init( request, htmlpage.RIGHT_MANAGE_HTMLPAGE ); %>
-<%= htmlpage.getCreateHtmlPage ( request ) %>
+${ htmlPageJspBean.init( pageContext.request, HtmlPageJspBean.RIGHT_MANAGE_HTMLPAGE ) }
+${ htmlPageJspBean.getCreateHtmlPage ( pageContext.request ) }
 
 <%@ include file="../../AdminFooter.jsp" %>

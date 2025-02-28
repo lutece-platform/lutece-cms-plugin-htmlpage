@@ -35,6 +35,7 @@ package fr.paris.lutece.plugins.htmlpage.business;
 
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.sql.DAOUtil;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -44,6 +45,7 @@ import java.util.Collection;
  * 
  * @author lenaini
  */
+@ApplicationScoped
 public class HtmlPageDAO implements IHtmlPageDAO
 {
     // Constants

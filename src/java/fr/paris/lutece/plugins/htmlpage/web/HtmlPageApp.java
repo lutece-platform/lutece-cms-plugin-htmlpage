@@ -34,7 +34,7 @@
 package fr.paris.lutece.plugins.htmlpage.web;
 
 import fr.paris.lutece.plugins.htmlpage.business.HtmlPage;
-import fr.paris.lutece.plugins.htmlpage.service.HtmlPageService;
+import fr.paris.lutece.plugins.htmlpage.service.IHtmlPageService;
 import fr.paris.lutece.plugins.htmlpage.utils.HtmlPageUtil;
 import fr.paris.lutece.portal.service.message.SiteMessage;
 import fr.paris.lutece.portal.service.message.SiteMessageException;
@@ -43,7 +43,6 @@ import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.search.SearchEngine;
 import fr.paris.lutece.portal.service.search.SearchResult;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.web.xpages.XPage;
@@ -55,13 +54,18 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.SessionScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 
 /**
  * This class manages HtmlPage page.
  */
+@SessionScoped
+@Named( "htmlpage.xpage.htmlpage" )
 public class HtmlPageApp implements XPageApplication
 {
     //////////////////////////////////////////////////////////////////////////////////////////////
@@ -93,12 +97,17 @@ public class HtmlPageApp implements XPageApplication
     // Templates
     private static final String TEMPLATE_XPAGE_HTMLPAGE = "skin/plugins/htmlpage/page_htmlpage.html";
     private static final String TEMPLATE_XPAGE_HTMLPAGE_LISTS = "skin/plugins/htmlpage/htmlpages_list.html";
-    // Bean
-    private static final String BEAN_SEARCH_ENGINE = "htmlpage.htmlpageSearchEngine";
 
     // private fields
     private Plugin _plugin;
 
+    @Inject 
+    private transient IHtmlPageService _htmlPageService;
+    
+    @Inject
+    @Named( "htmlpage.htmlpageSearchEngine" )
+    private transient SearchEngine _htmlpageSearchEngine;
+    
     /** Creates a new instance of HtmlPageApp */
     public HtmlPageApp( )
     {
@@ -152,8 +161,7 @@ public class HtmlPageApp implements XPageApplication
 
     private String getSearch( String strQuery, String strPluginName, HttpServletRequest request )
     {
-        SearchEngine engine = SpringContextService.getBean( BEAN_SEARCH_ENGINE );
-        List<SearchResult> listResults = engine.getSearchResults( strQuery, request );
+        List<SearchResult> listResults = _htmlpageSearchEngine.getSearchResults( strQuery, request );
 
         HashMap<String, Object> model = new HashMap<String, Object>( );
         model.put( MARK_RESULT, listResults );
@@ -167,7 +175,7 @@ public class HtmlPageApp implements XPageApplication
     {
         HashMap<String, Object> model = new HashMap<String, Object>( );
 
-        Collection<HtmlPage> htmlPageList = HtmlPageService.getInstance( ).getHtmlPageListCache( );
+        Collection<HtmlPage> htmlPageList = _htmlPageService.getHtmlPageListCache( );
         Collection<HtmlPage> visibleHtmlPageList = new ArrayList<HtmlPage>( ); // filter the list of lists by role
 
         for ( HtmlPage htmlpage : htmlPageList )
@@ -199,7 +207,7 @@ public class HtmlPageApp implements XPageApplication
         HashMap<String, Object> model = new HashMap<String, Object>( );
 
         int nHtmlPageId = Integer.parseInt( strHtmlPageId );
-        HtmlPage htmlpage = HtmlPageService.getInstance( ).getHtmlPageCache( nHtmlPageId );
+        HtmlPage htmlpage = _htmlPageService.getHtmlPageCache( nHtmlPageId );
 
         if ( htmlpage != null )
         {

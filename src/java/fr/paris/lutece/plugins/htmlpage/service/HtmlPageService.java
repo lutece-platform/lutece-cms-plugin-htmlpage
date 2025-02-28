@@ -38,15 +38,36 @@ import java.util.List;
 
 import fr.paris.lutece.plugins.htmlpage.business.HtmlPage;
 import fr.paris.lutece.plugins.htmlpage.business.HtmlPageHome;
+import fr.paris.lutece.plugins.htmlpage.service.search.HtmlPageIndexer;
+import fr.paris.lutece.plugins.htmlpage.utils.HtmlPageIndexerUtils;
 import fr.paris.lutece.plugins.htmlpage.utils.HtmlPageUtil;
+import fr.paris.lutece.portal.business.indexeraction.IndexerAction;
+import fr.paris.lutece.portal.service.cache.Lutece107Cache;
+import fr.paris.lutece.portal.service.cache.LuteceCache;
+import fr.paris.lutece.portal.service.plugin.Plugin;
+import fr.paris.lutece.portal.service.search.IndexationService;
+import fr.paris.lutece.portal.service.util.AppPropertiesService;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.Initialized;
+import jakarta.enterprise.event.Observes;
+import jakarta.inject.Inject;
+import jakarta.servlet.ServletContext;
 
 /**
  * 
  * HtmlPageService
  */
+@ApplicationScoped
 public class HtmlPageService implements IHtmlPageService
-{
-    private static HtmlPageService _singleton;
+{   
+	private static final String CACHE_SERVICE_NAME = "PublicHtmlPageCacheService";
+	
+    @Inject
+    private HtmlPageIndexerUtils _htmlPageIndexerUtils;
+    
+    @Inject
+	@LuteceCache( cacheName = CACHE_SERVICE_NAME, keyType = String.class, valueType = Object.class, enable = true )
+	private Lutece107Cache<String, Object> _cachePublicHtmlPage;
 
     /**
      * Initializes the Housing service
@@ -56,33 +77,23 @@ public class HtmlPageService implements IHtmlPageService
     {
         HtmlPage.init( );
     }
-
-    /**
-     * Returns the instance of the singleton
-     *
-     * @return The instance of the singleton
-     */
-    public static HtmlPageService getInstance( )
-    {
-        if ( _singleton == null )
-        {
-            _singleton = new HtmlPageService( );
-        }
-        return _singleton;
-    }
-
+    
     @Override
     public HtmlPage getHtmlPageCache( int nId )
     {
-        HtmlPage htmlPage = PublicHtmlPageCacheService.getService( ).getHtmlPageCache( String.valueOf( nId ) );
+    	HtmlPage htmlPage = ( HtmlPage ) _cachePublicHtmlPage.get( getCacheKey( String.valueOf( nId ) ) );
         
-        if ( htmlPage == null || !HtmlPageUtil.isActivedPageHtml( htmlPage ))
+        if ( htmlPage == null || !HtmlPageUtil.isActivedPageHtml( htmlPage ) )
         {
             htmlPage = getEnableHtmlPage( nId );
             
             if ( htmlPage != null && !HtmlPageUtil.isRoleExist( htmlPage.getRole( ) ))
             {
-                PublicHtmlPageCacheService.getService( ).addHtmlPageCache( htmlPage );
+            	String htmlPageCacheKey = getCacheKey( String.valueOf( htmlPage.getId( ) ) );
+            	if( _cachePublicHtmlPage.get( htmlPageCacheKey ) == null )
+            	{
+            		_cachePublicHtmlPage.put( htmlPageCacheKey, htmlPage );
+            	}
             }           
         }
         return htmlPage;
@@ -91,7 +102,8 @@ public class HtmlPageService implements IHtmlPageService
     @Override
     public List<HtmlPage> getHtmlPageListCache( )
     {
-        List<HtmlPage> htmlPageList = PublicHtmlPageCacheService.getService( ).getHtmlPageListCache(  );
+    	String allPageKey = getCacheKey( "all" );
+    	List<HtmlPage> htmlPageList = ( List<HtmlPage> ) _cachePublicHtmlPage.get( allPageKey );
         
         if ( htmlPageList == null )
         {
@@ -99,7 +111,10 @@ public class HtmlPageService implements IHtmlPageService
             
             if ( htmlPageList != null )
             {
-                PublicHtmlPageCacheService.getService( ).addHtmlPageCache( htmlPageList );
+            	if( _cachePublicHtmlPage.get( allPageKey ) == null )
+            	{
+            		_cachePublicHtmlPage.put( allPageKey, htmlPageList );
+            	}
             }           
         }
         return htmlPageList;
@@ -129,5 +144,116 @@ public class HtmlPageService implements IHtmlPageService
         
         return enablehtmlPageList;
     }
+    
+    /**
+     * Creation of an instance of htmlpage
+     *
+     * @param htmlpage
+     *            The instance of the htmlpage which contains the informations to store
+     * @param plugin
+     *            The Plugin object
+     * @return The instance of htmlpage which has been created with its primary key.
+     */
+    public HtmlPage create( HtmlPage htmlpage, Plugin plugin )
+    {
+    	HtmlPageHome.create( htmlpage, plugin );
 
+        if ( htmlpage.isEnabled( ) )
+        {
+            String strIdHtmlPage = Integer.toString( htmlpage.getId( ) );
+            IndexationService.addIndexerAction( strIdHtmlPage, AppPropertiesService.getProperty( HtmlPageIndexer.PROPERTY_INDEXER_NAME ),
+                    IndexerAction.TASK_CREATE );
+
+            _htmlPageIndexerUtils.addIndexerAction( strIdHtmlPage, IndexerAction.TASK_CREATE );
+        }
+
+        return htmlpage;
+    }
+    
+    /**
+     * Update of the htmlpage which is specified in parameter
+     *
+     * @param htmlpage
+     *            The instance of the htmlpage which contains the data to store
+     * @param plugin
+     *            The Plugin object
+     * @return The instance of the htmlpage which has been updated
+     */
+    public HtmlPage update( HtmlPage htmlpage, Plugin plugin )
+    {   	
+        String strIdHtmlPage = Integer.toString( htmlpage.getId( ) );
+        if ( htmlpage.isEnabled( ) )
+        {
+            IndexationService.addIndexerAction( strIdHtmlPage, AppPropertiesService.getProperty( HtmlPageIndexer.PROPERTY_INDEXER_NAME ),
+                    IndexerAction.TASK_MODIFY );
+
+            _htmlPageIndexerUtils.addIndexerAction( strIdHtmlPage, IndexerAction.TASK_MODIFY );
+        }
+        else
+        {
+            HtmlPage oldPage = getEnableHtmlPage( Integer.parseInt( strIdHtmlPage ) );
+
+            if ( oldPage != null )
+            {
+                IndexationService.addIndexerAction( strIdHtmlPage + "_" + HtmlPageIndexer.SHORT_NAME,
+                        AppPropertiesService.getProperty( HtmlPageIndexer.PROPERTY_INDEXER_NAME ), IndexerAction.TASK_DELETE );
+
+                _htmlPageIndexerUtils.addIndexerAction( strIdHtmlPage, IndexerAction.TASK_DELETE );
+            }
+        }
+        
+        HtmlPageHome.update( htmlpage, plugin );
+
+        return htmlpage;
+    }
+
+    /**
+     * Remove the Htmlpage whose identifier is specified in parameter
+     * 
+     * @param htmlpage
+     *            The Htmlpage object to remove
+     * @param plugin
+     *            The Plugin object
+     */
+    public void remove( HtmlPage htmlpage, Plugin plugin )
+    {
+    	HtmlPageHome.remove( htmlpage, plugin );
+
+        if ( htmlpage.isEnabled( ) )
+        {
+            String strIdHtmlPage = Integer.toString( htmlpage.getId( ) );
+            IndexationService.addIndexerAction( strIdHtmlPage + "_" + HtmlPageIndexer.SHORT_NAME,
+                    AppPropertiesService.getProperty( HtmlPageIndexer.PROPERTY_INDEXER_NAME ), IndexerAction.TASK_DELETE );
+
+            _htmlPageIndexerUtils.addIndexerAction( strIdHtmlPage, IndexerAction.TASK_DELETE );
+        }
+    }
+    
+    /**
+     * Create a cache key from the html page id
+     * 
+     * @param strId
+     *           The html page id
+     * @return cache key
+     */
+    private String getCacheKey( String strId )
+    {
+        StringBuilder sbKey = new StringBuilder( );
+        sbKey.append( "[htmlpage:" ).append( strId ).append( "]" );
+        return sbKey.toString( );
+    }
+    
+    /**
+     * This method observes the initialization of the {@link ApplicationScoped} context.
+     * It ensures that this CDI beans are instantiated at the application startup.
+     *
+     * <p>This method is triggered automatically by CDI when the {@link ApplicationScoped} context is initialized,
+     * which typically occurs during the startup of the application server.</p>
+     *
+     * @param context the {@link ServletContext} that is initialized. This parameter is observed
+     *                and injected automatically by CDI when the {@link ApplicationScoped} context is initialized.
+     */
+    public void initializedService(@Observes @Initialized(ApplicationScoped.class) ServletContext context) {
+        // This method is intentionally left empty to trigger CDI bean instantiation
+    }
 }
