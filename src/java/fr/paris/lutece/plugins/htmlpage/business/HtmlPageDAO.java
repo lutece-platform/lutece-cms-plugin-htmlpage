@@ -39,6 +39,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * This class provides Data Access methods for HtmlPage objects
@@ -54,6 +55,8 @@ public class HtmlPageDAO implements IHtmlPageDAO
     private static final String SQL_QUERY_SELECTALL = "SELECT id_htmlpage, description, html_content, status, workgroup_key, role, date_start, date_end FROM htmlpage ORDER BY description, id_htmlpage DESC";
     private static final String SQL_QUERY_SELECT_ENABLED = "SELECT id_htmlpage, description, html_content, status, workgroup_key, role, date_start, date_end FROM htmlpage WHERE id_htmlpage = ? AND status = 0 ";
     private static final String SQL_QUERY_SELECT_ENABLED_HTMLPAGE_LIST = "SELECT id_htmlpage, description, html_content, status, workgroup_key, role, date_start, date_end FROM htmlpage WHERE status = 0 ORDER BY description, id_htmlpage DESC";
+    private static final String SQL_QUERY_SELECTALL_ID = "SELECT id_htmlpage FROM htmlpage";
+    private static final String SQL_QUERY_SELECTALL_BY_IDS = "SELECT id_htmlpage, description, html_content, status, workgroup_key, role, date_start, date_end FROM htmlpage WHERE id_htmlpage IN (  ";
     private static final String SQL_QUERY_INSERT = "INSERT INTO htmlpage ( id_htmlpage , description, html_content, status, workgroup_key, role, date_start, date_end )  VALUES ( ?, ?, ?, ?, ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM htmlpage WHERE id_htmlpage = ? ";
     private static final String SQL_QUERY_UPDATE = "UPDATE htmlpage SET description = ? , html_content = ?, status = ?, workgroup_key = ?, role = ?, date_start = ?, date_end = ? WHERE id_htmlpage = ?  ";
@@ -294,6 +297,75 @@ public class HtmlPageDAO implements IHtmlPageDAO
             }
             
             return htmlpageList;
+        }
+    }
+    
+    /**
+     * {@inheritDoc }
+     */
+	@Override
+	public List<HtmlPage> selectHtmlPagesListByIds( Plugin plugin, List<Integer> listIds ) {
+		List<HtmlPage> htmlPageList = new ArrayList<>( );
+		
+		StringBuilder builder = new StringBuilder( );
+
+		if ( !listIds.isEmpty( ) )
+		{
+			for( int i = 0; i < listIds.size(); i++ ) 
+			{
+			    builder.append( "?," );
+			}
+	
+			String placeHolders =  builder.deleteCharAt( builder.length( ) -1 ).toString( );
+			String stmt = SQL_QUERY_SELECTALL_BY_IDS + placeHolders + ")";
+					
+	        try ( DAOUtil daoUtil = new DAOUtil( stmt, plugin ) )
+	        {
+	        	int index = 1;
+				for( Integer n : listIds ) 
+				{
+					daoUtil.setInt( index++, n ); 
+				}
+	        	
+	        	daoUtil.executeQuery( );
+	        	while ( daoUtil.next( ) )
+		        {	            
+		            HtmlPage htmlpage = new HtmlPage( );
+	                htmlpage.setId( daoUtil.getInt( 1 ) );
+	                htmlpage.setDescription( daoUtil.getString( 2 ) );
+	                htmlpage.setHtmlContent( daoUtil.getString( 3 ) );
+	                htmlpage.setStatus( daoUtil.getInt( 4 ) );
+	                htmlpage.setWorkgroup( daoUtil.getString( 5 ) );
+	                htmlpage.setRole( daoUtil.getString( 6 ) );
+	                htmlpage.setDateStart( daoUtil.getTimestamp( 7 ) );
+	                htmlpage.setDateEnd( daoUtil.getTimestamp( 8 ) );
+	                
+	                htmlPageList.add( htmlpage );
+		        }	
+		        daoUtil.free( );		        
+	        }
+	    }
+		return htmlPageList;
+		
+	}
+	
+	/**
+     * {@inheritDoc }
+     */
+    @Override
+    public List<Integer> selectIdHtmlPagesList( Plugin plugin )
+    {
+        List<Integer> htmlPageList = new ArrayList<>( );
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_ID, plugin ) )
+        {
+	        daoUtil.executeQuery(  );
+	
+	        while ( daoUtil.next(  ) )
+	        {
+	        	htmlPageList.add( daoUtil.getInt( 1 ) );
+	        }
+	
+	        return htmlPageList;
         }
     }
 }

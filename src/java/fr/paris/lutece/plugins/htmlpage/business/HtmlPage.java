@@ -33,9 +33,11 @@
  */
 package fr.paris.lutece.plugins.htmlpage.business;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 import fr.paris.lutece.plugins.htmlpage.service.HtmlPageWorkgroupRemovalListener;
+import fr.paris.lutece.plugins.htmlpage.utils.HtmlPageUtil;
 import fr.paris.lutece.portal.service.workgroup.AdminWorkgroupResource;
 import fr.paris.lutece.portal.service.workgroup.AdminWorkgroupService;
 import fr.paris.lutece.portal.service.workgroup.WorkgroupRemovalListenerService;
@@ -45,14 +47,14 @@ import fr.paris.lutece.portal.service.workgroup.WorkgroupRemovalListenerService;
  * 
  * @author lenaini
  */
-public class HtmlPage implements AdminWorkgroupResource
+public class HtmlPage implements AdminWorkgroupResource, Serializable
 {
     /////////////////////////////////////////////////////////////////////////////////
     // Constants
     public static final String RESOURCE_TYPE = "HTMLPAGE";
     public static final String ROLE_NONE = "none";
     private static final String EMPTY_STRING = "";
-    private static final int ENABLED = 0;
+    private static final long serialVersionUID = -6267054010459177934L;
     private static HtmlPageWorkgroupRemovalListener _listenerWorkgroup;
     private int _nId;
     private int _nStatus;
@@ -235,7 +237,7 @@ public class HtmlPage implements AdminWorkgroupResource
 
     public boolean isEnabled( )
     {
-        return ( _nStatus == ENABLED );
+    	return HtmlPageUtil.isActivedPageHtml( this );
     }
 
 	/**

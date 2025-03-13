@@ -14,27 +14,27 @@ import fr.paris.lutece.portal.service.plugin.Plugin;
 public interface IHtmlPageService
 {
     /**
-     * Get htmlpage in the cache by id
+     * Get enabled html page by id from the cache if possible, from database otherwise
      * @param nId
      * @return htmlPage
      */
     public HtmlPage getHtmlPageCache ( int nId );
     
     /**
-     * Get enable htmlpage by id
+     * Get enabled html page by id from database
      * @param nId
      * @return htmlPage
      */
     public HtmlPage getEnableHtmlPage ( int nId );
     
     /**
-     * Gets all htmlpage in the cache
-     * @return list of html
+     * Get all enabled html pages from cache if possible, from database otherwise
+     * @return list of htmlpage
      */
     public List<HtmlPage> getHtmlPageListCache ( );
     
     /**
-     * Gets enable htmlPage list
+     * Get all enabled html pages from database
      * @return list of htmlpage
      */
     public List<HtmlPage> getEnabledHtmlPageList( );
