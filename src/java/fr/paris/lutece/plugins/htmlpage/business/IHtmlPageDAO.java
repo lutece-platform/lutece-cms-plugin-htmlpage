@@ -36,6 +36,7 @@ package fr.paris.lutece.plugins.htmlpage.business;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * htmlPageInterface
@@ -105,6 +106,13 @@ public interface IHtmlPageDAO
     Collection<HtmlPage> selectEnabledHtmlPageList( Plugin plugin );
 
     /**
+     * Load the id of all the html page objects and returns them as a list
+     * @param plugin the Plugin
+     * @return The list which contains the id of all the html page objects
+     */
+    List<Integer> selectIdHtmlPagesList( Plugin plugin );
+    
+    /**
      * Update the record in the table
      * 
      * @param htmlpage
@@ -113,4 +121,12 @@ public interface IHtmlPageDAO
      *            The plugin
      */
     void store( HtmlPage htmlpage, Plugin plugin );
+    
+    /**
+     * Load the data of all the html page objects and returns them as a list
+     * @param plugin the Plugin
+     * @param listIds liste of ids
+     * @return The list which contains the data of all the html page objects
+     */
+	List<HtmlPage> selectHtmlPagesListByIds( Plugin _plugin, List<Integer> listIds );
 }

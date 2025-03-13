@@ -33,7 +33,6 @@
  */
 package fr.paris.lutece.plugins.htmlpage.web;
 
-import fr.paris.lutece.api.user.User;
 import fr.paris.lutece.plugins.htmlpage.business.HtmlPage;
 import fr.paris.lutece.plugins.htmlpage.business.HtmlPageHome;
 import fr.paris.lutece.plugins.htmlpage.service.EnumStatus;
@@ -43,21 +42,21 @@ import fr.paris.lutece.portal.business.role.RoleHome;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
+import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPathService;
-import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.service.workgroup.AdminWorkgroupService;
-import fr.paris.lutece.portal.web.admin.PluginAdminPageJspBean;
 import fr.paris.lutece.portal.web.constants.Messages;
 import fr.paris.lutece.util.ReferenceList;
+import fr.paris.lutece.util.html.AbstractPaginator;
 import fr.paris.lutece.util.html.HtmlTemplate;
-import fr.paris.lutece.util.html.Paginator;
+import fr.paris.lutece.util.http.SecurityUtil;
 import fr.paris.lutece.util.url.UrlItem;
 
-import java.sql.Timestamp;
-import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Inject;
@@ -72,7 +71,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 @SessionScoped
 @Named
-public class HtmlPageJspBean extends PluginAdminPageJspBean
+public class HtmlPageJspBean extends AbstractManageHtmlPageJspBean <Integer, HtmlPage>
 {
     // Right
     public static final String RIGHT_MANAGE_HTMLPAGE = "HTMLPAGE_MANAGEMENT";
@@ -82,17 +81,14 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
     private static final String PROPERTY_PAGE_TITLE_MODIFY = "htmlpage.modify_htmlpage.pageTitle";
     private static final String PROPERTY_PAGE_TITLE_CREATE = "htmlpage.create_htmlpage.pageTitle";
 
-    // Properties
-    private static final String PROPERTY_DEFAULT_HTMLPAGE_LIST_PER_PAGE = "htmlpage.htmlPageList.itemsPerPage";
-
     // Messages
     private static final String MESSAGE_CONFIRM_REMOVE_HTMLPAGE = "htmlpage.message.confirmRemoveHtmlPage";
     private static final String MESSAGE_INVALID_DATE_START = "htmlpage.message.invalidDateStart";
     private static final String MESSAGE_INVALID_DATE_END = "htmlpage.message.invalidDateEnd";
+    private static final String MESSAGE_INVALID_DATE_END_BEFORE_DATE_START = "htmlpage.message.dateEndBeforeDateStart";
     
     // Markers
     private static final String MARK_LIST_HTMLPAGE_LIST = "htmlpage_list";
-    private static final String MARK_NB_ITEMS_PER_PAGE = "nb_items_per_page";
     private static final String MARK_WORKGROUPS_LIST = "workgroups_list";
     private static final String MARK_WEBAPP_URL = "webapp_url";
     private static final String MARK_PROD_URL = "prod_url";
@@ -101,7 +97,6 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
     private static final String MARK_HTML_CONTENT = "html_content";
     private static final String MARK_HTMLPAGE = "htmlpage";
     private static final String MARK_ROLES_LIST = "roles_list";
-    private static final String MARK_PAGINATOR = "paginator";
     private static final String MARK_STATUS = "status_list";
 
     // parameters
@@ -112,7 +107,6 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
     private static final String PARAMETER_HTMLPAGE_HTML_CONTENT = "html_content";
     private static final String PARAMETER_ID_HTMLPAGE_LIST = "htmlpage_list_id";
     private static final String PARAMETER_HTMLPAGE_ROLE = "role";
-    private static final String PARAMETER_PAGE_INDEX = "page_index";
     private static final String PARAMETER_HTMLPAGE_DATE_START = "date_start";
     private static final String PARAMETER_HTMLPAGE_DATE_END = "date_end";
     
@@ -123,12 +117,10 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
 
     // Jsp Definition
     private static final String JSP_DO_REMOVE_HTMLPAGE = "jsp/admin/plugins/htmlpage/DoRemoveHtmlPage.jsp";
+    private static final String JSP_MANAGE_HTMLPAGE = "jsp/admin/plugins/htmlpage/ManageHtmlPage.jsp";
     private static final String JSP_REDIRECT_TO_MANAGE_HTMLPAGE = "ManageHtmlPage.jsp";
-
-    // Variables
-    private int _nDefaultItemsPerPage;
-    private String _strCurrentPageIndex;
-    private int _nItemsPerPage;
+    
+    private List<Integer> _listIdHtmlPages;
     
     @Inject 
     private IHtmlPageService _htmlPageService;
@@ -143,22 +135,13 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
     public String getManageHtmlPage( HttpServletRequest request )
     {
         setPageTitleProperty( PROPERTY_PAGE_TITLE_HTMLPAGE_LIST );
-
-        _strCurrentPageIndex = Paginator.getPageIndex( request, Paginator.PARAMETER_PAGE_INDEX, _strCurrentPageIndex );
-        _nDefaultItemsPerPage = AppPropertiesService.getPropertyInt( PROPERTY_DEFAULT_HTMLPAGE_LIST_PER_PAGE, 50 );
-        _nItemsPerPage = Paginator.getItemsPerPage( request, Paginator.PARAMETER_ITEMS_PER_PAGE, _nItemsPerPage, _nDefaultItemsPerPage );
-
-        Collection<HtmlPage> listHtmlPageList = HtmlPageHome.findAll( getPlugin( ) );
-        User currentUser = getUser( );
-        listHtmlPageList = AdminWorkgroupService.getAuthorizedCollection( listHtmlPageList, currentUser );
-
-        Paginator paginator = new Paginator( (List<HtmlPage>) listHtmlPageList, _nItemsPerPage, getHomeUrl( request ), PARAMETER_PAGE_INDEX,
-                _strCurrentPageIndex );
-
-        Map<String, Object> model = new HashMap<String, Object>( );
-        model.put( MARK_NB_ITEMS_PER_PAGE, "" + _nItemsPerPage );
-        model.put( MARK_PAGINATOR, paginator );
-        model.put( MARK_LIST_HTMLPAGE_LIST, paginator.getPageItems( ) );
+        
+        if ( request.getParameter( AbstractPaginator.PARAMETER_PAGE_INDEX) == null || _listIdHtmlPages.isEmpty( ) )
+        {
+        	_listIdHtmlPages = HtmlPageHome.getIdHtmlPagesList( getPlugin( ) );
+        }
+        
+        Map<String, Object> model = getPaginatedListModel( request, MARK_LIST_HTMLPAGE_LIST, _listIdHtmlPages, JSP_MANAGE_HTMLPAGE );
 
         HtmlTemplate templateList = AppTemplateService.getTemplate( TEMPLATE_MANAGE_HTMLPAGE, getLocale( ), model );
 
@@ -199,53 +182,94 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
      * @return The Jsp URL of the process result
      */
     public String doCreateHtmlPage( HttpServletRequest request )
-    {
-        String strDescription = request.getParameter( PARAMETER_HTMLPAGE_DESCRIPTION );
-        String strHtmlContent = request.getParameter( PARAMETER_HTMLPAGE_HTML_CONTENT );
-        String strStatus = request.getParameter( PARAMETER_HTMLPAGE_STATUS );
-        String strWorkgroup = request.getParameter( PARAMETER_HTMLPAGE_WORKGROUP );
-        String strRole = request.getParameter( PARAMETER_HTMLPAGE_ROLE );
-
+    {	
+    	HtmlPage htmlPage = new HtmlPage( );
+    	fillHtmlPageValues( request, htmlPage );
+        
         // Mandatory fields
-        if ( ( strDescription == null ) || strDescription.trim( ).equals( "" ) )
+        if( existsMandatoryFieldEmpty( request, htmlPage ) )
         {
             return AdminMessageService.getMessageUrl( request, Messages.MANDATORY_FIELDS, AdminMessage.TYPE_STOP );
         }
-
-        HtmlPage htmlpage = new HtmlPage( );
-
-        htmlpage.setDescription( strDescription );
-        htmlpage.setHtmlContent( strHtmlContent );
-        htmlpage.setStatus( Integer.parseInt( strStatus ) );
-        htmlpage.setWorkgroup( strWorkgroup );
-        htmlpage.setRole( strRole );
-        
-        String strDateStart = request.getParameter( PARAMETER_HTMLPAGE_DATE_START );
-        String strDateEnd = request.getParameter( PARAMETER_HTMLPAGE_DATE_END );
-        
-        Timestamp dateStart = HtmlPageUtil.convertToTimestamp( strDateStart );
-        Timestamp dateEnd = HtmlPageUtil.convertToTimestamp( strDateEnd );
-
-        if ( StringUtils.isNotEmpty( strDateStart ) && dateStart == null )
+               
+        //Dates check         
+        String error = checkHtmlPageDates( request, htmlPage );
+        if( error != null )
         {
-            return AdminMessageService.getMessageUrl( request, MESSAGE_INVALID_DATE_START, AdminMessage.TYPE_STOP );
-        }
+           return error;
+        }       	
         
-        if (  StringUtils.isNotEmpty( strDateEnd ) && dateEnd == null  )
-        {
-            return AdminMessageService.getMessageUrl( request, MESSAGE_INVALID_DATE_END, AdminMessage.TYPE_STOP );
-        }
-           
-            
-		htmlpage.setDateStart( dateStart );
-		htmlpage.setDateEnd( dateEnd );
-
-		_htmlPageService.create( htmlpage, getPlugin( ) );
+		_htmlPageService.create( htmlPage, getPlugin( ) );
 
         // if the operation occurred well, redirects towards the list of the HtmlPages
         return JSP_REDIRECT_TO_MANAGE_HTMLPAGE;
     }
 
+    /**
+     * fills Html page object with data coming from the Http request
+     * 
+     * @param request
+     *         The http request
+     * @param htmlpage
+     *         Thee html page object
+     */
+    private void fillHtmlPageValues( HttpServletRequest request, HtmlPage htmlpage )
+    {
+    	htmlpage.setDescription( request.getParameter( PARAMETER_HTMLPAGE_DESCRIPTION ) );
+        htmlpage.setHtmlContent( request.getParameter( PARAMETER_HTMLPAGE_HTML_CONTENT ) );
+        htmlpage.setStatus( Integer.parseInt( request.getParameter( PARAMETER_HTMLPAGE_STATUS ) ) );
+        htmlpage.setWorkgroup( request.getParameter( PARAMETER_HTMLPAGE_WORKGROUP ) );
+        htmlpage.setRole( request.getParameter( PARAMETER_HTMLPAGE_ROLE ) );
+		htmlpage.setDateStart( HtmlPageUtil.convertToTimestamp( request.getParameter( PARAMETER_HTMLPAGE_DATE_START ) ) );
+		htmlpage.setDateEnd( HtmlPageUtil.convertToTimestamp( request.getParameter( PARAMETER_HTMLPAGE_DATE_END ) ) );
+    }
+    
+    /**
+     * Checks that mandatory fields are filled
+     * 
+     * @param request
+     * @param htmlpage
+     * @return
+     */
+    private boolean existsMandatoryFieldEmpty( HttpServletRequest request, HtmlPage htmlpage )
+    {
+    	return  StringUtils.isBlank( htmlpage.getDescription( ) )  || StringUtils.isBlank( htmlpage.getHtmlContent( ) ) || 
+    	        ( htmlpage.getStatus( ) == EnumStatus.conditioned.getId( )  && ( StringUtils.isBlank( request.getParameter( PARAMETER_HTMLPAGE_DATE_START ) ) || 
+    	        		                                                         StringUtils.isBlank( request.getParameter( PARAMETER_HTMLPAGE_DATE_END ) ) ) );
+    }
+    
+    /**
+     * Checks that start date and end date are valid and that start date is before end date for html page with conditioned state
+     * 
+     * @param request
+     *            The Http Request
+     * @param htmlpage
+     *            The Html page
+     * @return an error message if controls have failed, null otherwise
+     */
+    private String checkHtmlPageDates( HttpServletRequest request, HtmlPage htmlPage )
+    {
+    	if( htmlPage.getStatus( ) == EnumStatus.conditioned.getId( ) )
+        {
+    		if ( htmlPage.getDateStart( ) == null )
+            {
+                return AdminMessageService.getMessageUrl( request, MESSAGE_INVALID_DATE_START, AdminMessage.TYPE_STOP );
+            }
+            
+            if ( htmlPage.getDateEnd( ) == null  )
+            {
+                return AdminMessageService.getMessageUrl( request, MESSAGE_INVALID_DATE_END, AdminMessage.TYPE_STOP );
+            }
+            
+            if( htmlPage.getDateEnd( ).before( htmlPage.getDateStart( ) ) )
+            {
+            	return AdminMessageService.getMessageUrl( request, MESSAGE_INVALID_DATE_END_BEFORE_DATE_START, AdminMessage.TYPE_STOP );
+            }
+        }
+    	
+        return null;
+    }
+    
     /**
      * Process the data capture form of a new htmlpage from copy of other
      *
@@ -264,7 +288,9 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
         duplicateHtmlPage.setHtmlContent( htmlpage.getHtmlContent( ) );
         duplicateHtmlPage.setStatus( htmlpage.getStatus( ) );
         duplicateHtmlPage.setWorkgroup( htmlpage.getWorkgroup( ) );
-        duplicateHtmlPage.setRole( htmlpage.getRole( ) );
+        duplicateHtmlPage.setRole( htmlpage.getRole( ) );        
+        duplicateHtmlPage.setDateStart( htmlpage.getDateStart() ); 
+        duplicateHtmlPage.setDateEnd( htmlpage.getDateEnd() );
 
         _htmlPageService.create( duplicateHtmlPage, getPlugin( ) );
 
@@ -283,8 +309,22 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
     {
         setPageTitleProperty( PROPERTY_PAGE_TITLE_MODIFY );
 
-        int nId = Integer.parseInt( request.getParameter( PARAMETER_HTMLPAGE_ID ) );
-        HtmlPage htmlPage = HtmlPageHome.findByPrimaryKey( nId, getPlugin( ) );
+        String strHtmlPageId = request.getParameter( PARAMETER_HTMLPAGE_ID );
+        
+        if ( !StringUtils.isNumeric( strHtmlPageId ) )
+        {
+            AppLogService.error( " {} is not a valid html page id.", ( ) -> SecurityUtil.logForgingProtect( strHtmlPageId ) );
+
+            return getManageHtmlPage( request );
+        }
+        
+        HtmlPage htmlPage = HtmlPageHome.findByPrimaryKey( Integer.parseInt( strHtmlPageId ), getPlugin( ) );
+        if ( htmlPage == null )
+        {
+            AppLogService.error( "{} is not a valid html page id.", ( ) -> SecurityUtil.logForgingProtect( strHtmlPageId ) );
+
+            return getManageHtmlPage( request );
+        }
 
         Map<String, Object> model = new HashMap<String, Object>( );
         ReferenceList workgroupsList = AdminWorkgroupService.getUserWorkgroups( getUser( ), getLocale( ) );
@@ -310,39 +350,23 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
      */
     public String doModifyHtmlPage( HttpServletRequest request )
     {
-        // Mandatory fields
-        if ( request.getParameter( PARAMETER_HTMLPAGE_DESCRIPTION ).equals( "" ) || request.getParameter( PARAMETER_HTMLPAGE_HTML_CONTENT ).equals( "" ) )
+    	int nId = Integer.parseInt( request.getParameter( PARAMETER_HTMLPAGE_ID ) );
+    	
+    	HtmlPage htmlPage = HtmlPageHome.findByPrimaryKey( nId, getPlugin( ) );
+    	fillHtmlPageValues( request, htmlPage );
+
+    	// Mandatory fields
+        if( existsMandatoryFieldEmpty( request, htmlPage ) )
         {
             return AdminMessageService.getMessageUrl( request, Messages.MANDATORY_FIELDS, AdminMessage.TYPE_STOP );
         }
-
-        int nId = Integer.parseInt( request.getParameter( PARAMETER_HTMLPAGE_ID ) );
-
-        HtmlPage htmlPage = HtmlPageHome.findByPrimaryKey( nId, getPlugin( ) );
-        htmlPage.setDescription( request.getParameter( PARAMETER_HTMLPAGE_DESCRIPTION ) );
-        htmlPage.setHtmlContent( request.getParameter( PARAMETER_HTMLPAGE_HTML_CONTENT ) );
-        htmlPage.setStatus( Integer.parseInt( request.getParameter( PARAMETER_HTMLPAGE_STATUS ) ) );
-        htmlPage.setWorkgroup( request.getParameter( PARAMETER_HTMLPAGE_WORKGROUP ) );
-        htmlPage.setRole( request.getParameter( PARAMETER_HTMLPAGE_ROLE ) );
-
-        String strDateStart = request.getParameter( PARAMETER_HTMLPAGE_DATE_START );
-        String strDateEnd = request.getParameter( PARAMETER_HTMLPAGE_DATE_END );
-        
-        Timestamp dateStart = HtmlPageUtil.convertToTimestamp( strDateStart );
-        Timestamp dateEnd = HtmlPageUtil.convertToTimestamp( strDateEnd );
-
-        if ( StringUtils.isNotEmpty( strDateStart ) && dateStart == null )
+               
+        //Dates check
+        String error = checkHtmlPageDates( request, htmlPage );
+        if( error != null )
         {
-            return AdminMessageService.getMessageUrl( request, MESSAGE_INVALID_DATE_START, AdminMessage.TYPE_STOP );
+            return error;
         }
-        
-        if (  StringUtils.isNotEmpty( strDateEnd ) && dateEnd == null  )
-        {
-            return AdminMessageService.getMessageUrl( request, MESSAGE_INVALID_DATE_END, AdminMessage.TYPE_STOP );
-        }
-            
-		htmlPage.setDateStart( dateStart );
-		htmlPage.setDateEnd( dateEnd );
 
         _htmlPageService.update( htmlPage, getPlugin( ) );
 
@@ -381,7 +405,7 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
      */
     public String doRemoveHtmlPage( HttpServletRequest request )
     {
-        int nIdHtmlPage = Integer.parseInt( request.getParameter( PARAMETER_HTMLPAGE_ID ) );
+    	int nIdHtmlPage = Integer.parseInt( request.getParameter( PARAMETER_HTMLPAGE_ID ) );
 
         HtmlPage htmlPage = HtmlPageHome.findByPrimaryKey( nIdHtmlPage, getPlugin( ) );
         _htmlPageService.remove( htmlPage, getPlugin( ) );
@@ -389,4 +413,19 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
         // if the operation occurred well, redirects towards the list of the HtmlPages
         return JSP_REDIRECT_TO_MANAGE_HTMLPAGE;
     }
+    
+    /**
+     * {@inheritDoc }
+     */
+	@Override
+	List<HtmlPage> getItemsFromIds( List<Integer> listIds ) 
+	{
+		List<HtmlPage> listHtmlPage = HtmlPageHome.getHtmlPagesListByIds( listIds, getPlugin( ) );
+		
+		// keep original order
+        return listHtmlPage.stream( )
+                           .sorted( Comparator.comparingInt( htmlPage -> listIds.indexOf( htmlPage.getId( ) ) ) )
+                           .collect( Collectors.toList( ) );
+	}
+     
 }

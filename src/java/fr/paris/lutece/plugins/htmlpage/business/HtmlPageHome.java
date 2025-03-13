@@ -34,6 +34,7 @@
 package fr.paris.lutece.plugins.htmlpage.business;
 
 import java.util.Collection;
+import java.util.List;
 
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import jakarta.enterprise.inject.spi.CDI;
@@ -149,5 +150,24 @@ public class HtmlPageHome
     public static Collection<HtmlPage> findEnabledHtmlPageList( Plugin plugin )
     {
         return _dao.selectEnabledHtmlPageList( plugin );
+    }
+    
+    /**
+     * Load the data of all the avant objects and returns them as a list
+     * @param listIds liste of ids
+     * @return the list which contains the data of all the avant objects
+     */
+    public static List<HtmlPage> getHtmlPagesListByIds( List<Integer> listIds, Plugin plugin )
+    {
+        return _dao.selectHtmlPagesListByIds( plugin, listIds );
+    }
+    
+    /**
+     * Load the id of all the html page objects and returns them as a list
+     * @return the list which contains the id of all the html page objects
+     */
+    public static List<Integer> getIdHtmlPagesList( Plugin plugin )
+    {
+        return _dao.selectIdHtmlPagesList( plugin );
     }
 }

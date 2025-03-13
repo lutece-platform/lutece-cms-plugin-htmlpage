@@ -44,6 +44,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 
+import org.apache.commons.lang3.StringUtils;
+
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
@@ -120,14 +122,18 @@ public class HtmlPageUtil
     public static Timestamp convertToTimestamp( String strDate )
     {
         SimpleDateFormat formatter = new SimpleDateFormat( DateUtil.ISO_PATTERN_DATE );
-        try
+        if( StringUtils.isNotBlank( strDate ) )
         {
-            return new Timestamp( formatter.parse ( strDate ).getTime( ) );
-            
-        } catch ( ParseException e )
-        {
-            AppLogService.error( "Erreur lors de la tentative de parse de la date {}", strDate, e.getMessage( ) );
-        }
+        	try
+            {
+                return new Timestamp( formatter.parse ( strDate ).getTime( ) );
+                
+            } 
+        	catch ( ParseException e )
+            {
+                AppLogService.error( "Erreur lors de la tentative de parse de la date {}", strDate, e );
+            }
+        }        
         return null;
     }
 }

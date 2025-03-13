@@ -34,7 +34,10 @@
 package fr.paris.lutece.plugins.htmlpage.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import fr.paris.lutece.plugins.htmlpage.business.HtmlPage;
 import fr.paris.lutece.plugins.htmlpage.business.HtmlPageHome;
@@ -66,66 +69,70 @@ public class HtmlPageService implements IHtmlPageService
     private HtmlPageIndexerUtils _htmlPageIndexerUtils;
     
     @Inject
-	@LuteceCache( cacheName = CACHE_SERVICE_NAME, keyType = String.class, valueType = Object.class, enable = true )
-	private Lutece107Cache<String, Object> _cachePublicHtmlPage;
-
+	@LuteceCache( cacheName = CACHE_SERVICE_NAME, keyType = String.class, valueType = HtmlPage.class, enable = true )
+	private Lutece107Cache<String, HtmlPage> _cachePublicHtmlPage;
+    
     /**
      * Initializes the Housing service
      *
      */
     public void init( )
     {
-        HtmlPage.init( );
+        HtmlPage.init( );                
     }
     
     @Override
     public HtmlPage getHtmlPageCache( int nId )
     {
-    	HtmlPage htmlPage = ( HtmlPage ) _cachePublicHtmlPage.get( getCacheKey( String.valueOf( nId ) ) );
-        
-        if ( htmlPage == null || !HtmlPageUtil.isActivedPageHtml( htmlPage ) )
+    	HtmlPage htmlPage = _cachePublicHtmlPage.get( getCacheKey( String.valueOf( nId ) ) );
+    	
+        if ( htmlPage == null )
         {
-            htmlPage = getEnableHtmlPage( nId );
-            
-            if ( htmlPage != null && !HtmlPageUtil.isRoleExist( htmlPage.getRole( ) ))
-            {
-            	String htmlPageCacheKey = getCacheKey( String.valueOf( htmlPage.getId( ) ) );
-            	if( _cachePublicHtmlPage.get( htmlPageCacheKey ) == null )
-            	{
-            		_cachePublicHtmlPage.put( htmlPageCacheKey, htmlPage );
-            	}
-            }           
+            htmlPage = HtmlPageHome.findByPrimaryKey( nId, HtmlPagePlugin.getPlugin( ) );    
+            if ( htmlPage != null )
+            {            	
+            	refreshHtmlPageCache( );
+            }        
         }
-        return htmlPage;
+        else if ( HtmlPageUtil.isRoleExist( htmlPage.getRole( ) ) )
+        {
+        	htmlPage = HtmlPageHome.findByPrimaryKey( nId, HtmlPagePlugin.getPlugin( ) );
+        }
+        return htmlPage != null && HtmlPageUtil.isActivedPageHtml( htmlPage ) ? htmlPage : null;
     }
-
+    
     @Override
     public List<HtmlPage> getHtmlPageListCache( )
     {
-    	String allPageKey = getCacheKey( "all" );
-    	List<HtmlPage> htmlPageList = ( List<HtmlPage> ) _cachePublicHtmlPage.get( allPageKey );
-        
-        if ( htmlPageList == null )
+    	List<HtmlPage> enabledHtmlPageList = new ArrayList<HtmlPage>( );
+    	
+        if ( _cachePublicHtmlPage.getCacheSize( ) == 0 )
         {
-            htmlPageList = getEnabledHtmlPageList( );
-            
-            if ( htmlPageList != null )
-            {
-            	if( _cachePublicHtmlPage.get( allPageKey ) == null )
-            	{
-            		_cachePublicHtmlPage.put( allPageKey, htmlPageList );
-            	}
-            }           
+        	List<HtmlPage> htmlPageList = refreshHtmlPageCache( );
+        	if( htmlPageList != null )
+        	{
+        		enabledHtmlPageList = htmlPageList.stream( )
+        				                          .filter( htmlPage -> HtmlPageUtil.isActivedPageHtml( htmlPage ) )
+        				                          .collect( Collectors.toCollection( ArrayList::new ) );
+        	}       	
         }
-        return htmlPageList;
+        else
+        {
+        	enabledHtmlPageList = _cachePublicHtmlPage.getKeys( ).stream( )
+        			                                             .map( htmlPageKey -> _cachePublicHtmlPage.get( htmlPageKey ) )
+        			                                             .filter( htmlPage -> HtmlPageUtil.isActivedPageHtml( htmlPage ) )
+        		        				                         .collect( Collectors.toCollection( ArrayList::new ) );                             
+        }
+        Collections.sort( enabledHtmlPageList, Comparator.comparing( HtmlPage::getDescription ) );
+        return enabledHtmlPageList;
     }
-
+    
     @Override
     public HtmlPage getEnableHtmlPage( int nId )
     {
         HtmlPage htmlPage = HtmlPageHome.findByPrimaryKey( nId, HtmlPagePlugin.getPlugin( ) );
         
-        return HtmlPageUtil.isActivedPageHtml( htmlPage ) ? htmlPage : null;
+        return htmlPage != null && HtmlPageUtil.isActivedPageHtml( htmlPage ) ? htmlPage : null;
     }
 
     @Override
@@ -144,7 +151,7 @@ public class HtmlPageService implements IHtmlPageService
         
         return enablehtmlPageList;
     }
-    
+
     /**
      * Creation of an instance of htmlpage
      *
@@ -157,7 +164,7 @@ public class HtmlPageService implements IHtmlPageService
     public HtmlPage create( HtmlPage htmlpage, Plugin plugin )
     {
     	HtmlPageHome.create( htmlpage, plugin );
-
+    	
         if ( htmlpage.isEnabled( ) )
         {
             String strIdHtmlPage = Integer.toString( htmlpage.getId( ) );
@@ -166,6 +173,7 @@ public class HtmlPageService implements IHtmlPageService
 
             _htmlPageIndexerUtils.addIndexerAction( strIdHtmlPage, IndexerAction.TASK_CREATE );
         }
+        refreshHtmlPageCache( );
 
         return htmlpage;
     }
@@ -181,6 +189,8 @@ public class HtmlPageService implements IHtmlPageService
      */
     public HtmlPage update( HtmlPage htmlpage, Plugin plugin )
     {   	
+    	HtmlPageHome.update( htmlpage, plugin );
+    	
         String strIdHtmlPage = Integer.toString( htmlpage.getId( ) );
         if ( htmlpage.isEnabled( ) )
         {
@@ -201,8 +211,7 @@ public class HtmlPageService implements IHtmlPageService
                 _htmlPageIndexerUtils.addIndexerAction( strIdHtmlPage, IndexerAction.TASK_DELETE );
             }
         }
-        
-        HtmlPageHome.update( htmlpage, plugin );
+        refreshHtmlPageCache( );
 
         return htmlpage;
     }
@@ -227,6 +236,7 @@ public class HtmlPageService implements IHtmlPageService
 
             _htmlPageIndexerUtils.addIndexerAction( strIdHtmlPage, IndexerAction.TASK_DELETE );
         }
+        refreshHtmlPageCache( );
     }
     
     /**
@@ -239,8 +249,28 @@ public class HtmlPageService implements IHtmlPageService
     private String getCacheKey( String strId )
     {
         StringBuilder sbKey = new StringBuilder( );
-        sbKey.append( "[htmlpage:" ).append( strId ).append( "]" );
+        sbKey.append( "[htmlpage:" ).append( strId ).append( "]" ); 
         return sbKey.toString( );
+    }
+    
+    /**
+     * Clear and reload the cache containing the list of all the html pages
+     * 
+     * @return list of all html pages
+     */
+    private List<HtmlPage> refreshHtmlPageCache( )
+    {    	
+    	_cachePublicHtmlPage.clear( );
+    	
+    	List<HtmlPage> htmlPageList = ( List<HtmlPage> ) HtmlPageHome.findAll( HtmlPagePlugin.getPlugin( ) );
+    	if( htmlPageList != null )
+    	{
+        	for( HtmlPage htmlPage : htmlPageList )
+        	{
+        		_cachePublicHtmlPage.put( getCacheKey( String.valueOf( htmlPage.getId( ) ) ), htmlPage );
+        	}
+    	}
+    	return htmlPageList;
     }
     
     /**
