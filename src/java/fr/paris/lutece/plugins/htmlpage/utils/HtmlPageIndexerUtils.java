@@ -33,10 +33,10 @@
  */
 package fr.paris.lutece.plugins.htmlpage.utils;
 
-import fr.paris.lutece.plugins.workflowcore.business.event.EventAction;
-import fr.paris.lutece.plugins.workflowcore.business.event.Type;
 import fr.paris.lutece.portal.business.event.ResourceEvent;
 import fr.paris.lutece.portal.business.indexeraction.IndexerAction;
+import fr.paris.lutece.portal.service.event.EventAction;
+import fr.paris.lutece.portal.service.event.Type;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Event;
 import jakarta.inject.Inject;
