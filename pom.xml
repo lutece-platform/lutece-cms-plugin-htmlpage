@@ -33,8 +33,6 @@
     
     <properties>
         <componentName>htmlpage</componentName>
-        <jiraProjectName>HTMLPAGE</jiraProjectName>
-        <jiraComponentId>10191</jiraComponentId>
     </properties>
     
     <scm>
