@@ -1,3 +1,6 @@
+--liquibase formatted sql
+--changeset htmlpage:create_db_htmlpage.sql
+--preconditions onFail:MARK_RAN onError:WARN
 --
 -- Structure for table htmlpage
 --
