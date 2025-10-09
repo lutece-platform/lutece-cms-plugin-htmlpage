@@ -1,6 +1,6 @@
---liquibase formatted sql
---changeset htmlpage:update_db_core_htmlpage-5.1.2-5.1.3.sql
---preconditions onFail:MARK_RAN onError:WARN
+-- liquibase formatted sql
+-- changeset htmlpage:update_db_core_htmlpage-5.1.2-5.1.3.sql
+-- preconditions onFail:MARK_RAN onError:WARN
 --
 -- Update Structure for table htmlpage
 --

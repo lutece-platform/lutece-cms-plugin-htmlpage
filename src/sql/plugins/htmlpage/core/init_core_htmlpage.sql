@@ -1,6 +1,6 @@
---liquibase formatted sql
---changeset htmlpage:init_core_htmlpage.sql
---preconditions onFail:MARK_RAN onError:WARN
+-- liquibase formatted sql
+-- changeset htmlpage:init_core_htmlpage.sql
+-- preconditions onFail:MARK_RAN onError:WARN
 --
 -- Dumping data for table core_admin_right
 --
