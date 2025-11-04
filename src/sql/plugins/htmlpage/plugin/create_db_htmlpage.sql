@@ -7,7 +7,7 @@
 
 DROP TABLE IF EXISTS htmlpage;
 CREATE TABLE htmlpage (
-  id_htmlpage INT DEFAULT 0 NOT NULL,
+  id_htmlpage INT AUTO_INCREMENT,
   description varchar(255) DEFAULT '' NOT NULL,
   html_content LONG VARCHAR,
   status INT DEFAULT 0 NOT NULL,

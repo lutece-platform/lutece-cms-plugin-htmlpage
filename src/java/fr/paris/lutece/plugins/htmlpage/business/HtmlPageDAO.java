@@ -36,6 +36,7 @@ package fr.paris.lutece.plugins.htmlpage.business;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.sql.DAOUtil;
 
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -47,44 +48,16 @@ import java.util.Collection;
 public class HtmlPageDAO implements IHtmlPageDAO
 {
     // Constants
-    private static final String SQL_QUERY_NEWPK = "SELECT max( id_htmlpage ) FROM htmlpage ";
     private static final String SQL_QUERY_SELECT = "SELECT id_htmlpage, description, html_content, status, workgroup_key, role, date_start, date_end FROM htmlpage WHERE id_htmlpage = ? ";
     private static final String SQL_QUERY_SELECTALL = "SELECT id_htmlpage, description, html_content, status, workgroup_key, role, date_start, date_end FROM htmlpage ORDER BY description, id_htmlpage DESC";
     private static final String SQL_QUERY_SELECT_ENABLED = "SELECT id_htmlpage, description, html_content, status, workgroup_key, role, date_start, date_end FROM htmlpage WHERE id_htmlpage = ? AND status = 0 ";
     private static final String SQL_QUERY_SELECT_ENABLED_HTMLPAGE_LIST = "SELECT id_htmlpage, description, html_content, status, workgroup_key, role, date_start, date_end FROM htmlpage WHERE status = 0 ORDER BY description, id_htmlpage DESC";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO htmlpage ( id_htmlpage , description, html_content, status, workgroup_key, role, date_start, date_end )  VALUES ( ?, ?, ?, ?, ?, ?, ?, ? ) ";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO htmlpage ( description, html_content, status, workgroup_key, role, date_start, date_end )  VALUES ( ?, ?, ?, ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM htmlpage WHERE id_htmlpage = ? ";
     private static final String SQL_QUERY_UPDATE = "UPDATE htmlpage SET description = ? , html_content = ?, status = ?, workgroup_key = ?, role = ?, date_start = ?, date_end = ? WHERE id_htmlpage = ?  ";
 
     ///////////////////////////////////////////////////////////////////////////////////////
     // Access methods to data
-
-    /**
-     * Generates a new primary key
-     * 
-     * @param plugin
-     *            The plugin
-     * @return The new primary key
-     */
-    private int newPrimaryKey( Plugin plugin )
-    {
-        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_NEWPK, plugin ) )
-        {
-            daoUtil.executeQuery( );
-    
-            int nKey;
-    
-            if ( !daoUtil.next( ) )
-            {
-                // if the table is empty
-                nKey = 1;
-            }
-    
-            nKey = daoUtil.getInt( 1 ) + 1;  
-    
-            return nKey;
-        }
-    }
 
     ////////////////////////////////////////////////////////////////////////
     // Methods using a dynamic pool
@@ -99,17 +72,16 @@ public class HtmlPageDAO implements IHtmlPageDAO
      */
     public void insert( HtmlPage htmlpage, Plugin plugin )
     {
-        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, plugin ) )
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, plugin ) )
         {
-            htmlpage.setId( newPrimaryKey( plugin ) );
-            daoUtil.setInt( 1, htmlpage.getId( ) );
-            daoUtil.setString( 2, htmlpage.getDescription( ) );
-            daoUtil.setString( 3, htmlpage.getHtmlContent( ) );
-            daoUtil.setInt( 4, htmlpage.getStatus( ) );
-            daoUtil.setString( 5, htmlpage.getWorkgroup( ) );
-            daoUtil.setString( 6, htmlpage.getRole( ) );
-            daoUtil.setTimestamp(7, htmlpage.getDateStart( ) );
-            daoUtil.setTimestamp(8, htmlpage.getDateEnd( ) );
+            int i = 0;
+            daoUtil.setString( ++i, htmlpage.getDescription( ) );
+            daoUtil.setString( ++i, htmlpage.getHtmlContent( ) );
+            daoUtil.setInt( ++i, htmlpage.getStatus( ) );
+            daoUtil.setString( ++i, htmlpage.getWorkgroup( ) );
+            daoUtil.setString( ++i, htmlpage.getRole( ) );
+            daoUtil.setTimestamp( ++i, htmlpage.getDateStart( ) );
+            daoUtil.setTimestamp( ++i, htmlpage.getDateEnd( ) );
             
             daoUtil.executeUpdate( );
         }
