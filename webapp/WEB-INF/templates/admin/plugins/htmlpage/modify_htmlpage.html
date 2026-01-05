@@ -1,7 +1,7 @@
 <#include "/admin/util/editor/editor.html" />
 <@pageContainer>
 	<@pageColumn>
-		<@pageHeader title='#i18n{htmlpage.modify_htmlpage.tableLabel} - ${htmlpage.description}' />
+		<@pageHeader title='#i18n{htmlpage.modify_htmlpage.tableLabel}' />
 		<@tform method='post' name='modify_htmlpage' id='modify_htmlpage' action='jsp/admin/plugins/htmlpage/DoModifyHtmlPage.jsp' boxed=true>
 			<@input type='hidden' name='id_htmlpage' value='${htmlpage.id}' />
 			<@formGroup labelFor='description' labelKey='#i18n{htmlpage.modify_htmlpage.rowTitleLabel}' mandatory=true>
