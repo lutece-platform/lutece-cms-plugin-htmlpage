@@ -1,41 +1,24 @@
 <@cTpl>
-<div class="row">
-	<div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
-		${page_tree_menu?if_exists} 
-		<form class="form-search" method="post" action="jsp/site/Portal.jsp?page=htmlpage">
-			<input type="hidden" name="page" value="htmlpage">
-			<label>#i18n{htmlpage.page_htmlpage.search} </label>:
-			
-			<div class="input-group">
-			<#if query?exists>
-				<input type="text" class="form-control input-sm" name="query" value="${query}">
-			<#else>
-				<input type="text" class="form-control input-sm" name="query" value="">
-			</#if>
-			<span class="input-group-btn">
-			<button class="btn btn-default btn-sm" type="submit"><i class="glyphicon glyphicon-search"></i></button>
-			</span>
-			</div>
-		</form>		
-	</div>
-	<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-	<fieldset>
-	<legend>#i18n{htmlpage.page_htmlpage.pageTitle}</legend>
-		<ul>
+<@cContainer>
+    <@cRow>
+        <@cCol>
+            <@cTitle level=2>#i18n{htmlpage.page_htmlpage.pageTitle}</@cTitle>
+			<@cList>
 			<#if htmlpages_list?has_content>
 				<#list htmlpages_list as htmlpage >
-					<li><a href="jsp/site/Portal.jsp?page=htmlpage&htmlpage_id=${htmlpage.id}">${htmlpage.description}</a></li>
-				</#list>
-			<#else><#if result?exists>
-				<#list result as htmlpage >
-					<li><a href="${htmlpage.url}">${htmlpage.title}</a></li>
+					<@cListItem url='jsp/site/Portal.jsp?page=htmlpage&htmlpage_id=${htmlpage.id}' label=htmlpage.description />
 				</#list>
 			<#else>
-				#i18n{htmlpage.page_htmlpage.messageListEmpty}
-			</#if></#if>
-		</ul>
-		
-		</fieldset>
-	</div>
-</div>
+				<#if result?exists>
+					<#list result as htmlpage >
+						<@cListItem url='${htmlpage.url}' label=htmlpage.title />
+					</#list>
+				<#else>
+					<@cEmpy title='#i18n{htmlpage.page_htmlpage.messageListEmpty}' />
+				</#if>
+			</#if>
+			</@cList>
+		</@cCol>
+	</@cRow>
+</@cContainer>
 </@cTpl>

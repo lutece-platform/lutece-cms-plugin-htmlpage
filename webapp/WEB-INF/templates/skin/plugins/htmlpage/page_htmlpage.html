@@ -1,17 +1,12 @@
 <@cTpl>
-<div class="row">
-	<div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
-		${page_tree_menu?if_exists}        
-	</div>
-	<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-	<fieldset>
-	<legend>#i18n{htmlpage.page_htmlpage.pageTitle}</legend>
-	<input type="hidden" name="htmlpage_id" description="htmlpage_id" value="${htmlpage.id}"/>            
-		${htmlpage.htmlContent}
-	</fieldset>
-	</div>
-</div>    
+<@cContainer>
+    <@cRow>
+        <@cCol>
+        ${htmlpage.htmlContent}
+		</@cCol>
+	</@cRow>
+</@cContainer>
 <script>
-document.title = "${htmlpage.description}";
+<@cSetPageTitle title=htmlpage.description />
 </script>
 </@cTpl>
