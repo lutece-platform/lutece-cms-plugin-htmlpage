@@ -36,56 +36,55 @@
 				<@input type='textarea' id='html_content' richtext=true name='html_content' rows=20>${htmlpage.htmlContent}</@input>
 			</@formGroup>
 			<@formGroup>
-				<@button type='submit' title='#i18n{htmlpage.modify_htmlpage.buttonModify}' buttonIcon='check' />
-				<@aButton href='jsp/admin/plugins/htmlpage/ManageHtmlPage.jsp' title='#i18n{portal.admin.message.buttonCancel}' buttonIcon='times' color='default' />
+				<@button type='submit' title='#i18n{htmlpage.modify_htmlpage.buttonModify}' buttonIcon='check' class='form-validation' />
+				<@aButton href='jsp/admin/plugins/htmlpage/ManageHtmlPage.jsp' title='#i18n{portal.admin.message.buttonCancel}' buttonIcon='times' color='default' class='form-validation'/>
 			</@formGroup>
 		</@tform>
 	</@pageColumn>
 </@pageContainer>
 <@initEditor />
-
 <script>
-	document.addEventListener("DOMContentLoaded", function () {
-	  var status = document.getElementById('status').value;
-	  var fgDateStart = document.getElementById('fgDateStart');
-	  var fgDateEnd = document.getElementById('fgDateEnd');
-	  var dateStart = document.getElementById('dateStart');
-	  var dateEnd = document.getElementById('dateEnd');
+document.addEventListener("DOMContentLoaded", function () {
+	var status = document.getElementById('status').value;
+	var fgDateStart = document.getElementById('fgDateStart');
+	var fgDateEnd = document.getElementById('fgDateEnd');
+	var dateStart = document.getElementById('dateStart');
+	var dateEnd = document.getElementById('dateEnd');
 
-	  if (status == 0 || status == 1) {
+	if (status == 0 || status == 1) {
 		fgDateStart.style.display = 'none';
 		fgDateEnd.style.display = 'none';
 		dateStart.value = "";
 		dateEnd.value = "";
 		dateStart.required = false;
 		dateEnd.required = false;
-	  }
+	}
 
-	  if (status == 2) {
+	if (status == 2) {
 		fgDateStart.style.display = 'block';
 		fgDateEnd.style.display = 'block';
 		dateStart.required = true;
 		dateEnd.required = true;
-	  }
+	}
 
-	  document.getElementById('status').addEventListener('change', function () {
+	document.getElementById('status').addEventListener('change', function(){
 		var statusVal = this.value;
 
 		if (statusVal == 0 || statusVal == 1) {
-		  fgDateStart.style.display = 'none';
-		  fgDateEnd.style.display = 'none';
-		  dateStart.value = "";
-		  dateEnd.value = "";
-		  dateStart.required = false;
-		  dateEnd.required = false;
+			fgDateStart.style.display = 'none';
+			fgDateEnd.style.display = 'none';
+			dateStart.value = "";
+			dateEnd.value = "";
+			dateStart.required = false;
+			dateEnd.required = false;
 		}
 
 		if (statusVal == 2) {
-		  fgDateStart.style.display = 'block';
-		  fgDateEnd.style.display = 'block';
-		  dateStart.required = true;
-		  dateEnd.required = true;
+			fgDateStart.style.display = 'block';
+			fgDateEnd.style.display = 'block';
+			dateStart.required = true;
+			dateEnd.required = true;
 		}
-	  });
 	});
+});
 </script>
