@@ -3,22 +3,25 @@
     <@cRow>
         <@cCol>
             <@cTitle level=2>#i18n{htmlpage.page_htmlpage.pageTitle}</@cTitle>
-			<@cList>
-			<#if htmlpages_list?has_content>
-				<#list htmlpages_list as htmlpage >
-					<@cListItem url='jsp/site/Portal.jsp?page=htmlpage&htmlpage_id=${htmlpage.id}' label=htmlpage.description />
-				</#list>
+			<#if htmlpages_list?? && htmlpages_list?has_content>
+				<@cList>
+					<#list htmlpages_list as htmlpage >
+						<@cListItem url='jsp/site/Portal.jsp?page=htmlpage&htmlpage_id=${htmlpage.id}' label=htmlpage.description />
+					</#list>
+				</@cList>
 			<#else>
 				<#if result?exists>
 					<#list result as htmlpage >
 						<@cListItem url='${htmlpage.url}' label=htmlpage.title />
 					</#list>
 				<#else>
-					<@cEmpy title='#i18n{htmlpage.page_htmlpage.messageListEmpty}' />
+					<@cEmpty title='#i18n{htmlpage.page_htmlpage.messageListEmpty}' />
 				</#if>
 			</#if>
-			</@cList>
 		</@cCol>
 	</@cRow>
 </@cContainer>
+<script>
+<@cSetPageTitle title='#i18n{htmlpage.page_htmlpage.pageTitle}' />
+</script>
 </@cTpl>
