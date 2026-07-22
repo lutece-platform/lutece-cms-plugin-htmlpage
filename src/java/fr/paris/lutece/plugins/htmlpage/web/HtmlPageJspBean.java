@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2022, City of Paris
+ * Copyright (c) 2002-2026, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,10 +33,14 @@
  */
 package fr.paris.lutece.plugins.htmlpage.web;
 
+import fr.paris.lutece.api.user.User;
 import fr.paris.lutece.plugins.htmlpage.business.HtmlPage;
 import fr.paris.lutece.plugins.htmlpage.business.HtmlPageHome;
 import fr.paris.lutece.plugins.htmlpage.service.EnumStatus;
 import fr.paris.lutece.plugins.htmlpage.utils.HtmlPageUtil;
+import fr.paris.lutece.plugins.htmlpage.rbac.ManageHtmlpageResource;
+import fr.paris.lutece.portal.service.admin.AccessDeniedException;
+import fr.paris.lutece.portal.service.rbac.RBACService;
 import fr.paris.lutece.portal.business.role.RoleHome;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
@@ -82,20 +86,21 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
     private static final String MESSAGE_CONFIRM_REMOVE_HTMLPAGE = "htmlpage.message.confirmRemoveHtmlPage";
     private static final String MESSAGE_INVALID_DATE_START = "htmlpage.message.invalidDateStart";
     private static final String MESSAGE_INVALID_DATE_END = "htmlpage.message.invalidDateEnd";
-    
+
     // Markers
     private static final String MARK_LIST_HTMLPAGE_LIST = "htmlpage_list";
     private static final String MARK_NB_ITEMS_PER_PAGE = "nb_items_per_page";
     private static final String MARK_WORKGROUPS_LIST = "workgroups_list";
     private static final String MARK_WEBAPP_URL = "webapp_url";
     private static final String MARK_PROD_URL = "prod_url";
-    
+
     private static final String MARK_LOCALE = "locale";
     private static final String MARK_HTML_CONTENT = "html_content";
     private static final String MARK_HTMLPAGE = "htmlpage";
     private static final String MARK_ROLES_LIST = "roles_list";
     private static final String MARK_PAGINATOR = "paginator";
     private static final String MARK_STATUS = "status_list";
+    private static final String MARK_CAN_DELETE = "can_delete";
 
     // parameters
     private static final String PARAMETER_HTMLPAGE_ID = "id_htmlpage";
@@ -108,7 +113,7 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
     private static final String PARAMETER_PAGE_INDEX = "page_index";
     private static final String PARAMETER_HTMLPAGE_DATE_START = "date_start";
     private static final String PARAMETER_HTMLPAGE_DATE_END = "date_end";
-    
+
     // templates
     private static final String TEMPLATE_MANAGE_HTMLPAGE = "/admin/plugins/htmlpage/manage_htmlpage.html";
     private static final String TEMPLATE_CREATE_HTMLPAGE = "/admin/plugins/htmlpage/create_htmlpage.html";
@@ -125,7 +130,7 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
 
     /**
      * returns the template of the HtmlPageLists management
-     * 
+     *
      * @param request
      *            The HttpRequest
      * @return template of lists management
@@ -148,6 +153,7 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
         model.put( MARK_NB_ITEMS_PER_PAGE, "" + _nItemsPerPage );
         model.put( MARK_PAGINATOR, paginator );
         model.put( MARK_LIST_HTMLPAGE_LIST, paginator.getPageItems( ) );
+        model.put( MARK_CAN_DELETE, RBACService.isAuthorized( new ManageHtmlpageResource( ), ManageHtmlpageResource.PERMISSION_DELETE, (User) getUser( ) ) );
 
         HtmlTemplate templateList = AppTemplateService.getTemplate( TEMPLATE_MANAGE_HTMLPAGE, getLocale( ), model );
 
@@ -169,7 +175,7 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
         ReferenceList workgroupsList = AdminWorkgroupService.getUserWorkgroups( getUser( ), getLocale( ) );
         model.put( MARK_WORKGROUPS_LIST, workgroupsList );
         model.put( MARK_WEBAPP_URL, AppPathService.getBaseUrl( request ) );
-        model.put( MARK_PROD_URL, AppPathService.getProdUrl(request) );
+        model.put( MARK_PROD_URL, AppPathService.getProdUrl( request ) );
         model.put( MARK_LOCALE, getLocale( ) );
         model.put( MARK_HTML_CONTENT, "" );
         model.put( MARK_ROLES_LIST, RoleHome.getRolesList( ) );
@@ -208,10 +214,10 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
         htmlpage.setStatus( Integer.parseInt( strStatus ) );
         htmlpage.setWorkgroup( strWorkgroup );
         htmlpage.setRole( strRole );
-        
+
         String strDateStart = request.getParameter( PARAMETER_HTMLPAGE_DATE_START );
         String strDateEnd = request.getParameter( PARAMETER_HTMLPAGE_DATE_END );
-        
+
         Timestamp dateStart = HtmlPageUtil.convertToTimestamp( strDateStart );
         Timestamp dateEnd = HtmlPageUtil.convertToTimestamp( strDateEnd );
 
@@ -219,15 +225,14 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
         {
             return AdminMessageService.getMessageUrl( request, MESSAGE_INVALID_DATE_START, AdminMessage.TYPE_STOP );
         }
-        
-        if (  StringUtils.isNotEmpty( strDateEnd ) && dateEnd == null  )
+
+        if ( StringUtils.isNotEmpty( strDateEnd ) && dateEnd == null )
         {
             return AdminMessageService.getMessageUrl( request, MESSAGE_INVALID_DATE_END, AdminMessage.TYPE_STOP );
         }
-           
-            
-		htmlpage.setDateStart( dateStart );
-		htmlpage.setDateEnd( dateEnd );
+
+        htmlpage.setDateStart( dateStart );
+        htmlpage.setDateEnd( dateEnd );
 
         HtmlPageHome.create( htmlpage, getPlugin( ) );
 
@@ -279,12 +284,12 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
         ReferenceList workgroupsList = AdminWorkgroupService.getUserWorkgroups( getUser( ), getLocale( ) );
         model.put( MARK_WORKGROUPS_LIST, workgroupsList );
         model.put( MARK_WEBAPP_URL, AppPathService.getBaseUrl( request ) );
-        model.put( MARK_PROD_URL, AppPathService.getProdUrl(request) );
+        model.put( MARK_PROD_URL, AppPathService.getProdUrl( request ) );
         model.put( MARK_LOCALE, getLocale( ) );
         model.put( MARK_HTMLPAGE, htmlPage );
         model.put( MARK_ROLES_LIST, RoleHome.getRolesList( ) );
         model.put( MARK_STATUS, EnumStatus.getReferenceList( ) );
-        
+
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_MODIFY_HTMLPAGE, getLocale( ), model );
 
         return getAdminPage( template.getHtml( ) );
@@ -316,7 +321,7 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
 
         String strDateStart = request.getParameter( PARAMETER_HTMLPAGE_DATE_START );
         String strDateEnd = request.getParameter( PARAMETER_HTMLPAGE_DATE_END );
-        
+
         Timestamp dateStart = HtmlPageUtil.convertToTimestamp( strDateStart );
         Timestamp dateEnd = HtmlPageUtil.convertToTimestamp( strDateEnd );
 
@@ -324,14 +329,14 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
         {
             return AdminMessageService.getMessageUrl( request, MESSAGE_INVALID_DATE_START, AdminMessage.TYPE_STOP );
         }
-        
-        if (  StringUtils.isNotEmpty( strDateEnd ) && dateEnd == null  )
+
+        if ( StringUtils.isNotEmpty( strDateEnd ) && dateEnd == null )
         {
             return AdminMessageService.getMessageUrl( request, MESSAGE_INVALID_DATE_END, AdminMessage.TYPE_STOP );
         }
-            
-		htmlPage.setDateStart( dateStart );
-		htmlPage.setDateEnd( dateEnd );
+
+        htmlPage.setDateStart( dateStart );
+        htmlPage.setDateEnd( dateEnd );
 
         HtmlPageHome.update( htmlPage, getPlugin( ) );
 
@@ -346,8 +351,13 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
      *            The Http request
      * @return the html code to confirm
      */
-    public String getConfirmRemoveHtmlPage( HttpServletRequest request )
+    public String getConfirmRemoveHtmlPage( HttpServletRequest request ) throws AccessDeniedException
     {
+        if ( !RBACService.isAuthorized( new ManageHtmlpageResource( ), ManageHtmlpageResource.PERMISSION_DELETE, (User) getUser( ) ) )
+        {
+            throw new AccessDeniedException( "You don't have the right to delete HTML pages" );
+        }
+
         int nIdHtmlPage = Integer.parseInt( request.getParameter( PARAMETER_HTMLPAGE_ID ) );
 
         UrlItem url = new UrlItem( JSP_DO_REMOVE_HTMLPAGE );
@@ -368,8 +378,13 @@ public class HtmlPageJspBean extends PluginAdminPageJspBean
      *            The Http request
      * @return the jsp URL to display the form to manage htmlPages
      */
-    public String doRemoveHtmlPage( HttpServletRequest request )
+    public String doRemoveHtmlPage( HttpServletRequest request ) throws AccessDeniedException
     {
+        if ( !RBACService.isAuthorized( new ManageHtmlpageResource( ), ManageHtmlpageResource.PERMISSION_DELETE, (User) getUser( ) ) )
+        {
+            throw new AccessDeniedException( "You don't have the right to delete HTML pages" );
+        }
+
         int nIdHtmlPage = Integer.parseInt( request.getParameter( PARAMETER_HTMLPAGE_ID ) );
 
         HtmlPage htmlPage = HtmlPageHome.findByPrimaryKey( nIdHtmlPage, getPlugin( ) );
