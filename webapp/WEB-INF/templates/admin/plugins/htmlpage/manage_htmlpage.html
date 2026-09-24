@@ -18,7 +18,7 @@
 					<@p class='mb-0'>#i18n{htmlpage.manage_htmlpage.workgroup} : ${htmlpage.workgroup}</@p>
 				</@manageFeatureItemColumn>
 				<@manageFeatureItemColumn cols='12 col-md-2'>
-					<@code class='mb-0' codeClass='fw-bold copy-content'><#noparse>$</#noparse>{htmlpage_${htmlpage.id}!}</@code>
+					<@code class='mb-0' codeClass='fw-bold copy-content lh-1'><#noparse>$</#noparse>{htmlpage_${htmlpage.id}!}</@code>
 				</@manageFeatureItemColumn>
 				<@manageFeatureItemColumn align='end'>
 					<@offcanvas targetUrl='jsp/admin/plugins/htmlpage/ModifyHtmlPage.jsp?id_htmlpage=${htmlpage.id}' useIframe=true targetElement='#modify_htmlpage' id='htmlpage-modify-${htmlpage.id}' title='#i18n{htmlpage.modify_htmlpage.buttonModify}' btnTitle='#i18n{htmlpage.modify_htmlpage.buttonModify}' hideTitle=['xs','sm'] btnIcon='pencil' position='end' size='full' />
@@ -38,4 +38,4 @@
 		<@paginationAdmin paginator=paginator />
 	</@pageColumn>
 </@pageContainer>
-<@copyElementToClipboard selector='.copy-content'  />
+<@copyElementToClipboard selector='.copy-content' btnClass='link text-light fs-3' />
