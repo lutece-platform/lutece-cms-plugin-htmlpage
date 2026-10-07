@@ -10,7 +10,7 @@
     <groupId>fr.paris.lutece.plugins</groupId>
     <artifactId>plugin-htmlpage</artifactId>
     <packaging>lutece-plugin</packaging>
-    <version>6.0.1-SNAPSHOT</version>
+    <version>6.0.1-beta-02</version>
     <name>Lutece htmlpage plugin</name>
     
     <repositories>
