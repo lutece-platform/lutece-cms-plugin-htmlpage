@@ -11,7 +11,7 @@
     <description>Module de gestion de la page speciale de contenu HTML</description>
     <provider>Mairie de Paris</provider>
     <provider-url>http://fr.lutece.paris.fr</provider-url>
-    <icon-url>images/admin/skin/plugins/htmlpage/htmlpage.png</icon-url>
+    <icon-url>themes/admin/shared/plugins/htmlpage/images/htmlpage.svg</icon-url>
     <copyright>Copyright 2001-2009 Mairie de Paris</copyright>
     <core-version-dependency>
 		<min-core-version>8.0.0</min-core-version>
@@ -35,7 +35,7 @@
             <feature-description>htmlpage.adminFeature.htmlpage_management.description</feature-description>
             <feature-level>2</feature-level>
             <feature-url>jsp/admin/plugins/htmlpage/ManageHtmlPage.jsp</feature-url>
-            <feature-icon-url>images/admin/skin/plugins/htmlpage/htmlpage.png</feature-icon-url>
+            <feature-icon-url>ti ti-file-code</feature-icon-url>
             <feature-documentation-url>jsp/admin/documentation/AdminDocumentation.jsp?doc=admin-htmlpage</feature-documentation-url>
         </admin-feature>
     </admin-features>
