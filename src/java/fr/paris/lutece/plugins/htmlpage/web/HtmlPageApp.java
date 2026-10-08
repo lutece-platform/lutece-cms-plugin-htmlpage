@@ -101,12 +101,12 @@ public class HtmlPageApp implements XPageApplication
     // private fields
     private Plugin _plugin;
 
-    @Inject 
-    private transient IHtmlPageService _htmlPageService;
-    
+    @Inject
+    private IHtmlPageService _htmlPageService;
+
     @Inject
     @Named( "htmlpage.htmlpageSearchEngine" )
-    private transient SearchEngine _htmlpageSearchEngine;
+    private SearchEngine _htmlpageSearchEngine;
     
     /** Creates a new instance of HtmlPageApp */
     public HtmlPageApp( )
