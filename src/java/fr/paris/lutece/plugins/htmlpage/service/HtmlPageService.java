@@ -248,11 +248,6 @@ public class HtmlPageService implements IHtmlPageService
     }
     
     /**
-     * Clear and reload the cache containing the list of all the html pages
-     * 
-     * @return list of all html pages
-     */
-    /**
      * Gets the pages of the cache from the ids of its index entry
      * 
      * @return the cached pages, or null if the cache has to be refreshed (index or page missing)
@@ -280,6 +275,11 @@ public class HtmlPageService implements IHtmlPageService
     	return htmlPageList;
     }
 
+    /**
+     * Clear and reload the cache containing the list of all the html pages
+     * 
+     * @return list of all html pages
+     */
     private List<HtmlPage> refreshHtmlPageCache( )
     {    	
     	_cachePublicHtmlPage.clear( );
