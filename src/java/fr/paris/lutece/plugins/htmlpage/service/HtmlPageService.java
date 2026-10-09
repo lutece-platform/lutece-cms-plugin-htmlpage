@@ -64,6 +64,11 @@ import jakarta.servlet.ServletContext;
 public class HtmlPageService implements IHtmlPageService
 {   
 	private static final String CACHE_SERVICE_NAME = "PublicHtmlPageCacheService";
+	// Cache entry written after the pages, holding their ids (none when the site has no page). The page include calls
+	// getHtmlPageListCache on every portal page: reading this key is served by the near cache of a distributed cache, whereas
+	// counting then listing the entries iterated the whole cache, and an empty cache sent a query to the database on every page.
+	private static final String KEY_INDEX = "[htmlpage:index]";
+	private static final String SEPARATOR_IDS = ",";
 	
     @Inject
     private HtmlPageIndexerUtils _htmlPageIndexerUtils;
@@ -104,25 +109,14 @@ public class HtmlPageService implements IHtmlPageService
     @Override
     public List<HtmlPage> getHtmlPageListCache( )
     {
-    	List<HtmlPage> enabledHtmlPageList = new ArrayList<HtmlPage>( );
-    	
-        if ( _cachePublicHtmlPage.getCacheSize( ) == 0 )
-        {
-        	List<HtmlPage> htmlPageList = refreshHtmlPageCache( );
-        	if( htmlPageList != null )
-        	{
-        		enabledHtmlPageList = htmlPageList.stream( )
-        				                          .filter( htmlPage -> HtmlPageUtil.isActivedPageHtml( htmlPage ) )
-        				                          .collect( Collectors.toCollection( ArrayList::new ) );
-        	}       	
-        }
-        else
-        {
-        	enabledHtmlPageList = _cachePublicHtmlPage.getKeys( ).stream( )
-        			                                             .map( htmlPageKey -> _cachePublicHtmlPage.get( htmlPageKey ) )
-        			                                             .filter( htmlPage -> HtmlPageUtil.isActivedPageHtml( htmlPage ) )
-        		        				                         .collect( Collectors.toCollection( ArrayList::new ) );                             
-        }
+    	List<HtmlPage> htmlPageList = getCachedHtmlPageList( );
+    	if ( htmlPageList == null )
+    	{
+    		htmlPageList = refreshHtmlPageCache( );
+    	}
+    	List<HtmlPage> enabledHtmlPageList = htmlPageList.stream( )
+    			                                         .filter( htmlPage -> HtmlPageUtil.isActivedPageHtml( htmlPage ) )
+    			                                         .collect( Collectors.toCollection( ArrayList::new ) );
         Collections.sort( enabledHtmlPageList, Comparator.comparing( HtmlPage::getDescription ) );
         return enabledHtmlPageList;
     }
@@ -258,18 +252,47 @@ public class HtmlPageService implements IHtmlPageService
      * 
      * @return list of all html pages
      */
+    /**
+     * Gets the pages of the cache from the ids of its index entry
+     * 
+     * @return the cached pages, or null if the cache has to be refreshed (index or page missing)
+     */
+    private List<HtmlPage> getCachedHtmlPageList( )
+    {
+    	HtmlPage index = _cachePublicHtmlPage.get( KEY_INDEX );
+    	if ( index == null )
+    	{
+    		return null;
+    	}
+    	List<HtmlPage> htmlPageList = new ArrayList<>( );
+    	for ( String strId : index.getHtmlContent( ).split( SEPARATOR_IDS ) )
+    	{
+    		if ( !strId.isEmpty( ) )
+    		{
+    			HtmlPage htmlPage = _cachePublicHtmlPage.get( getCacheKey( strId ) );
+    			if ( htmlPage == null )
+    			{
+    				return null;
+    			}
+    			htmlPageList.add( htmlPage );
+    		}
+    	}
+    	return htmlPageList;
+    }
+
     private List<HtmlPage> refreshHtmlPageCache( )
     {    	
     	_cachePublicHtmlPage.clear( );
     	
-    	List<HtmlPage> htmlPageList = ( List<HtmlPage> ) HtmlPageHome.findAll( HtmlPagePlugin.getPlugin( ) );
-    	if( htmlPageList != null )
+    	List<HtmlPage> htmlPageList = new ArrayList<>( HtmlPageHome.findAll( HtmlPagePlugin.getPlugin( ) ) );
+    	for( HtmlPage htmlPage : htmlPageList )
     	{
-        	for( HtmlPage htmlPage : htmlPageList )
-        	{
-        		_cachePublicHtmlPage.put( getCacheKey( String.valueOf( htmlPage.getId( ) ) ), htmlPage );
-        	}
+    		_cachePublicHtmlPage.put( getCacheKey( String.valueOf( htmlPage.getId( ) ) ), htmlPage );
     	}
+    	HtmlPage index = new HtmlPage( );
+    	index.setId( -1 );
+    	index.setHtmlContent( htmlPageList.stream( ).map( htmlPage -> String.valueOf( htmlPage.getId( ) ) ).collect( Collectors.joining( SEPARATOR_IDS ) ) );
+    	_cachePublicHtmlPage.put( KEY_INDEX, index );
     	return htmlPageList;
     }
     
