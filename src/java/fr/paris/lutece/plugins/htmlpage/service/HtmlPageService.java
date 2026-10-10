@@ -36,7 +36,9 @@ package fr.paris.lutece.plugins.htmlpage.service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import fr.paris.lutece.plugins.htmlpage.business.HtmlPage;
@@ -117,7 +119,7 @@ public class HtmlPageService implements IHtmlPageService
     	List<HtmlPage> enabledHtmlPageList = htmlPageList.stream( )
     			                                         .filter( htmlPage -> HtmlPageUtil.isActivedPageHtml( htmlPage ) )
     			                                         .collect( Collectors.toCollection( ArrayList::new ) );
-        Collections.sort( enabledHtmlPageList, Comparator.comparing( HtmlPage::getDescription ) );
+        Collections.sort( enabledHtmlPageList, Comparator.comparing( HtmlPage::getDescription, Comparator.nullsLast( Comparator.naturalOrder( ) ) ) );
         return enabledHtmlPageList;
     }
     
@@ -255,7 +257,7 @@ public class HtmlPageService implements IHtmlPageService
     private List<HtmlPage> getCachedHtmlPageList( )
     {
     	HtmlPage index = _cachePublicHtmlPage.get( KEY_INDEX );
-    	if ( index == null )
+    	if ( index == null || index.getHtmlContent( ) == null )
     	{
     		return null;
     	}
@@ -281,18 +283,34 @@ public class HtmlPageService implements IHtmlPageService
      * @return list of all html pages
      */
     private List<HtmlPage> refreshHtmlPageCache( )
-    {    	
-    	_cachePublicHtmlPage.clear( );
-    	
+    {
+    	// No clear( ) first: the cache is shared by the instances, a reader must never see it empty while it is refreshed
+    	HtmlPage oldIndex = _cachePublicHtmlPage.get( KEY_INDEX );
+
     	List<HtmlPage> htmlPageList = new ArrayList<>( HtmlPageHome.findAll( HtmlPagePlugin.getPlugin( ) ) );
+    	Set<String> setIds = new LinkedHashSet<>( );
     	for( HtmlPage htmlPage : htmlPageList )
     	{
-    		_cachePublicHtmlPage.put( getCacheKey( String.valueOf( htmlPage.getId( ) ) ), htmlPage );
+    		String strId = String.valueOf( htmlPage.getId( ) );
+    		_cachePublicHtmlPage.put( getCacheKey( strId ), htmlPage );
+    		setIds.add( strId );
     	}
     	HtmlPage index = new HtmlPage( );
     	index.setId( -1 );
-    	index.setHtmlContent( htmlPageList.stream( ).map( htmlPage -> String.valueOf( htmlPage.getId( ) ) ).collect( Collectors.joining( SEPARATOR_IDS ) ) );
+    	index.setHtmlContent( String.join( SEPARATOR_IDS, setIds ) );
     	_cachePublicHtmlPage.put( KEY_INDEX, index );
+
+    	// Pages removed since the previous refresh
+    	if ( oldIndex != null && oldIndex.getHtmlContent( ) != null )
+    	{
+    		for ( String strId : oldIndex.getHtmlContent( ).split( SEPARATOR_IDS ) )
+    		{
+    			if ( !strId.isEmpty( ) && !setIds.contains( strId ) )
+    			{
+    				_cachePublicHtmlPage.remove( getCacheKey( strId ) );
+    			}
+    		}
+    	}
     	return htmlPageList;
     }
     
