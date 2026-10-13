@@ -89,6 +89,11 @@ public class HtmlPageDAO implements IHtmlPageDAO
             daoUtil.setTimestamp( ++i, htmlpage.getDateEnd( ) );
             
             daoUtil.executeUpdate( );
+
+            if ( daoUtil.nextGeneratedKey( ) )
+            {
+                htmlpage.setId( daoUtil.getGeneratedKeyInt( 1 ) );
+            }
         }
     }
 
