@@ -37,6 +37,7 @@ import fr.paris.lutece.plugins.htmlpage.business.HtmlPage;
 import fr.paris.lutece.plugins.htmlpage.service.HtmlPageService;
 import fr.paris.lutece.plugins.htmlpage.utils.HtmlPageUtil;
 import fr.paris.lutece.portal.service.content.PageData;
+import fr.paris.lutece.portal.service.editor.RichTextContentService;
 import fr.paris.lutece.portal.service.includes.PageInclude;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 
@@ -62,7 +63,9 @@ public class HtmlPageInclude implements PageInclude
     private static boolean _bEnableApiRest =  AppPropertiesService.getPropertyBoolean( PROPERTY_ENABLE_API_REST, false );
     
     /**
-     * Substitue specific Freemarker markers in the page template.
+     * Substitue specific Freemarker markers in the page template. The content of a page is rich text entered by an
+     * administrator: it is put in the model as sanitized markup, written as HTML by <code>${htmlpage_&lt;id&gt;!}</code>
+     * under auto-escaping (LUT-33153).
      * 
      * @param rootModel
      *            the HashMap containing markers to substitute
@@ -81,7 +84,7 @@ public class HtmlPageInclude implements PageInclude
             {
                 if( HtmlPageUtil.isVisible( request, htmlpage.getRole( ) ) )
                 {
-                    rootModel.put( MARK_HTMLPAGE_MARKER_PREFIX + htmlpage.getId( ), htmlpage.getHtmlContent( ) );
+                    rootModel.put( MARK_HTMLPAGE_MARKER_PREFIX + htmlpage.getId( ), RichTextContentService.getMarkup( htmlpage.getHtmlContent( ) ) );
                 }
             }
         }
