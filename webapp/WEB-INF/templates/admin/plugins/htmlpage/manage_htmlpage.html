@@ -7,14 +7,14 @@
 		<#list htmlpage_list as htmlpage >
 			<@manageFeatureItem>
 				<@manageFeatureItemColumn cols='12 col-md-4' flex=false>
-					<@h level=3 class='mb-1' params='title="#i18n{htmlpage.modify_htmlpage.title_modify} ${htmlpage.description}"'>
+					<@h level=3 class='mb-1' params={"title": "#i18n{htmlpage.modify_htmlpage.title_modify} ${htmlpage.description}"}>
 						<#if htmlpage.status==1 || ( htmlpage.status==2 && ( htmlpage.dateStart lte .now && htmlpage.dateEnd gte .now) ) >
-							<@link href='jsp/site/Portal.jsp?page=htmlpage&amp;htmlpage_id=${htmlpage.id}' target='_blank' label=htmlpage.description title=htmlpage.description />
+							<@link href='jsp/site/Portal.jsp?page=htmlpage&htmlpage_id=${htmlpage.id}' target='_blank' label=htmlpage.description title=htmlpage.description />
 						<#else>
 							${htmlpage.description}
 						</#if>
 					</@h>	
-					<@p class='mb-1'><#if htmlpage.status==1><@tag color='success' params='title="#i18n{portal.util.labelEnabled}"'><@icon style='check' /> #i18n{portal.util.labelEnabled}</@tag><#elseif htmlpage.status == 0><@tag color='danger' params='title="#i18n{portal.util.labelDisabled}"'><@icon style='times' /> #i18n{portal.util.labelDisabled}</@tag><#elseif htmlpage.status == 2><@tag color='secondary'><@icon style='check' /> #i18n{htmlpage.modify_htmlpage.statusLabelConditioned}</@tag><@tag color='success' class='ml-1'><@icon style='calendar-check' /><strong>${(htmlpage.dateStart?string.short)!} <@icon style='arrow-right mx-1' /> ${(htmlpage.dateEnd?string.short)!}</strong></@tag></#if></@p>
+					<@p class='mb-1'><#if htmlpage.status==1><@tag color='success' title="#i18n{portal.util.labelEnabled}"><@icon style='check' /> #i18n{portal.util.labelEnabled}</@tag><#elseif htmlpage.status == 0><@tag color='danger' title="#i18n{portal.util.labelDisabled}"><@icon style='times' /> #i18n{portal.util.labelDisabled}</@tag><#elseif htmlpage.status == 2><@tag color='secondary'><@icon style='check' /> #i18n{htmlpage.modify_htmlpage.statusLabelConditioned}</@tag><@tag color='success' class='ml-1'><@icon style='calendar-check' /><strong>${(htmlpage.dateStart?string.short)!} <@icon style='arrow-right mx-1' /> ${(htmlpage.dateEnd?string.short)!}</strong></@tag></#if></@p>
 					<@p class='mb-0'>#i18n{htmlpage.manage_htmlpage.workgroup} : ${htmlpage.workgroup}</@p>
 				</@manageFeatureItemColumn>
 				<@manageFeatureItemColumn cols='12 col-md-2'>
