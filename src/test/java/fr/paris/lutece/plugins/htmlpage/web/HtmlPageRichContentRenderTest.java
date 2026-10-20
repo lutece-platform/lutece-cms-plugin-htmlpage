@@ -81,7 +81,7 @@ public class HtmlPageRichContentRenderTest extends LuteceTestCase
     private static final String TITLE = "<h2>Horaires</h2>";
     private static final String LIST = "<ul><li>Lundi</li><li>Mardi</li></ul>";
     private static final String LINK_IN = "<a href=\"https://example.org/plan\">Plan</a>";
-    private static final String LINK_OUT = "<a href=\"https://example.org/plan\" rel=\"nofollow\">Plan</a>";
+    private static final String LINK_OUT = "<a href=\"https://example.org/plan\" rel=\"nofollow noopener noreferrer\">Plan</a>";
     private static final String IMAGE_IN = "<img src=\"images/plan.png\" alt=\"Plan\">";
     private static final String IMAGE_OUT = "<img src=\"images/plan.png\" alt=\"Plan\" />";
     private static final String TABLE = "<table><tbody><tr><td>9h</td><td>18h</td></tr></tbody></table>";
