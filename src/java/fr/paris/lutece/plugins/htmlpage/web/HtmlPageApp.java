@@ -152,7 +152,7 @@ public class HtmlPageApp implements XPageApplication
 
             if ( strHtmlPageId != null )
             {
-                page.setContent( getHtmlPage( request, strHtmlPageId ) );
+                page.setContent( getHtmlPage( request, strHtmlPageId, page ) );
             }
         }
 
@@ -198,11 +198,13 @@ public class HtmlPageApp implements XPageApplication
      * 
      * @param request
      *            The Html request
-     * @param plugin
-     *            The plugin
+     * @param strHtmlPageId
+     *            The id of the html page
+     * @param page
+     *            The XPage, which takes the description of the html page as title
      * @return The Html template
      */
-    private String getHtmlPage( HttpServletRequest request, String strHtmlPageId ) throws SiteMessageException
+    private String getHtmlPage( HttpServletRequest request, String strHtmlPageId, XPage page ) throws SiteMessageException
     {
         HashMap<String, Object> model = new HashMap<String, Object>( );
 
@@ -215,6 +217,8 @@ public class HtmlPageApp implements XPageApplication
             {
                 model.put( MARK_HTMLPAGE, htmlpage );
                 model.put( MARK_PAGE, _plugin.getName( ) );
+                // the title of the page is the description of the html page, set on the server (it was set by a script)
+                page.setTitle( htmlpage.getDescription( ) );
             }
             else
             {

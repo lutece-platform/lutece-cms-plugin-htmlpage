@@ -9,27 +9,27 @@
 				<@manageFeatureItemColumn cols='12 col-md-4' flex=false>
 					<@h level=3 class='mb-1' params={"title": "#i18n{htmlpage.modify_htmlpage.title_modify} ${htmlpage.description}"}>
 						<#if htmlpage.status==1 || ( htmlpage.status==2 && ( htmlpage.dateStart lte .now && htmlpage.dateEnd gte .now) ) >
-							<@link href='jsp/site/Portal.jsp?page=htmlpage&htmlpage_id=${htmlpage.id}' target='_blank' label=htmlpage.description title=htmlpage.description />
+							<@link href='jsp/site/Portal.jsp?page=htmlpage&htmlpage_id=${htmlpage.id}' target='_blank' title=htmlpage.description>${htmlpage.description}<span class="visually-hidden"> #i18n{htmlpage.manage_htmlpage.labelNewWindow}</span></@link>
 						<#else>
 							${htmlpage.description}
 						</#if>
 					</@h>	
-					<@p class='mb-1'><#if htmlpage.status==1><@tag color='success' title="#i18n{portal.util.labelEnabled}"><@icon style='check' /> #i18n{portal.util.labelEnabled}</@tag><#elseif htmlpage.status == 0><@tag color='danger' title="#i18n{portal.util.labelDisabled}"><@icon style='times' /> #i18n{portal.util.labelDisabled}</@tag><#elseif htmlpage.status == 2><@tag color='secondary'><@icon style='check' /> #i18n{htmlpage.modify_htmlpage.statusLabelConditioned}</@tag><@tag color='success' class='ml-1'><@icon style='calendar-check' /><strong>${(htmlpage.dateStart?string.short)!} <@icon style='arrow-right mx-1' /> ${(htmlpage.dateEnd?string.short)!}</strong></@tag></#if></@p>
+					<@p class='mb-1'><#if htmlpage.status==1><@tag color='success' title="#i18n{portal.util.labelEnabled}"><@icon style='check' /> #i18n{portal.util.labelEnabled}</@tag><#elseif htmlpage.status == 0><@tag color='danger' title="#i18n{portal.util.labelDisabled}"><@icon style='times' /> #i18n{portal.util.labelDisabled}</@tag><#elseif htmlpage.status == 2><@tag color='secondary'><@icon style='check' /> #i18n{htmlpage.modify_htmlpage.statusLabelConditioned}</@tag><@tag color='success' class='ml-1'><@icon style='calendar-check' /><strong>${i18n( 'htmlpage.manage_htmlpage.labelPeriod', (htmlpage.dateStart?string.short)!'', (htmlpage.dateEnd?string.short)!'' )}</strong></@tag></#if></@p>
 					<@p class='mb-0'>#i18n{htmlpage.manage_htmlpage.workgroup} : ${htmlpage.workgroup}</@p>
 				</@manageFeatureItemColumn>
 				<@manageFeatureItemColumn cols='12 col-md-2'>
 					<@code class='mb-0' codeClass='fw-bold copy-content lh-1'><#noparse>$</#noparse>{htmlpage_${htmlpage.id}!}</@code>
 				</@manageFeatureItemColumn>
 				<@manageFeatureItemColumn align='end'>
-					<@offcanvas targetUrl='jsp/admin/plugins/htmlpage/ModifyHtmlPage.jsp?id_htmlpage=${htmlpage.id}' useIframe=true targetElement='#modify_htmlpage' id='htmlpage-modify-${htmlpage.id}' title='#i18n{htmlpage.modify_htmlpage.buttonModify}' btnTitle='#i18n{htmlpage.modify_htmlpage.buttonModify}' hideTitle=['xs','sm'] btnIcon='pencil' position='end' size='full' />
+					<@offcanvas targetUrl='jsp/admin/plugins/htmlpage/ModifyHtmlPage.jsp?id_htmlpage=${htmlpage.id}' useIframe=true targetElement='#modify_htmlpage' id='htmlpage-modify-${htmlpage.id}' title='#i18n{htmlpage.modify_htmlpage.buttonModify}' btnTitle='#i18n{htmlpage.modify_htmlpage.buttonModify}' hideTitle=['xs','sm'] btnIcon='pencil' position='end' size='full' params={'aria-label': '#i18n{htmlpage.modify_htmlpage.buttonModify} ' + htmlpage.description} />
 					<@tform method='post' action='jsp/admin/plugins/htmlpage/DoDuplicateHtmlPage.jsp'>
 						<@input type='hidden' name='id_htmlpage' id='id_htmlpage' value='${htmlpage.id}' />
-						<@button type='submit' title='#i18n{htmlpage.manage_htmlpage.actionDuplicate}' buttonIcon='copy me-1' hideTitle=['xs','sm'] />
+						<@button type='submit' title='#i18n{htmlpage.manage_htmlpage.actionDuplicate}' buttonIcon='copy me-1' hideTitle=['xs','sm'] params={'aria-label': '#i18n{htmlpage.manage_htmlpage.actionDuplicate} ' + htmlpage.description} />
 					</@tform>
 					<@tform method='post' action='jsp/admin/plugins/htmlpage/RemoveHtmlPage.jsp'>
 						<@input type='hidden' name='id_htmlpage' value='${htmlpage.id}' />
 						<@input type='hidden' name='description' value='${htmlpage.description}' />
-						<@button type='submit' title='#i18n{htmlpage.manage_htmlpage.actionDelete}' hideTitle=['xs','sm'] buttonIcon='trash me-1' color='danger'  />
+						<@button type='submit' title='#i18n{htmlpage.manage_htmlpage.actionDelete}' hideTitle=['xs','sm'] buttonIcon='trash me-1' color='danger' params={'aria-label': '#i18n{htmlpage.manage_htmlpage.actionDelete} ' + htmlpage.description} />
 					</@tform> 
 				</@manageFeatureItemColumn>
 			</@manageFeatureItem>					
