@@ -1,8 +1,10 @@
 <#macro getHtmlPage id='' idDefault='' idDiv='' divClass='' baseUrl='' >
+<#local strId = id?is_number?then( id?c, id ) />
+<#local strIdDefault = idDefault?is_number?then( idDefault?c, idDefault ) />
 <script type="text/javascript" src="themes/shared/plugins/htmlpage/js/vendor/purify.min.js"></script>
 <script type="text/javascript" src="themes/shared/plugins/htmlpage/js/htmlpage-rest.js"></script>
 <script>
-setBaseUrl( '${baseUrl!?js_string}' );
-getContentHtmlPage( '${id!?js_string}', '${idDefault!?js_string}', '${idDiv!?js_string}'<#if divClass !=''>, '${divClass?js_string}'</#if> );
+setBaseUrl( '${( baseUrl! )?js_string?no_esc}' );
+getContentHtmlPage( '${strId?js_string?no_esc}', '${strIdDefault?js_string?no_esc}', '${( idDiv! )?js_string?no_esc}'<#if divClass !=''>, '${divClass?js_string?no_esc}'</#if> );
 </script>
 </#macro>
