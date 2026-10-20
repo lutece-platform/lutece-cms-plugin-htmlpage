@@ -7,7 +7,7 @@
 		<#list htmlpage_list as htmlpage >
 			<@manageFeatureItem>
 				<@manageFeatureItemColumn cols='12 col-md-4' flex=false>
-					<@h level=3 class='mb-1' params={"title": "#i18n{htmlpage.modify_htmlpage.title_modify} ${htmlpage.description}"}>
+					<@h level=2 class='h3 mb-1' params={"title": "#i18n{htmlpage.modify_htmlpage.title_modify} ${htmlpage.description}"}>
 						<#if htmlpage.status==1 || ( htmlpage.status==2 && ( htmlpage.dateStart lte .now && htmlpage.dateEnd gte .now) ) >
 							<@link href='jsp/site/Portal.jsp?page=htmlpage&htmlpage_id=${htmlpage.id}' target='_blank' title=htmlpage.description>${htmlpage.description}<span class="visually-hidden"> #i18n{htmlpage.manage_htmlpage.labelNewWindow}</span></@link>
 						<#else>
