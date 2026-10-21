@@ -118,6 +118,8 @@ public class HtmlPageJspBean extends AbstractManageHtmlPageJspBean <Integer, Htm
     // Jsp Definition
     private static final String JSP_DO_REMOVE_HTMLPAGE = "jsp/admin/plugins/htmlpage/DoRemoveHtmlPage.jsp";
     private static final String JSP_MANAGE_HTMLPAGE = "jsp/admin/plugins/htmlpage/ManageHtmlPage.jsp";
+    private static final String JSP_CREATE_HTMLPAGE = "jsp/admin/plugins/htmlpage/CreateHtmlPage.jsp";
+    private static final String JSP_MODIFY_HTMLPAGE = "jsp/admin/plugins/htmlpage/ModifyHtmlPage.jsp";
     private static final String JSP_REDIRECT_TO_MANAGE_HTMLPAGE = "ManageHtmlPage.jsp";
     
     private List<Integer> _listIdHtmlPages;
@@ -185,15 +187,16 @@ public class HtmlPageJspBean extends AbstractManageHtmlPageJspBean <Integer, Htm
     {	
     	HtmlPage htmlPage = new HtmlPage( );
     	fillHtmlPageValues( request, htmlPage );
+    	String strReturnUrl = AppPathService.getBaseUrl( request ) + JSP_CREATE_HTMLPAGE;
         
         // Mandatory fields
         if( existsMandatoryFieldEmpty( request, htmlPage ) )
         {
-            return AdminMessageService.getMessageUrl( request, Messages.MANDATORY_FIELDS, AdminMessage.TYPE_STOP );
+            return AdminMessageService.getMessageUrlReturningTo( request, Messages.MANDATORY_FIELDS, AdminMessage.TYPE_STOP, strReturnUrl );
         }
                
         //Dates check         
-        String error = checkHtmlPageDates( request, htmlPage );
+        String error = checkHtmlPageDates( request, htmlPage, strReturnUrl );
         if( error != null )
         {
            return error;
@@ -245,25 +248,27 @@ public class HtmlPageJspBean extends AbstractManageHtmlPageJspBean <Integer, Htm
      *            The Http Request
      * @param htmlpage
      *            The Html page
+     * @param strReturnUrl
+     *            the URL of the screen of the form, opened by the button of an error message when there is no page to go back to
      * @return an error message if controls have failed, null otherwise
      */
-    private String checkHtmlPageDates( HttpServletRequest request, HtmlPage htmlPage )
+    private String checkHtmlPageDates( HttpServletRequest request, HtmlPage htmlPage, String strReturnUrl )
     {
     	if( htmlPage.getStatus( ) == EnumStatus.conditioned.getId( ) )
         {
     		if ( htmlPage.getDateStart( ) == null )
             {
-                return AdminMessageService.getMessageUrl( request, MESSAGE_INVALID_DATE_START, AdminMessage.TYPE_STOP );
+                return AdminMessageService.getMessageUrlReturningTo( request, MESSAGE_INVALID_DATE_START, AdminMessage.TYPE_STOP, strReturnUrl );
             }
             
             if ( htmlPage.getDateEnd( ) == null  )
             {
-                return AdminMessageService.getMessageUrl( request, MESSAGE_INVALID_DATE_END, AdminMessage.TYPE_STOP );
+                return AdminMessageService.getMessageUrlReturningTo( request, MESSAGE_INVALID_DATE_END, AdminMessage.TYPE_STOP, strReturnUrl );
             }
             
             if( htmlPage.getDateEnd( ).before( htmlPage.getDateStart( ) ) )
             {
-            	return AdminMessageService.getMessageUrl( request, MESSAGE_INVALID_DATE_END_BEFORE_DATE_START, AdminMessage.TYPE_STOP );
+            	return AdminMessageService.getMessageUrlReturningTo( request, MESSAGE_INVALID_DATE_END_BEFORE_DATE_START, AdminMessage.TYPE_STOP, strReturnUrl );
             }
         }
     	
@@ -354,15 +359,16 @@ public class HtmlPageJspBean extends AbstractManageHtmlPageJspBean <Integer, Htm
     	
     	HtmlPage htmlPage = HtmlPageHome.findByPrimaryKey( nId, getPlugin( ) );
     	fillHtmlPageValues( request, htmlPage );
+    	String strReturnUrl = getJspModifyHtmlPage( request, nId );
 
     	// Mandatory fields
         if( existsMandatoryFieldEmpty( request, htmlPage ) )
         {
-            return AdminMessageService.getMessageUrl( request, Messages.MANDATORY_FIELDS, AdminMessage.TYPE_STOP );
+            return AdminMessageService.getMessageUrlReturningTo( request, Messages.MANDATORY_FIELDS, AdminMessage.TYPE_STOP, strReturnUrl );
         }
                
         //Dates check
-        String error = checkHtmlPageDates( request, htmlPage );
+        String error = checkHtmlPageDates( request, htmlPage, strReturnUrl );
         if( error != null )
         {
             return error;
@@ -412,6 +418,23 @@ public class HtmlPageJspBean extends AbstractManageHtmlPageJspBean <Integer, Htm
 
         // if the operation occurred well, redirects towards the list of the HtmlPages
         return JSP_REDIRECT_TO_MANAGE_HTMLPAGE;
+    }
+
+    /**
+     * Return the url of the jsp modify html page
+     * 
+     * @param request
+     *            The Http request
+     * @param nIdHtmlPage
+     *            the id of the html page
+     * @return the url of the jsp modify html page
+     */
+    private String getJspModifyHtmlPage( HttpServletRequest request, int nIdHtmlPage )
+    {
+        UrlItem url = new UrlItem( AppPathService.getBaseUrl( request ) + JSP_MODIFY_HTMLPAGE );
+        url.addParameter( PARAMETER_HTMLPAGE_ID, nIdHtmlPage );
+
+        return url.getUrl( );
     }
     
     /**
