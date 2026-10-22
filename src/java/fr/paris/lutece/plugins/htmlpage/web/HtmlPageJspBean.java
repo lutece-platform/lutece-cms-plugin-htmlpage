@@ -39,8 +39,10 @@ import fr.paris.lutece.plugins.htmlpage.service.EnumStatus;
 import fr.paris.lutece.plugins.htmlpage.service.IHtmlPageService;
 import fr.paris.lutece.plugins.htmlpage.utils.HtmlPageUtil;
 import fr.paris.lutece.portal.business.role.RoleHome;
+import fr.paris.lutece.portal.service.admin.AccessDeniedException;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
+import fr.paris.lutece.portal.service.security.SecurityTokenService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPathService;
@@ -142,6 +144,7 @@ public class HtmlPageJspBean extends AbstractManageHtmlPageJspBean <Integer, Htm
         }
         
         Map<String, Object> model = getPaginatedListModel( request, MARK_LIST_HTMLPAGE_LIST, _listIdHtmlPages, JSP_MANAGE_HTMLPAGE );
+        model.put( SecurityTokenService.MARK_TOKEN, getSecurityTokenService( ).getToken( request, TEMPLATE_MANAGE_HTMLPAGE ) );
 
         HtmlTemplate templateList = AppTemplateService.getTemplate( TEMPLATE_MANAGE_HTMLPAGE, getLocale( ), model );
 
@@ -168,6 +171,7 @@ public class HtmlPageJspBean extends AbstractManageHtmlPageJspBean <Integer, Htm
         model.put( MARK_HTML_CONTENT, "" );
         model.put( MARK_ROLES_LIST, RoleHome.getRolesList( ) );
         model.put( MARK_STATUS, EnumStatus.getReferenceList( ) );
+        model.put( SecurityTokenService.MARK_TOKEN, getSecurityTokenService( ).getToken( request, TEMPLATE_CREATE_HTMLPAGE ) );
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_CREATE_HTMLPAGE, getLocale( ), model );
 
@@ -180,8 +184,10 @@ public class HtmlPageJspBean extends AbstractManageHtmlPageJspBean <Integer, Htm
      * @param request
      *            The Http Request
      * @return The Jsp URL of the process result
+     * @throws AccessDeniedException
+     *             if the security token is invalid
      */
-    public String doCreateHtmlPage( HttpServletRequest request )
+    public String doCreateHtmlPage( HttpServletRequest request ) throws AccessDeniedException
     {	
     	HtmlPage htmlPage = new HtmlPage( );
     	fillHtmlPageValues( request, htmlPage );
@@ -199,6 +205,11 @@ public class HtmlPageJspBean extends AbstractManageHtmlPageJspBean <Integer, Htm
            return error;
         }       	
         
+        if ( !getSecurityTokenService( ).validate( request, TEMPLATE_CREATE_HTMLPAGE ) )
+        {
+            throw new AccessDeniedException( ERROR_INVALID_TOKEN );
+        }
+
 		_htmlPageService.create( htmlPage, getPlugin( ) );
 
         // if the operation occurred well, redirects towards the list of the HtmlPages
@@ -276,9 +287,16 @@ public class HtmlPageJspBean extends AbstractManageHtmlPageJspBean <Integer, Htm
      * @param request
      *            The Http Request
      * @return The Jsp URL of the process result
+     * @throws AccessDeniedException
+     *             if the security token is invalid
      */
-    public String doDuplicateHtmlPage( HttpServletRequest request )
+    public String doDuplicateHtmlPage( HttpServletRequest request ) throws AccessDeniedException
     {
+        if ( !getSecurityTokenService( ).validate( request, TEMPLATE_MANAGE_HTMLPAGE ) )
+        {
+            throw new AccessDeniedException( ERROR_INVALID_TOKEN );
+        }
+
         int nId = Integer.parseInt( request.getParameter( PARAMETER_HTMLPAGE_ID ) );
 
         HtmlPage htmlpage = HtmlPageHome.findByPrimaryKey( nId, getPlugin( ) );
@@ -335,6 +353,7 @@ public class HtmlPageJspBean extends AbstractManageHtmlPageJspBean <Integer, Htm
         model.put( MARK_HTMLPAGE, htmlPage );
         model.put( MARK_ROLES_LIST, RoleHome.getRolesList( ) );
         model.put( MARK_STATUS, EnumStatus.getReferenceList( ) );
+        model.put( SecurityTokenService.MARK_TOKEN, getSecurityTokenService( ).getToken( request, TEMPLATE_MODIFY_HTMLPAGE ) );
         
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_MODIFY_HTMLPAGE, getLocale( ), model );
 
@@ -347,8 +366,10 @@ public class HtmlPageJspBean extends AbstractManageHtmlPageJspBean <Integer, Htm
      * @param request
      *            The Http request
      * @return The Jsp URL of the process result
+     * @throws AccessDeniedException
+     *             if the security token is invalid
      */
-    public String doModifyHtmlPage( HttpServletRequest request )
+    public String doModifyHtmlPage( HttpServletRequest request ) throws AccessDeniedException
     {
     	int nId = Integer.parseInt( request.getParameter( PARAMETER_HTMLPAGE_ID ) );
     	
@@ -366,6 +387,11 @@ public class HtmlPageJspBean extends AbstractManageHtmlPageJspBean <Integer, Htm
         if( error != null )
         {
             return error;
+        }
+
+        if ( !getSecurityTokenService( ).validate( request, TEMPLATE_MODIFY_HTMLPAGE ) )
+        {
+            throw new AccessDeniedException( ERROR_INVALID_TOKEN );
         }
 
         _htmlPageService.update( htmlPage, getPlugin( ) );
@@ -389,11 +415,15 @@ public class HtmlPageJspBean extends AbstractManageHtmlPageJspBean <Integer, Htm
         url.addParameter( PARAMETER_HTMLPAGE_ID, nIdHtmlPage );
         url.addParameter( PARAMETER_ID_HTMLPAGE_LIST, request.getParameter( PARAMETER_ID_HTMLPAGE_LIST ) );
 
+        Map<String, Object> parameters = new HashMap<>( );
+        parameters.put( SecurityTokenService.PARAMETER_TOKEN, getSecurityTokenService( ).getToken( request, JSP_DO_REMOVE_HTMLPAGE ) );
+
         Object [ ] args = {
                 request.getParameter( PARAMETER_HTMLPAGE_DESCRIPTION )
         };
 
-        return AdminMessageService.getMessageUrl( request, MESSAGE_CONFIRM_REMOVE_HTMLPAGE, args, url.getUrl( ), AdminMessage.TYPE_CONFIRMATION );
+        return AdminMessageService.getMessageUrl( request, MESSAGE_CONFIRM_REMOVE_HTMLPAGE, args, null, url.getUrl( ), null, AdminMessage.TYPE_CONFIRMATION,
+                parameters );
     }
 
     /**
@@ -402,9 +432,16 @@ public class HtmlPageJspBean extends AbstractManageHtmlPageJspBean <Integer, Htm
      * @param request
      *            The Http request
      * @return the jsp URL to display the form to manage htmlPages
+     * @throws AccessDeniedException
+     *             if the security token is invalid
      */
-    public String doRemoveHtmlPage( HttpServletRequest request )
+    public String doRemoveHtmlPage( HttpServletRequest request ) throws AccessDeniedException
     {
+        if ( !getSecurityTokenService( ).validate( request, JSP_DO_REMOVE_HTMLPAGE ) )
+        {
+            throw new AccessDeniedException( ERROR_INVALID_TOKEN );
+        }
+
     	int nIdHtmlPage = Integer.parseInt( request.getParameter( PARAMETER_HTMLPAGE_ID ) );
 
         HtmlPage htmlPage = HtmlPageHome.findByPrimaryKey( nIdHtmlPage, getPlugin( ) );

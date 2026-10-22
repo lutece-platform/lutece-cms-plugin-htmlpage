@@ -4,6 +4,7 @@
 		<@pageHeader title='#i18n{htmlpage.modify_htmlpage.tableLabel}' />
 		<@tform method='post' name='modify_htmlpage' id='modify_htmlpage' action='jsp/admin/plugins/htmlpage/DoModifyHtmlPage.jsp' boxed=true>
 			<@input type='hidden' name='id_htmlpage' value='${htmlpage.id}' />
+			<@input type='hidden' name='token' value='${token}' />
 			<@formGroup labelFor='description' labelKey='#i18n{htmlpage.modify_htmlpage.rowTitleLabel}' mandatory=true>
 				<@input type='text' id='description' name='description' inputSize=60 maxlength=50 value='${htmlpage.description}' />
 			</@formGroup>
