@@ -24,6 +24,7 @@
 					<@offcanvas targetUrl='jsp/admin/plugins/htmlpage/ModifyHtmlPage.jsp?id_htmlpage=${htmlpage.id}' useIframe=true targetElement='#modify_htmlpage' id='htmlpage-modify-${htmlpage.id}' title='#i18n{htmlpage.modify_htmlpage.buttonModify}' btnTitle='#i18n{htmlpage.modify_htmlpage.buttonModify}' hideTitle=['xs','sm'] btnIcon='pencil' position='end' size='full' />
 					<@tform method='post' action='jsp/admin/plugins/htmlpage/DoDuplicateHtmlPage.jsp'>
 						<@input type='hidden' name='id_htmlpage' id='id_htmlpage' value='${htmlpage.id}' />
+						<@input type='hidden' name='token' id='token_${htmlpage.id}' value='${token}' />
 						<@button type='submit' title='#i18n{htmlpage.manage_htmlpage.actionDuplicate}' buttonIcon='copy me-1' hideTitle=['xs','sm'] />
 					</@tform>
 					<@tform method='post' action='jsp/admin/plugins/htmlpage/RemoveHtmlPage.jsp'>

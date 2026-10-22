@@ -3,6 +3,7 @@
 	<@pageColumn>
 		<@pageHeader title='#i18n{htmlpage.create_htmlpage.tableLabel}' />
 		<@tform method='post' name='create_htmlpage' id='create_htmlpage' action='jsp/admin/plugins/htmlpage/DoCreateHtmlPage.jsp' boxed=true id='create_html_page'>
+			<@input type='hidden' name='token' value='${token}' />
 			<@formGroup labelFor='description' labelKey='#i18n{htmlpage.create_htmlpage.rowTitleLabel}' mandatory=true> 
 				<@input type='text' id='description' name='description' inputSize=60 maxlength=50 />
 			</@formGroup>
