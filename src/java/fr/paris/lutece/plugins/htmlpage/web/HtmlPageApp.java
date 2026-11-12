@@ -60,6 +60,7 @@ import jakarta.inject.Named;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 /**
  * This class manages HtmlPage page.
@@ -206,8 +207,9 @@ public class HtmlPageApp implements XPageApplication
     {
         HashMap<String, Object> model = new HashMap<String, Object>( );
 
-        int nHtmlPageId = Integer.parseInt( strHtmlPageId );
-        HtmlPage htmlpage = _htmlPageService.getHtmlPageCache( nHtmlPageId );
+        // a non numeric identifier is an unknown page
+        int nHtmlPageId = NumberUtils.toInt( strHtmlPageId, -1 );
+        HtmlPage htmlpage = ( nHtmlPageId < 0 ) ? null : _htmlPageService.getHtmlPageCache( nHtmlPageId );
 
         if ( htmlpage != null )
         {
