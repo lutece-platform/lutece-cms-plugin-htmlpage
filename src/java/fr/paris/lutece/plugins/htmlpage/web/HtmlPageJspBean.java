@@ -39,6 +39,7 @@ import fr.paris.lutece.plugins.htmlpage.service.EnumStatus;
 import fr.paris.lutece.plugins.htmlpage.service.IHtmlPageService;
 import fr.paris.lutece.plugins.htmlpage.utils.HtmlPageUtil;
 import fr.paris.lutece.portal.business.role.RoleHome;
+import fr.paris.lutece.api.user.User;
 import fr.paris.lutece.portal.service.admin.AccessDeniedException;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
@@ -59,6 +60,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import jakarta.enterprise.context.SessionScoped;
@@ -145,7 +147,7 @@ public class HtmlPageJspBean extends AbstractManageHtmlPageJspBean <Integer, Htm
         
         if ( request.getParameter( AbstractPaginator.PARAMETER_PAGE_INDEX) == null || _listIdHtmlPages.isEmpty( ) )
         {
-        	_listIdHtmlPages = HtmlPageHome.getIdHtmlPagesList( getPlugin( ) );
+        	_listIdHtmlPages = getAuthorizedIdHtmlPagesList( );
         }
         
         Map<String, Object> model = getPaginatedListModel( request, MARK_LIST_HTMLPAGE_LIST, _listIdHtmlPages, JSP_MANAGE_HTMLPAGE );
@@ -155,6 +157,31 @@ public class HtmlPageJspBean extends AbstractManageHtmlPageJspBean <Integer, Htm
         HtmlTemplate templateList = AppTemplateService.getTemplate( TEMPLATE_MANAGE_HTMLPAGE, getLocale( ), model );
 
         return getAdminPage( templateList.getHtml( ) );
+    }
+
+    /**
+     * Returns the ids of the html pages that the current user can manage: pages of his workgroups and pages of no workgroup
+     *
+     * @return the ids, in the order of the list of all the pages
+     */
+    private List<Integer> getAuthorizedIdHtmlPagesList( )
+    {
+        Set<Integer> setAuthorizedIds = AdminWorkgroupService.getAuthorizedCollection( HtmlPageHome.findAll( getPlugin( ) ), (User) getUser( ) ).stream( )
+                .map( HtmlPage::getId ).collect( Collectors.toSet( ) );
+
+        return HtmlPageHome.getIdHtmlPagesList( getPlugin( ) ).stream( ).filter( setAuthorizedIds::contains ).collect( Collectors.toList( ) );
+    }
+
+    /**
+     * Tells whether the current user can manage an html page: its workgroup must be one of his workgroups, or no workgroup
+     *
+     * @param htmlPage
+     *            the html page
+     * @return true if the user belongs to the workgroup of the page
+     */
+    private boolean isAuthorized( HtmlPage htmlPage )
+    {
+        return AdminWorkgroupService.isAuthorized( htmlPage, (User) getUser( ) );
     }
 
     /**
@@ -214,6 +241,10 @@ public class HtmlPageJspBean extends AbstractManageHtmlPageJspBean <Integer, Htm
     {	
     	HtmlPage htmlPage = new HtmlPage( );
     	fillHtmlPageValues( request, htmlPage );
+    	if ( !isAuthorized( htmlPage ) )
+    	{
+    	    return AdminMessageService.getMessageUrl( request, Messages.USER_ACCESS_DENIED, AdminMessage.TYPE_STOP );
+    	}
     	String strReturnUrl = AppPathService.getBaseUrl( request ) + JSP_CREATE_HTMLPAGE;
         
         // Mandatory fields
@@ -326,6 +357,10 @@ public class HtmlPageJspBean extends AbstractManageHtmlPageJspBean <Integer, Htm
         int nId = Integer.parseInt( request.getParameter( PARAMETER_HTMLPAGE_ID ) );
 
         HtmlPage htmlpage = HtmlPageHome.findByPrimaryKey( nId, getPlugin( ) );
+        if ( htmlpage != null && !isAuthorized( htmlpage ) )
+        {
+            return AdminMessageService.getMessageUrl( request, Messages.USER_ACCESS_DENIED, AdminMessage.TYPE_STOP );
+        }
 
         HtmlPage duplicateHtmlPage = new HtmlPage( );
         duplicateHtmlPage.setDescription( htmlpage.getDescription( ) );
@@ -369,6 +404,12 @@ public class HtmlPageJspBean extends AbstractManageHtmlPageJspBean <Integer, Htm
 
             return getManageHtmlPage( request );
         }
+        if ( !isAuthorized( htmlPage ) )
+        {
+            AppLogService.error( "The html page {} belongs to a workgroup of another administrator.", strHtmlPageId );
+
+            return getManageHtmlPage( request );
+        }
 
         Map<String, Object> model = new HashMap<String, Object>( );
         ReferenceList workgroupsList = AdminWorkgroupService.getUserWorkgroups( getUser( ), getLocale( ) );
@@ -400,7 +441,16 @@ public class HtmlPageJspBean extends AbstractManageHtmlPageJspBean <Integer, Htm
     	int nId = Integer.parseInt( request.getParameter( PARAMETER_HTMLPAGE_ID ) );
     	
     	HtmlPage htmlPage = HtmlPageHome.findByPrimaryKey( nId, getPlugin( ) );
+    	// the page and the workgroup given to it must belong to the workgroups of the administrator
+    	if ( htmlPage != null && !isAuthorized( htmlPage ) )
+    	{
+    	    return AdminMessageService.getMessageUrl( request, Messages.USER_ACCESS_DENIED, AdminMessage.TYPE_STOP );
+    	}
     	fillHtmlPageValues( request, htmlPage );
+    	if ( !isAuthorized( htmlPage ) )
+    	{
+    	    return AdminMessageService.getMessageUrl( request, Messages.USER_ACCESS_DENIED, AdminMessage.TYPE_STOP );
+    	}
     	String strReturnUrl = getJspModifyHtmlPage( request, nId );
 
     	// Mandatory fields
@@ -442,6 +492,10 @@ public class HtmlPageJspBean extends AbstractManageHtmlPageJspBean <Integer, Htm
         {
             return AdminMessageService.getMessageUrl( request, MESSAGE_HTMLPAGE_INVALID, AdminMessage.TYPE_STOP );
         }
+        if ( !isAuthorized( HtmlPageHome.findByPrimaryKey( Integer.parseInt( strIdHtmlPage ), getPlugin( ) ) ) )
+        {
+            return AdminMessageService.getMessageUrl( request, Messages.USER_ACCESS_DENIED, AdminMessage.TYPE_STOP );
+        }
 
         int nIdHtmlPage = Integer.parseInt( strIdHtmlPage );
 
@@ -479,6 +533,10 @@ public class HtmlPageJspBean extends AbstractManageHtmlPageJspBean <Integer, Htm
     	int nIdHtmlPage = Integer.parseInt( request.getParameter( PARAMETER_HTMLPAGE_ID ) );
 
         HtmlPage htmlPage = HtmlPageHome.findByPrimaryKey( nIdHtmlPage, getPlugin( ) );
+        if ( htmlPage != null && !isAuthorized( htmlPage ) )
+        {
+            return AdminMessageService.getMessageUrl( request, Messages.USER_ACCESS_DENIED, AdminMessage.TYPE_STOP );
+        }
         _htmlPageService.remove( htmlPage, getPlugin( ) );
 
         // if the operation occurred well, redirects towards the list of the HtmlPages
