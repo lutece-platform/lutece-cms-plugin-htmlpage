@@ -11,11 +11,15 @@
 				</@cList>
 			<#else>
 				<#if result??>
+					<#if result?has_content>
 					<@cList>
 					<#list result as htmlpage >
 						<@cListItem url='${htmlpage.url}' label=htmlpage.title />
 					</#list>
 					</@cList>
+					<#else>
+					<@cEmpty title='#i18n{htmlpage.page_htmlpage.messageNoResult}' />
+					</#if>
 				<#else>
 					<@cEmpty title='#i18n{htmlpage.page_htmlpage.messageListEmpty}' />
 				</#if>
