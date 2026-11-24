@@ -357,7 +357,12 @@ public class HtmlPageJspBean extends AbstractManageHtmlPageJspBean <Integer, Htm
         int nId = Integer.parseInt( request.getParameter( PARAMETER_HTMLPAGE_ID ) );
 
         HtmlPage htmlpage = HtmlPageHome.findByPrimaryKey( nId, getPlugin( ) );
-        if ( htmlpage != null && !isAuthorized( htmlpage ) )
+        // the page may have been removed meanwhile (other tab)
+        if ( htmlpage == null )
+        {
+            return AdminMessageService.getMessageUrl( request, MESSAGE_HTMLPAGE_INVALID, AdminMessage.TYPE_STOP );
+        }
+        if ( !isAuthorized( htmlpage ) )
         {
             return AdminMessageService.getMessageUrl( request, Messages.USER_ACCESS_DENIED, AdminMessage.TYPE_STOP );
         }
@@ -441,8 +446,13 @@ public class HtmlPageJspBean extends AbstractManageHtmlPageJspBean <Integer, Htm
     	int nId = Integer.parseInt( request.getParameter( PARAMETER_HTMLPAGE_ID ) );
     	
     	HtmlPage htmlPage = HtmlPageHome.findByPrimaryKey( nId, getPlugin( ) );
+    	// the page may have been removed meanwhile (other tab)
+    	if ( htmlPage == null )
+    	{
+    	    return AdminMessageService.getMessageUrl( request, MESSAGE_HTMLPAGE_INVALID, AdminMessage.TYPE_STOP );
+    	}
     	// the page and the workgroup given to it must belong to the workgroups of the administrator
-    	if ( htmlPage != null && !isAuthorized( htmlPage ) )
+    	if ( !isAuthorized( htmlPage ) )
     	{
     	    return AdminMessageService.getMessageUrl( request, Messages.USER_ACCESS_DENIED, AdminMessage.TYPE_STOP );
     	}
@@ -533,7 +543,12 @@ public class HtmlPageJspBean extends AbstractManageHtmlPageJspBean <Integer, Htm
     	int nIdHtmlPage = Integer.parseInt( request.getParameter( PARAMETER_HTMLPAGE_ID ) );
 
         HtmlPage htmlPage = HtmlPageHome.findByPrimaryKey( nIdHtmlPage, getPlugin( ) );
-        if ( htmlPage != null && !isAuthorized( htmlPage ) )
+        // the page may have been removed meanwhile (other tab)
+        if ( htmlPage == null )
+        {
+            return AdminMessageService.getMessageUrl( request, MESSAGE_HTMLPAGE_INVALID, AdminMessage.TYPE_STOP );
+        }
+        if ( !isAuthorized( htmlPage ) )
         {
             return AdminMessageService.getMessageUrl( request, Messages.USER_ACCESS_DENIED, AdminMessage.TYPE_STOP );
         }

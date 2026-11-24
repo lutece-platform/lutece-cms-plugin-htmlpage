@@ -128,6 +128,39 @@ public class HtmlPageJspBeanTest extends LuteceTestCase
         assertDoesNotThrow( ( ) -> _bean.getManageHtmlPage( request ) );
     }
 
+    /**
+     * Modify, duplicate and remove of a page removed meanwhile (other tab) answer the message of an unknown page
+     */
+    @Test
+    public void testActionsOnARemovedPage( ) throws Exception
+    {
+        HtmlPage htmlPage = new HtmlPage( );
+        htmlPage.setDescription( "htmlpage removed meanwhile" );
+        htmlPage.setHtmlContent( "<p>content</p>" );
+        htmlPage.setStatus( EnumStatus.disabled.getId( ) );
+        htmlPage.setWorkgroup( "all" );
+        htmlPage.setRole( "none" );
+        _htmlPageService.create( htmlPage, HtmlPageService.getPlugin( ) );
+        String strId = Integer.toString( htmlPage.getId( ) );
+        _htmlPageService.remove( htmlPage, HtmlPageService.getPlugin( ) );
+
+        MockHttpServletRequest request = getUserRequest( );
+        _bean.init( request, HtmlPageJspBean.RIGHT_MANAGE_HTMLPAGE );
+        request.setParameter( "id_htmlpage", strId );
+        request.setParameter( "description", "htmlpage removed meanwhile" );
+        request.setParameter( "html_content", "<p>content</p>" );
+        request.setParameter( "status", Integer.toString( EnumStatus.disabled.getId( ) ) );
+        request.setParameter( "workgroup", "all" );
+        request.setParameter( "role", "none" );
+
+        request.setParameter( "token", _bean.getSecurityTokenService( ).getToken( request, "/admin/plugins/htmlpage/modify_htmlpage.html" ) );
+        assertTrue( _bean.doModifyHtmlPage( request ).endsWith( AdminMessageService.getMessageRelativeUrl( ) ) );
+        request.setParameter( "token", _bean.getSecurityTokenService( ).getToken( request, "/admin/plugins/htmlpage/manage_htmlpage.html" ) );
+        assertTrue( _bean.doDuplicateHtmlPage( request ).endsWith( AdminMessageService.getMessageRelativeUrl( ) ) );
+        request.setParameter( "token", _bean.getSecurityTokenService( ).getToken( request, "jsp/admin/plugins/htmlpage/DoRemoveHtmlPage.jsp" ) );
+        assertTrue( _bean.doRemoveHtmlPage( request ).endsWith( AdminMessageService.getMessageRelativeUrl( ) ) );
+    }
+
     private MockHttpServletRequest getUserRequest( )
     {
         MockHttpServletRequest request = new MockHttpServletRequest( );
