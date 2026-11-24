@@ -11,30 +11,36 @@
 			<@formGroup rows=2 labelFor='description' labelKey='#i18n{htmlpage.create_htmlpage.rowTitleLabel}' mandatory=true> 
 				<@input type='text' id='description' name='description' inputSize=60 maxlength=50 />
 			</@formGroup>
-			<@formGroup rows=2 labelFor='status' labelKey='#i18n{htmlpage.create_htmlpage.labelStatus}'>
-				<@select id='status' name='status' items=status_list default_value='1' />
-			</@formGroup>    
+			<@row>
+				<@columns md=6>
+					<@formGroup rows=2 labelFor='status' labelKey='#i18n{htmlpage.create_htmlpage.labelStatus}'>
+						<@select id='status' name='status' items=status_list default_value='1' />
+					</@formGroup>
+				</@columns>
+				<@columns md=6 id='fgDates' class='d-none'>
+					<@formGroup rows=2 labelFor='dateStart' labelKey='#i18n{htmlpage.create_htmlpage.labelDateStart}' mandatory=true>
+						<@inputGroup>
+							<@input type='datetime' name='date_start' id='dateStart' />
+							<@inputGroupItem type='text'>
+								<@icon style='calendar' />
+							</@inputGroupItem>
+						</@inputGroup>
+					</@formGroup>
+					<@formGroup rows=2 labelFor='dateEnd' labelKey='#i18n{htmlpage.create_htmlpage.labelDateEnd}' mandatory=true>
+						<@inputGroup>
+							<@input type='datetime' name='date_end' id='dateEnd' />
+							<@inputGroupItem type='text'>
+								<@icon style='calendar' />
+							</@inputGroupItem>
+						</@inputGroup>
+					</@formGroup>
+				</@columns>
+			</@row>
 			<@formGroup rows=2 labelFor='workgroup' labelKey='#i18n{htmlpage.create_htmlpage.labelWorkgroupKey}' mandatory=true>
 				<@select name='workgroup' default_value='all' items=workgroups_list />
 			</@formGroup>
 			<@formGroup rows=2 labelFor='role' labelKey='#i18n{htmlpage.create_htmlpage.labelRole}' mandatory=true>
 				<@select name='role' default_value='none' items=roles_list />
-			</@formGroup>
-			<@formGroup rows=2 labelFor='dateStart' id='fgDateStart' labelKey='#i18n{htmlpage.create_htmlpage.labelDateStart}'>
-				<@inputGroup>
-					<@input type='datetime' name='date_start' id='dateStart' />
-					<@inputGroupItem type='text'>
-						<@icon style='calendar' />
-					</@inputGroupItem>
-				</@inputGroup>
-			</@formGroup>
-			<@formGroup rows=2 labelFor='dateEnd' id='fgDateEnd' labelKey='#i18n{htmlpage.create_htmlpage.labelDateEnd}'>
-				<@inputGroup>
-					<@input type='datetime' name='date_end' id='dateEnd' />
-					<@inputGroupItem type='text'>
-						<@icon style='calendar' />
-					</@inputGroupItem>
-				</@inputGroup>
 			</@formGroup>
 			<@formGroup rows=2 labelFor='html_content' labelKey='#i18n{htmlpage.create_htmlpage.labelHtmlContent}' mandatory=true>
 				<@input type='textarea' id='html_content' richtext=true name='html_content' rows=20>${html_content}</@input>
@@ -48,32 +54,35 @@
 </@pageContainer>
 <@initEditor />
 <script>
-	document.addEventListener("DOMContentLoaded", function () {
-	  var fgDateStart = document.getElementById('fgDateStart');
-	  var fgDateEnd = document.getElementById('fgDateEnd');
-	  var status = document.getElementById('status');
-	  var dateStart = document.getElementById('dateStart');
-	  var dateEnd = document.getElementById('dateEnd');
+document.addEventListener("DOMContentLoaded", function () {
+	var status = document.getElementById('status');
+	var dateGroups = [ document.getElementById('fgDates') ];
+	var dateInputs = [ document.getElementById('dateStart'), document.getElementById('dateEnd') ];
 
-	  fgDateStart.style.display = 'none';
-	  fgDateEnd.style.display = 'none';
+	function applyStatus( value ) {
+		var conditioned = value == 2;
+		dateGroups.forEach( function ( group ) {
+			group.classList.toggle( 'd-none', !conditioned );
+		} );
+		dateInputs.forEach( function ( input ) {
+			input.required = conditioned;
+			if ( input._flatpickr && input._flatpickr.altInput ) {
+				input._flatpickr.altInput.required = conditioned;
+			}
+			if ( !conditioned ) {
+				if ( input._flatpickr ) {
+					input._flatpickr.clear( );
+				} else {
+					input.value = '';
+				}
+			}
+		} );
+	}
 
-	  status.addEventListener('change', function () {
-		if (this.value == 0 || this.value == 1) {
-		  fgDateStart.style.display = 'none';
-		  fgDateEnd.style.display = 'none';
-		  dateStart.value = "";
-		  dateEnd.value = "";
-		  dateStart.required = false;
-		  dateEnd.required = false;
-		}
-		if (this.value == 2) {
-		  fgDateStart.style.display = 'block';
-		  fgDateEnd.style.display = 'block';
-		  dateStart.required = true;
-		  dateEnd.required = true;
-		}
-	  });
-	});
+	applyStatus( status.value );
+	status.addEventListener( 'change', function ( ) {
+		applyStatus( this.value );
+	} );
+});
 </script>
 

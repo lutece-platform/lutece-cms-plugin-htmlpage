@@ -12,30 +12,37 @@
 			<@formGroup rows=2 labelFor='description' labelKey='#i18n{htmlpage.modify_htmlpage.rowTitleLabel}' mandatory=true>
 				<@input type='text' id='description' name='description' inputSize=60 maxlength=50 value='${htmlpage.description}' />
 			</@formGroup>
-			<@formGroup rows=2 labelFor='status' labelKey='#i18n{htmlpage.modify_htmlpage.labelStatus}'>
-				<@select id='status' name='status' items=status_list default_value='${htmlpage.status}'/>
-			</@formGroup>
+			<#assign dateClass = ( htmlpage.status == 2 )?then( '', 'd-none' ) />
+			<@row>
+				<@columns md=6>
+					<@formGroup rows=2 labelFor='status' labelKey='#i18n{htmlpage.modify_htmlpage.labelStatus}'>
+						<@select id='status' name='status' items=status_list default_value='${htmlpage.status}'/>
+					</@formGroup>
+				</@columns>
+				<@columns md=6 id='fgDates' class=dateClass>
+					<@formGroup rows=2 labelFor='dateStart' labelKey='#i18n{htmlpage.modify_htmlpage.labelDateStart}' mandatory=true>
+						<@inputGroup>
+							<@input type='datetime' name='date_start' id='dateStart' value='${(htmlpage.dateStart?string.iso)!}' />
+							<@inputGroupItem type='text'>
+								<@icon style='calendar' />
+							</@inputGroupItem>
+						</@inputGroup>
+					</@formGroup>
+					<@formGroup rows=2 labelFor='dateEnd' labelKey='#i18n{htmlpage.modify_htmlpage.labelDateEnd}' mandatory=true>
+						<@inputGroup>
+							<@input type='datetime' name='date_end' id='dateEnd' value='${(htmlpage.dateEnd?string.iso)!}' />
+							<@inputGroupItem type='text'>
+								<@icon style='calendar' />
+							</@inputGroupItem>
+						</@inputGroup>
+					</@formGroup>
+				</@columns>
+			</@row>
 			<@formGroup rows=2 labelFor='workgroup' labelKey='#i18n{htmlpage.modify_htmlpage.labelWorkgroupKey}' mandatory=true>
 				<@select name='workgroup' default_value='${htmlpage.workgroup}' items=workgroups_list />
 			</@formGroup>
 			<@formGroup rows=2 labelFor='role' labelKey='#i18n{htmlpage.modify_htmlpage.labelRole}' mandatory=true>
 				<@select name='role' default_value='${htmlpage.role}' items=roles_list />
-			</@formGroup>
-			<@formGroup rows=2 labelFor='dateStart' id='fgDateStart' labelKey='#i18n{htmlpage.modify_htmlpage.labelDateStart}'>
-				<@inputGroup>
-					<@input type='datetime' name='date_start' id='dateStart' value='${(htmlpage.dateStart?string.iso)!}' />
-					<@inputGroupItem type='text'>
-						<@icon style='calendar' />
-					</@inputGroupItem>
-				</@inputGroup>
-			</@formGroup>
-			<@formGroup rows=2 labelFor='dateEnd' id='fgDateEnd' labelKey='#i18n{htmlpage.modify_htmlpage.labelDateEnd}'>
-				<@inputGroup>
-					<@input type='datetime' name='date_end' id='dateEnd' value='${(htmlpage.dateEnd?string.iso)!}' />
-					<@inputGroupItem type='text'>
-						<@icon style='calendar' />
-					</@inputGroupItem>
-				</@inputGroup>
 			</@formGroup>
 			<@formGroup rows=2 labelFor='html_content' labelKey='#i18n{htmlpage.modify_htmlpage.labelHtmlContent}' mandatory=true>
 				<@input type='textarea' id='html_content' richtext=true name='html_content' rows=20>${htmlpage.htmlContent}</@input>
@@ -50,46 +57,33 @@
 <@initEditor />
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-	var status = document.getElementById('status').value;
-	var fgDateStart = document.getElementById('fgDateStart');
-	var fgDateEnd = document.getElementById('fgDateEnd');
-	var dateStart = document.getElementById('dateStart');
-	var dateEnd = document.getElementById('dateEnd');
+	var status = document.getElementById('status');
+	var dateGroups = [ document.getElementById('fgDates') ];
+	var dateInputs = [ document.getElementById('dateStart'), document.getElementById('dateEnd') ];
 
-	if (status == 0 || status == 1) {
-		fgDateStart.style.display = 'none';
-		fgDateEnd.style.display = 'none';
-		dateStart.value = "";
-		dateEnd.value = "";
-		dateStart.required = false;
-		dateEnd.required = false;
+	function applyStatus( value ) {
+		var conditioned = value == 2;
+		dateGroups.forEach( function ( group ) {
+			group.classList.toggle( 'd-none', !conditioned );
+		} );
+		dateInputs.forEach( function ( input ) {
+			input.required = conditioned;
+			if ( input._flatpickr && input._flatpickr.altInput ) {
+				input._flatpickr.altInput.required = conditioned;
+			}
+			if ( !conditioned ) {
+				if ( input._flatpickr ) {
+					input._flatpickr.clear( );
+				} else {
+					input.value = '';
+				}
+			}
+		} );
 	}
 
-	if (status == 2) {
-		fgDateStart.style.display = 'block';
-		fgDateEnd.style.display = 'block';
-		dateStart.required = true;
-		dateEnd.required = true;
-	}
-
-	document.getElementById('status').addEventListener('change', function(){
-		var statusVal = this.value;
-
-		if (statusVal == 0 || statusVal == 1) {
-			fgDateStart.style.display = 'none';
-			fgDateEnd.style.display = 'none';
-			dateStart.value = "";
-			dateEnd.value = "";
-			dateStart.required = false;
-			dateEnd.required = false;
-		}
-
-		if (statusVal == 2) {
-			fgDateStart.style.display = 'block';
-			fgDateEnd.style.display = 'block';
-			dateStart.required = true;
-			dateEnd.required = true;
-		}
-	});
+	applyStatus( status.value );
+	status.addEventListener( 'change', function ( ) {
+		applyStatus( this.value );
+	} );
 });
 </script>
