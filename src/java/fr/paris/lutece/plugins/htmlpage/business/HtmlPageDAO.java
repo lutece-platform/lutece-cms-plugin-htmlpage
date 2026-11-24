@@ -319,7 +319,6 @@ public class HtmlPageDAO implements IHtmlPageDAO
 	                
 	                htmlPageList.add( htmlpage );
 		        }	
-		        daoUtil.free( );		        
 	        }
 	    }
 		return htmlPageList;

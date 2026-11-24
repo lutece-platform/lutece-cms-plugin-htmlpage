@@ -10,7 +10,7 @@
 					</#list>
 				</@cList>
 			<#else>
-				<#if result?exists>
+				<#if result??>
 					<@cList>
 					<#list result as htmlpage >
 						<@cListItem url='${htmlpage.url}' label=htmlpage.title />
