@@ -177,13 +177,17 @@ public class HtmlPageSearchEngine implements SearchEngine
             SearchResult result = new SearchResult( );
             result.setId( item.getId( ) );
 
-            try
+            // the documents of the html pages carry no date
+            if ( item.getDate( ) != null )
             {
-                result.setDate( DateTools.stringToDate( item.getDate( ) ) );
-            }
-            catch( ParseException e )
-            {
-                AppLogService.error( "Bad Date Format for indexed item \"{}\" : {}", item.getTitle( ), e.getMessage( ) );
+                try
+                {
+                    result.setDate( DateTools.stringToDate( item.getDate( ) ) );
+                }
+                catch( ParseException e )
+                {
+                    AppLogService.error( "Bad Date Format for indexed item \"{}\" : {}", item.getTitle( ), e.getMessage( ) );
+                }
             }
 
             result.setUrl( item.getUrl( ) );

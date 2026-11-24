@@ -36,6 +36,8 @@ package fr.paris.lutece.plugins.htmlpage.service.search;
 import fr.paris.lutece.plugins.htmlpage.business.HtmlPage;
 import fr.paris.lutece.plugins.htmlpage.service.HtmlPageService;
 import fr.paris.lutece.plugins.htmlpage.service.IHtmlPageService;
+import fr.paris.lutece.plugins.htmlpage.utils.HtmlPageUtil;
+import fr.paris.lutece.portal.business.page.Page;
 import fr.paris.lutece.portal.service.content.XPageAppService;
 import fr.paris.lutece.portal.service.message.SiteMessageException;
 import fr.paris.lutece.portal.service.plugin.Plugin;
@@ -244,6 +246,10 @@ public class HtmlPageIndexer implements SearchIndexer
         doc.add( new Field( SearchItem.FIELD_TITLE, htmlpage.getDescription( ), ftdfp ) );
 
         doc.add( new Field( SearchItem.FIELD_TYPE, HtmlPageService.PLUGIN_NAME, ft ) );
+
+        // The role, read by the role filter of the portal search when the authentication is enabled
+        String strRole = HtmlPageUtil.isRoleExist( htmlpage.getRole( ) ) ? htmlpage.getRole( ) : Page.ROLE_NONE;
+        doc.add( new Field( SearchItem.FIELD_ROLE, strRole, ft ) );
 
         // return the document
         return doc;
