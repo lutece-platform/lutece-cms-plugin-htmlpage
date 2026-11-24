@@ -48,6 +48,7 @@ import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.workgroup.AdminWorkgroupService;
 import fr.paris.lutece.portal.web.constants.Messages;
+import fr.paris.lutece.util.ReferenceItem;
 import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.html.AbstractPaginator;
 import fr.paris.lutece.util.html.HtmlTemplate;
@@ -93,6 +94,7 @@ public class HtmlPageJspBean extends AbstractManageHtmlPageJspBean <Integer, Htm
     // Markers
     private static final String MARK_LIST_HTMLPAGE_LIST = "htmlpage_list";
     private static final String MARK_WORKGROUPS_LIST = "workgroups_list";
+    private static final String MARK_WORKGROUP_LABELS = "workgroup_labels";
     private static final String MARK_WEBAPP_URL = "webapp_url";
     private static final String MARK_PROD_URL = "prod_url";
     
@@ -147,11 +149,29 @@ public class HtmlPageJspBean extends AbstractManageHtmlPageJspBean <Integer, Htm
         }
         
         Map<String, Object> model = getPaginatedListModel( request, MARK_LIST_HTMLPAGE_LIST, _listIdHtmlPages, JSP_MANAGE_HTMLPAGE );
+        model.put( MARK_WORKGROUP_LABELS, getWorkgroupLabels( ) );
         model.put( SecurityTokenService.MARK_TOKEN, getSecurityTokenService( ).getToken( request, TEMPLATE_MANAGE_HTMLPAGE ) );
 
         HtmlTemplate templateList = AppTemplateService.getTemplate( TEMPLATE_MANAGE_HTMLPAGE, getLocale( ), model );
 
         return getAdminPage( templateList.getHtml( ) );
+    }
+
+    /**
+     * Returns the labels of the workgroups of the current user, by workgroup key
+     *
+     * @return the label of each workgroup key the user can see, the key "all" included
+     */
+    private Map<String, String> getWorkgroupLabels( )
+    {
+        Map<String, String> mapLabels = new HashMap<>( );
+
+        for ( ReferenceItem workgroup : AdminWorkgroupService.getUserWorkgroups( getUser( ), getLocale( ) ) )
+        {
+            mapLabels.put( workgroup.getCode( ), workgroup.getName( ) );
+        }
+
+        return mapLabels;
     }
 
     /**

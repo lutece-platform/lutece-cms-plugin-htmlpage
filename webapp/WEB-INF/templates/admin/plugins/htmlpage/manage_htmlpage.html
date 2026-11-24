@@ -16,7 +16,7 @@
 					<span class="avatar avatar-sm bg-blue-lt" aria-hidden="true"><@icon style='file-code' /></span>
 					<@div class='text-truncate'>
 						<@link href=modifyUrl class='text-reset fw-semibold' title='#i18n{htmlpage.modify_htmlpage.title_modify} ${htmlpage.description}'>${htmlpage.description}</@link>
-						<@div class='text-secondary small text-truncate'>#i18n{htmlpage.manage_htmlpage.workgroup} : ${htmlpage.workgroup!} &middot; <code class="copy-content"><#noparse>$</#noparse>{htmlpage_${htmlpage.id?c}!}</code></@div>
+						<@div class='text-secondary small text-truncate'>#i18n{htmlpage.manage_htmlpage.workgroup} : ${(workgroup_labels[htmlpage.workgroup])!htmlpage.workgroup!} &middot; <code class="copy-content"><#noparse>$</#noparse>{htmlpage_${htmlpage.id?c}!}</code></@div>
 					</@div>
 				</@manageFeatureItemColumn>
 				<@manageFeatureItemColumn auto=true align='end' class='d-flex align-items-center gap-2'>
