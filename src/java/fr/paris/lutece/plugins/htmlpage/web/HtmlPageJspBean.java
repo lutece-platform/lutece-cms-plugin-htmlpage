@@ -88,6 +88,7 @@ public class HtmlPageJspBean extends AbstractManageHtmlPageJspBean <Integer, Htm
     private static final String MESSAGE_INVALID_DATE_START = "htmlpage.message.invalidDateStart";
     private static final String MESSAGE_INVALID_DATE_END = "htmlpage.message.invalidDateEnd";
     private static final String MESSAGE_INVALID_DATE_END_BEFORE_DATE_START = "htmlpage.message.dateEndBeforeDateStart";
+    private static final String MESSAGE_HTMLPAGE_INVALID = "htmlpage.message.pageInvalid";
     
     // Markers
     private static final String MARK_LIST_HTMLPAGE_LIST = "htmlpage_list";
@@ -411,11 +412,18 @@ public class HtmlPageJspBean extends AbstractManageHtmlPageJspBean <Integer, Htm
      *
      * @param request
      *            The Http request
-     * @return the html code to confirm
+     * @return the html code to confirm, or an error message when the identifier names no html page
      */
     public String getConfirmRemoveHtmlPage( HttpServletRequest request )
     {
-        int nIdHtmlPage = Integer.parseInt( request.getParameter( PARAMETER_HTMLPAGE_ID ) );
+        String strIdHtmlPage = request.getParameter( PARAMETER_HTMLPAGE_ID );
+
+        if ( !StringUtils.isNumeric( strIdHtmlPage ) || HtmlPageHome.findByPrimaryKey( Integer.parseInt( strIdHtmlPage ), getPlugin( ) ) == null )
+        {
+            return AdminMessageService.getMessageUrl( request, MESSAGE_HTMLPAGE_INVALID, AdminMessage.TYPE_STOP );
+        }
+
+        int nIdHtmlPage = Integer.parseInt( strIdHtmlPage );
 
         UrlItem url = new UrlItem( JSP_DO_REMOVE_HTMLPAGE );
         url.addParameter( PARAMETER_HTMLPAGE_ID, nIdHtmlPage );
