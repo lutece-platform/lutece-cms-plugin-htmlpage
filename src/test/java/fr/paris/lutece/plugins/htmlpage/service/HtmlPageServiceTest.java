@@ -40,6 +40,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import fr.paris.lutece.plugins.htmlpage.business.HtmlPage;
+import fr.paris.lutece.plugins.htmlpage.service.search.HtmlPageIndexer;
+import fr.paris.lutece.portal.business.indexeraction.IndexerAction;
+import fr.paris.lutece.portal.business.indexeraction.IndexerActionHome;
 import fr.paris.lutece.portal.service.cache.Lutece107Cache;
 import fr.paris.lutece.portal.service.cache.LuteceCache;
 import fr.paris.lutece.test.LuteceTestCase;
@@ -100,6 +103,21 @@ public class HtmlPageServiceTest extends LuteceTestCase
         assertEquals( List.of( pageKept.getId( ) ), testPageIds( ) );
         assertNull( _cache.get( "[htmlpage:" + pageRemoved.getId( ) + "]" ) );
         assertNull( _htmlPageService.getHtmlPageCache( pageRemoved.getId( ) ) );
+    }
+
+    /**
+     * A published page that is disabled is removed from the search index: a delete action is queued for its document
+     */
+    @Test
+    public void testDisabledPageLeavesTheIndex( )
+    {
+        HtmlPage htmlPage = create( "htmlpage test disabled later", EnumStatus.enabled );
+        htmlPage.setStatus( EnumStatus.disabled.getId( ) );
+
+        _htmlPageService.update( htmlPage, HtmlPageService.getPlugin( ) );
+
+        assertTrue( IndexerActionHome.getList( ).stream( ).anyMatch( action -> action.getIdTask( ) == IndexerAction.TASK_DELETE
+                && ( htmlPage.getId( ) + "_" + HtmlPageIndexer.SHORT_NAME ).equals( action.getIdDocument( ) ) ) );
     }
 
     private HtmlPage create( String strDescription, EnumStatus status )

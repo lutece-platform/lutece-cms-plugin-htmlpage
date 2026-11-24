@@ -195,7 +195,10 @@ public class HtmlPageService implements IHtmlPageService
      * @return The instance of the htmlpage which has been updated
      */
     public HtmlPage update( HtmlPage htmlpage, Plugin plugin )
-    {   	
+    {
+        // the page as published before the update: read before the new state is written
+        HtmlPage oldPage = getEnableHtmlPage( htmlpage.getId( ) );
+
     	HtmlPageHome.update( htmlpage, plugin );
     	
         String strIdHtmlPage = Integer.toString( htmlpage.getId( ) );
@@ -208,8 +211,6 @@ public class HtmlPageService implements IHtmlPageService
         }
         else
         {
-            HtmlPage oldPage = getEnableHtmlPage( Integer.parseInt( strIdHtmlPage ) );
-
             if ( oldPage != null )
             {
                 IndexationService.addIndexerAction( strIdHtmlPage + "_" + HtmlPageIndexer.SHORT_NAME,
