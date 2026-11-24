@@ -1,5 +1,6 @@
 package fr.paris.lutece.plugins.htmlpage.service;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 
@@ -70,4 +71,16 @@ public interface IHtmlPageService
      *            The Plugin object
      */
     public void remove( HtmlPage htmlpage, Plugin plugin );
+
+    /**
+     * Queues the indexing of the conditioned pages whose publication period started, and the removal from the index of those whose period
+     * ended, between two instants
+     *
+     * @param tsFrom
+     *            the beginning of the interval, excluded
+     * @param tsTo
+     *            the end of the interval, included
+     * @return the number of indexer actions queued
+     */
+    public int indexPublicationChanges( Timestamp tsFrom, Timestamp tsTo );
 }

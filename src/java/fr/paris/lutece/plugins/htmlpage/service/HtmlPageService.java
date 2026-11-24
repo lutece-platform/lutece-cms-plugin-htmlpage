@@ -33,6 +33,7 @@
  */
 package fr.paris.lutece.plugins.htmlpage.service;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -222,6 +223,56 @@ public class HtmlPageService implements IHtmlPageService
         refreshHtmlPageCache( );
 
         return htmlpage;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int indexPublicationChanges( Timestamp tsFrom, Timestamp tsTo )
+    {
+        int nActions = 0;
+
+        for ( HtmlPage htmlPage : HtmlPageHome.findAll( getPlugin( ) ) )
+        {
+            if ( htmlPage.getStatus( ) != EnumStatus.conditioned.getId( ) )
+            {
+                continue;
+            }
+            String strIdHtmlPage = Integer.toString( htmlPage.getId( ) );
+            if ( isBetween( htmlPage.getDateEnd( ), tsFrom, tsTo ) )
+            {
+                IndexationService.addIndexerAction( strIdHtmlPage + "_" + HtmlPageIndexer.SHORT_NAME,
+                        AppPropertiesService.getProperty( HtmlPageIndexer.PROPERTY_INDEXER_NAME ), IndexerAction.TASK_DELETE );
+                _htmlPageIndexerUtils.addIndexerAction( strIdHtmlPage, IndexerAction.TASK_DELETE );
+                nActions++;
+            }
+            else
+                if ( isBetween( htmlPage.getDateStart( ), tsFrom, tsTo ) )
+                {
+                    IndexationService.addIndexerAction( strIdHtmlPage, AppPropertiesService.getProperty( HtmlPageIndexer.PROPERTY_INDEXER_NAME ),
+                            IndexerAction.TASK_CREATE );
+                    _htmlPageIndexerUtils.addIndexerAction( strIdHtmlPage, IndexerAction.TASK_CREATE );
+                    nActions++;
+                }
+        }
+        return nActions;
+    }
+
+    /**
+     * Tells whether an instant is in an interval
+     *
+     * @param ts
+     *            the instant, may be null
+     * @param tsFrom
+     *            the beginning of the interval, excluded
+     * @param tsTo
+     *            the end of the interval, included
+     * @return true if the instant is after tsFrom and not after tsTo
+     */
+    private static boolean isBetween( Timestamp ts, Timestamp tsFrom, Timestamp tsTo )
+    {
+        return ts != null && ts.after( tsFrom ) && !ts.after( tsTo );
     }
 
     /**

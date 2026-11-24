@@ -54,7 +54,18 @@
                 fr.paris.lutece.plugins.htmlpage.service.search.HtmlPageIndexer
             </search-indexer-class>
         </search-indexer>
-    </search-indexers>    
+    </search-indexers>
+
+    <!-- Daemons -->
+    <daemons>
+        <daemon>
+            <daemon-id>htmlPagePublicationDaemon</daemon-id>
+            <daemon-name>htmlpage.daemon.publicationDaemon.name</daemon-name>
+            <daemon-description>htmlpage.daemon.publicationDaemon.description</daemon-description>
+            <daemon-class>fr.paris.lutece.plugins.htmlpage.service.HtmlPagePublicationDaemon</daemon-class>
+        </daemon>
+    </daemons>
+
 	<!-- Freemarker macros -->
 	<freemarker-macro-files>
 		<freemarker-macro-file>util/htmlpage/commons-htmlpage-rest.html</freemarker-macro-file>

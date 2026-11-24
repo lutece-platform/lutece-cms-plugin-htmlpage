@@ -33,6 +33,8 @@
  */
 package fr.paris.lutece.plugins.htmlpage.service;
 
+import java.lang.reflect.Method;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -118,6 +120,44 @@ public class HtmlPageServiceTest extends LuteceTestCase
 
         assertTrue( IndexerActionHome.getList( ).stream( ).anyMatch( action -> action.getIdTask( ) == IndexerAction.TASK_DELETE
                 && ( htmlPage.getId( ) + "_" + HtmlPageIndexer.SHORT_NAME ).equals( action.getIdDocument( ) ) ) );
+    }
+
+    /**
+     * A conditioned page is indexed when its publication period starts, and removed from the index when it ends
+     */
+    @Test
+    public void testPublicationPeriodChangesAreIndexed( ) throws Exception
+    {
+        long lNow = System.currentTimeMillis( );
+        HtmlPage pageStarting = createConditioned( "htmlpage test starting", lNow - 60_000, lNow + 3_600_000 );
+        HtmlPage pageEnding = createConditioned( "htmlpage test ending", lNow - 3_600_000, lNow - 60_000 );
+        HtmlPage pageLater = createConditioned( "htmlpage test later", lNow + 3_600_000, lNow + 7_200_000 );
+
+        Method method = HtmlPageService.class.getMethod( "indexPublicationChanges", Timestamp.class, Timestamp.class );
+        method.invoke( _htmlPageService, new Timestamp( lNow - 120_000 ), new Timestamp( lNow ) );
+
+        List<IndexerAction> listActions = IndexerActionHome.getList( );
+        assertTrue( listActions.stream( ).anyMatch( action -> action.getIdTask( ) == IndexerAction.TASK_CREATE
+                && Integer.toString( pageStarting.getId( ) ).equals( action.getIdDocument( ) ) ) );
+        assertTrue( listActions.stream( ).anyMatch( action -> action.getIdTask( ) == IndexerAction.TASK_DELETE
+                && ( pageEnding.getId( ) + "_" + HtmlPageIndexer.SHORT_NAME ).equals( action.getIdDocument( ) ) ) );
+        assertFalse( listActions.stream( ).anyMatch( action -> action.getIdDocument( ).startsWith( Integer.toString( pageLater.getId( ) ) ) ) );
+    }
+
+    private HtmlPage createConditioned( String strDescription, long lStart, long lEnd )
+    {
+        HtmlPage htmlPage = new HtmlPage( );
+        htmlPage.setDescription( strDescription );
+        htmlPage.setHtmlContent( "<p>" + strDescription + "</p>" );
+        htmlPage.setStatus( EnumStatus.conditioned.getId( ) );
+        htmlPage.setDateStart( new Timestamp( lStart ) );
+        htmlPage.setDateEnd( new Timestamp( lEnd ) );
+        htmlPage.setWorkgroup( "all" );
+        htmlPage.setRole( "none" );
+        _htmlPageService.create( htmlPage, HtmlPageService.getPlugin( ) );
+        _listCreated.add( htmlPage );
+
+        return htmlPage;
     }
 
     private HtmlPage create( String strDescription, EnumStatus status )
