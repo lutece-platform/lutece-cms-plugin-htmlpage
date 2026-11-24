@@ -9,17 +9,21 @@
 		<@tform method='post' name='modify_htmlpage' id='modify_htmlpage' action='jsp/admin/plugins/htmlpage/DoModifyHtmlPage.jsp' boxed=true>
 			<@input type='hidden' name='id_htmlpage' value='${htmlpage.id}' />
 			<@input type='hidden' name='token' value='${token}' />
-			<@formGroup rows=2 labelFor='description' labelKey='#i18n{htmlpage.modify_htmlpage.rowTitleLabel}' mandatory=true>
-				<@input type='text' id='description' name='description' inputSize=60 maxlength=50 value='${htmlpage.description}' />
-			</@formGroup>
 			<#assign dateClass = ( htmlpage.status == 2 )?then( '', 'd-none' ) />
 			<@row>
 				<@columns md=6>
-					<@formGroup rows=2 labelFor='status' labelKey='#i18n{htmlpage.modify_htmlpage.labelStatus}'>
-						<@select id='status' name='status' items=status_list default_value='${htmlpage.status}'/>
+					<@formGroup rows=2 labelFor='description' labelKey='#i18n{htmlpage.modify_htmlpage.rowTitleLabel}' mandatory=true>
+						<@input type='text' id='description' name='description' inputSize=60 maxlength=50 value='${htmlpage.description}' />
 					</@formGroup>
 				</@columns>
-				<@columns md=6 id='fgDates' class=dateClass>
+				<@columns md=6>
+					<@formGroup rows=2 labelFor='status' labelKey='#i18n{htmlpage.modify_htmlpage.labelStatus}'>
+						<@select id='status' name='status' items=status_list default_value='${htmlpage.status}' />
+					</@formGroup>
+				</@columns>
+			</@row>
+			<@row id='fgDates' class=dateClass>
+				<@columns md=6>
 					<@formGroup rows=2 labelFor='dateStart' labelKey='#i18n{htmlpage.modify_htmlpage.labelDateStart}' mandatory=true>
 						<@inputGroup>
 							<@input type='datetime' name='date_start' id='dateStart' value='${(htmlpage.dateStart?string.iso)!}' />
@@ -28,6 +32,8 @@
 							</@inputGroupItem>
 						</@inputGroup>
 					</@formGroup>
+				</@columns>
+				<@columns md=6>
 					<@formGroup rows=2 labelFor='dateEnd' labelKey='#i18n{htmlpage.modify_htmlpage.labelDateEnd}' mandatory=true>
 						<@inputGroup>
 							<@input type='datetime' name='date_end' id='dateEnd' value='${(htmlpage.dateEnd?string.iso)!}' />
@@ -38,12 +44,18 @@
 					</@formGroup>
 				</@columns>
 			</@row>
-			<@formGroup rows=2 labelFor='workgroup' labelKey='#i18n{htmlpage.modify_htmlpage.labelWorkgroupKey}' mandatory=true>
-				<@select name='workgroup' default_value='${htmlpage.workgroup}' items=workgroups_list />
-			</@formGroup>
-			<@formGroup rows=2 labelFor='role' labelKey='#i18n{htmlpage.modify_htmlpage.labelRole}' mandatory=true>
-				<@select name='role' default_value='${htmlpage.role}' items=roles_list />
-			</@formGroup>
+			<@row>
+				<@columns md=6>
+					<@formGroup rows=2 labelFor='role' labelKey='#i18n{htmlpage.modify_htmlpage.labelRole}' mandatory=true>
+						<@select name='role' default_value='${htmlpage.role}' items=roles_list />
+					</@formGroup>
+				</@columns>
+				<@columns md=6>
+					<@formGroup rows=2 labelFor='workgroup' labelKey='#i18n{htmlpage.modify_htmlpage.labelWorkgroupKey}' mandatory=true>
+						<@select name='workgroup' default_value='${htmlpage.workgroup}' items=workgroups_list />
+					</@formGroup>
+				</@columns>
+			</@row>
 			<@formGroup rows=2 labelFor='html_content' labelKey='#i18n{htmlpage.modify_htmlpage.labelHtmlContent}' mandatory=true>
 				<@input type='textarea' id='html_content' richtext=true name='html_content' rows=20>${htmlpage.htmlContent}</@input>
 			</@formGroup>

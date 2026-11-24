@@ -8,16 +8,20 @@
 		<@messages infos=infos![] errors=errors![] warnings=warnings![] />
 		<@tform method='post' name='create_htmlpage' id='create_htmlpage' action='jsp/admin/plugins/htmlpage/DoCreateHtmlPage.jsp' boxed=true>
 			<@input type='hidden' name='token' value='${token}' />
-			<@formGroup rows=2 labelFor='description' labelKey='#i18n{htmlpage.create_htmlpage.rowTitleLabel}' mandatory=true> 
-				<@input type='text' id='description' name='description' inputSize=60 maxlength=50 />
-			</@formGroup>
 			<@row>
+				<@columns md=6>
+					<@formGroup rows=2 labelFor='description' labelKey='#i18n{htmlpage.create_htmlpage.rowTitleLabel}' mandatory=true>
+						<@input type='text' id='description' name='description' inputSize=60 maxlength=50 />
+					</@formGroup>
+				</@columns>
 				<@columns md=6>
 					<@formGroup rows=2 labelFor='status' labelKey='#i18n{htmlpage.create_htmlpage.labelStatus}'>
 						<@select id='status' name='status' items=status_list default_value='1' />
 					</@formGroup>
 				</@columns>
-				<@columns md=6 id='fgDates' class='d-none'>
+			</@row>
+			<@row id='fgDates' class='d-none'>
+				<@columns md=6>
 					<@formGroup rows=2 labelFor='dateStart' labelKey='#i18n{htmlpage.create_htmlpage.labelDateStart}' mandatory=true>
 						<@inputGroup>
 							<@input type='datetime' name='date_start' id='dateStart' />
@@ -26,6 +30,8 @@
 							</@inputGroupItem>
 						</@inputGroup>
 					</@formGroup>
+				</@columns>
+				<@columns md=6>
 					<@formGroup rows=2 labelFor='dateEnd' labelKey='#i18n{htmlpage.create_htmlpage.labelDateEnd}' mandatory=true>
 						<@inputGroup>
 							<@input type='datetime' name='date_end' id='dateEnd' />
@@ -36,12 +42,18 @@
 					</@formGroup>
 				</@columns>
 			</@row>
-			<@formGroup rows=2 labelFor='workgroup' labelKey='#i18n{htmlpage.create_htmlpage.labelWorkgroupKey}' mandatory=true>
-				<@select name='workgroup' default_value='all' items=workgroups_list />
-			</@formGroup>
-			<@formGroup rows=2 labelFor='role' labelKey='#i18n{htmlpage.create_htmlpage.labelRole}' mandatory=true>
-				<@select name='role' default_value='none' items=roles_list />
-			</@formGroup>
+			<@row>
+				<@columns md=6>
+					<@formGroup rows=2 labelFor='role' labelKey='#i18n{htmlpage.create_htmlpage.labelRole}' mandatory=true>
+						<@select name='role' default_value='none' items=roles_list />
+					</@formGroup>
+				</@columns>
+				<@columns md=6>
+					<@formGroup rows=2 labelFor='workgroup' labelKey='#i18n{htmlpage.create_htmlpage.labelWorkgroupKey}' mandatory=true>
+						<@select name='workgroup' default_value='all' items=workgroups_list />
+					</@formGroup>
+				</@columns>
+			</@row>
 			<@formGroup rows=2 labelFor='html_content' labelKey='#i18n{htmlpage.create_htmlpage.labelHtmlContent}' mandatory=true>
 				<@input type='textarea' id='html_content' richtext=true name='html_content' rows=20>${html_content}</@input>
 			</@formGroup>
