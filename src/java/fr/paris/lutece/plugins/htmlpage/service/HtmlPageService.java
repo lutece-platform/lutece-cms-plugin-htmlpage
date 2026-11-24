@@ -50,12 +50,16 @@ import fr.paris.lutece.portal.business.indexeraction.IndexerAction;
 import fr.paris.lutece.portal.service.cache.Lutece107Cache;
 import fr.paris.lutece.portal.service.cache.LuteceCache;
 import fr.paris.lutece.portal.service.plugin.Plugin;
+import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.search.IndexationService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
+import fr.paris.lutece.portal.service.util.BeanUtils;
+import fr.paris.lutece.portal.service.util.RemovalListenerService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.Initialized;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.servlet.ServletContext;
 
 /**
@@ -65,6 +69,8 @@ import jakarta.servlet.ServletContext;
 @ApplicationScoped
 public class HtmlPageService implements IHtmlPageService
 {   
+    public static final String PLUGIN_NAME = "htmlpage";
+
 	private static final String CACHE_SERVICE_NAME = "PublicHtmlPageCacheService";
 	// Cache entry written after the pages, holding their ids (none when the site has no page). The page include calls
 	// getHtmlPageListCache on every portal page: reading this key is served by the near cache of a distributed cache, whereas
@@ -74,18 +80,23 @@ public class HtmlPageService implements IHtmlPageService
 	
     @Inject
     private HtmlPageIndexerUtils _htmlPageIndexerUtils;
+
+    @Inject
+    @Named( BeanUtils.BEAN_WORKGROUP_REMOVAL_SERVICE )
+    private RemovalListenerService _workgroupRemovalService;
     
     @Inject
 	@LuteceCache( cacheName = CACHE_SERVICE_NAME, keyType = String.class, valueType = HtmlPage.class, enable = true )
 	private Lutece107Cache<String, HtmlPage> _cachePublicHtmlPage;
     
     /**
-     * Initializes the Housing service
+     * Returns the HtmlPage plugin
      *
+     * @return the plugin
      */
-    public void init( )
+    public static Plugin getPlugin( )
     {
-        HtmlPage.init( );                
+        return PluginService.getPlugin( PLUGIN_NAME );
     }
     
     @Override
@@ -95,7 +106,7 @@ public class HtmlPageService implements IHtmlPageService
     	
         if ( htmlPage == null )
         {
-            htmlPage = HtmlPageHome.findByPrimaryKey( nId, HtmlPagePlugin.getPlugin( ) );    
+            htmlPage = HtmlPageHome.findByPrimaryKey( nId, HtmlPageService.getPlugin( ) );    
             if ( htmlPage != null )
             {            	
             	refreshHtmlPageCache( );
@@ -103,7 +114,7 @@ public class HtmlPageService implements IHtmlPageService
         }
         else if ( HtmlPageUtil.isRoleExist( htmlPage.getRole( ) ) )
         {
-        	htmlPage = HtmlPageHome.findByPrimaryKey( nId, HtmlPagePlugin.getPlugin( ) );
+        	htmlPage = HtmlPageHome.findByPrimaryKey( nId, HtmlPageService.getPlugin( ) );
         }
         return htmlPage != null && HtmlPageUtil.isActivedPageHtml( htmlPage ) ? htmlPage : null;
     }
@@ -126,7 +137,7 @@ public class HtmlPageService implements IHtmlPageService
     @Override
     public HtmlPage getEnableHtmlPage( int nId )
     {
-        HtmlPage htmlPage = HtmlPageHome.findByPrimaryKey( nId, HtmlPagePlugin.getPlugin( ) );
+        HtmlPage htmlPage = HtmlPageHome.findByPrimaryKey( nId, HtmlPageService.getPlugin( ) );
         
         return htmlPage != null && HtmlPageUtil.isActivedPageHtml( htmlPage ) ? htmlPage : null;
     }
@@ -135,7 +146,7 @@ public class HtmlPageService implements IHtmlPageService
     public List<HtmlPage> getEnabledHtmlPageList( )
     {
         List<HtmlPage> enablehtmlPageList = new ArrayList<>( );
-        List<HtmlPage> htmlPageList = ( List<HtmlPage> ) HtmlPageHome.findAll( HtmlPagePlugin.getPlugin( ) );
+        List<HtmlPage> htmlPageList = ( List<HtmlPage> ) HtmlPageHome.findAll( HtmlPageService.getPlugin( ) );
        
         for ( HtmlPage htmlPage : htmlPageList )
         {
@@ -287,7 +298,7 @@ public class HtmlPageService implements IHtmlPageService
     	// No clear( ) first: the cache is shared by the instances, a reader must never see it empty while it is refreshed
     	HtmlPage oldIndex = _cachePublicHtmlPage.get( KEY_INDEX );
 
-    	List<HtmlPage> htmlPageList = new ArrayList<>( HtmlPageHome.findAll( HtmlPagePlugin.getPlugin( ) ) );
+    	List<HtmlPage> htmlPageList = new ArrayList<>( HtmlPageHome.findAll( HtmlPageService.getPlugin( ) ) );
     	Set<String> setIds = new LinkedHashSet<>( );
     	for( HtmlPage htmlPage : htmlPageList )
     	{
@@ -316,7 +327,7 @@ public class HtmlPageService implements IHtmlPageService
     
     /**
      * This method observes the initialization of the {@link ApplicationScoped} context.
-     * It ensures that this CDI beans are instantiated at the application startup.
+     * It ensures that this CDI beans are instantiated at the application startup, and registers the workgroup removal listener.
      *
      * <p>This method is triggered automatically by CDI when the {@link ApplicationScoped} context is initialized,
      * which typically occurs during the startup of the application server.</p>
@@ -325,6 +336,6 @@ public class HtmlPageService implements IHtmlPageService
      *                and injected automatically by CDI when the {@link ApplicationScoped} context is initialized.
      */
     public void initializedService(@Observes @Initialized(ApplicationScoped.class) ServletContext context) {
-        // This method is intentionally left empty to trigger CDI bean instantiation
+        _workgroupRemovalService.registerListener( new HtmlPageWorkgroupRemovalListener( ) );
     }
 }

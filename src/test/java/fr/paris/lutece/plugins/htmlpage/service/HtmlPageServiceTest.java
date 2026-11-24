@@ -62,7 +62,7 @@ public class HtmlPageServiceTest extends LuteceTestCase
     {
         for ( HtmlPage htmlPage : _listCreated )
         {
-            _htmlPageService.remove( htmlPage, HtmlPagePlugin.getPlugin( ) );
+            _htmlPageService.remove( htmlPage, HtmlPageService.getPlugin( ) );
         }
         super.tearDown( );
     }
@@ -94,7 +94,7 @@ public class HtmlPageServiceTest extends LuteceTestCase
         HtmlPage pageKept = create( "htmlpage test kept", EnumStatus.enabled );
         HtmlPage pageRemoved = create( "htmlpage test removed", EnumStatus.enabled );
 
-        _htmlPageService.remove( pageRemoved, HtmlPagePlugin.getPlugin( ) );
+        _htmlPageService.remove( pageRemoved, HtmlPageService.getPlugin( ) );
         _listCreated.remove( pageRemoved );
 
         assertEquals( List.of( pageKept.getId( ) ), testPageIds( ) );
@@ -110,7 +110,7 @@ public class HtmlPageServiceTest extends LuteceTestCase
         htmlPage.setStatus( status.getId( ) );
         htmlPage.setWorkgroup( "all" );
         htmlPage.setRole( "none" );
-        _htmlPageService.create( htmlPage, HtmlPagePlugin.getPlugin( ) );
+        _htmlPageService.create( htmlPage, HtmlPageService.getPlugin( ) );
         // The generated key is set on the created page (used by the cache and the indexer)
         assertTrue( htmlPage.getId( ) > 0 );
         _listCreated.add( htmlPage );

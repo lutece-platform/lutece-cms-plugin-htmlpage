@@ -46,7 +46,6 @@ import org.junit.jupiter.api.Test;
 
 import fr.paris.lutece.plugins.htmlpage.business.HtmlPage;
 import fr.paris.lutece.plugins.htmlpage.service.EnumStatus;
-import fr.paris.lutece.plugins.htmlpage.service.HtmlPagePlugin;
 import fr.paris.lutece.plugins.htmlpage.service.HtmlPageService;
 import fr.paris.lutece.portal.service.editor.RichTextContentMethod;
 import fr.paris.lutece.test.LuteceTestCase;
@@ -98,7 +97,7 @@ public class HtmlPageRichContentRenderTest extends LuteceTestCase
     {
         for ( HtmlPage htmlPage : _listCreated )
         {
-            _htmlPageService.remove( htmlPage, HtmlPagePlugin.getPlugin( ) );
+            _htmlPageService.remove( htmlPage, HtmlPageService.getPlugin( ) );
         }
         super.tearDown( );
     }
@@ -205,7 +204,7 @@ public class HtmlPageRichContentRenderTest extends LuteceTestCase
         htmlPage.setStatus( EnumStatus.enabled.getId( ) );
         htmlPage.setWorkgroup( "all" );
         htmlPage.setRole( HtmlPage.ROLE_NONE );
-        _htmlPageService.create( htmlPage, HtmlPagePlugin.getPlugin( ) );
+        _htmlPageService.create( htmlPage, HtmlPageService.getPlugin( ) );
         _listCreated.add( htmlPage );
 
         Map<String, Object> model = new HashMap<>( );

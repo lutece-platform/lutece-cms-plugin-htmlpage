@@ -34,7 +34,7 @@
 package fr.paris.lutece.plugins.htmlpage.service.search;
 
 import fr.paris.lutece.plugins.htmlpage.business.HtmlPage;
-import fr.paris.lutece.plugins.htmlpage.service.HtmlPagePlugin;
+import fr.paris.lutece.plugins.htmlpage.service.HtmlPageService;
 import fr.paris.lutece.plugins.htmlpage.service.IHtmlPageService;
 import fr.paris.lutece.portal.service.content.XPageAppService;
 import fr.paris.lutece.portal.service.message.SiteMessageException;
@@ -102,14 +102,14 @@ public class HtmlPageIndexer implements SearchIndexer
     public void indexDocuments( ) throws IOException, InterruptedException, SiteMessageException
     {
         String strPortalUrl = AppPathService.getPortalUrl( );
-        Plugin plugin = PluginService.getPlugin( HtmlPagePlugin.PLUGIN_NAME );
+        Plugin plugin = PluginService.getPlugin( HtmlPageService.PLUGIN_NAME );
 
         Collection<HtmlPage> listHtmlPages = _htmlPageService.getEnabledHtmlPageList( );
 
         for ( HtmlPage htmlpage : listHtmlPages )
         {
             UrlItem url = new UrlItem( strPortalUrl );
-            url.addParameter( XPageAppService.PARAM_XPAGE_APP, HtmlPagePlugin.PLUGIN_NAME );
+            url.addParameter( XPageAppService.PARAM_XPAGE_APP, HtmlPageService.PLUGIN_NAME );
             url.addParameter( PARAMETER_HTMLPAGE_ID, htmlpage.getId( ) );
 
             org.apache.lucene.document.Document docHtmlPage = getDocument( htmlpage, url.getUrl( ), plugin );
@@ -128,13 +128,13 @@ public class HtmlPageIndexer implements SearchIndexer
     {
         ArrayList<org.apache.lucene.document.Document> listDocuments = new ArrayList<Document>( );
         String strPortalUrl = AppPathService.getPortalUrl( );
-        Plugin plugin = PluginService.getPlugin( HtmlPagePlugin.PLUGIN_NAME );
+        Plugin plugin = PluginService.getPlugin( HtmlPageService.PLUGIN_NAME );
 
         HtmlPage htmlpage = _htmlPageService.getEnableHtmlPage( Integer.parseInt( strId ) );
         if ( htmlpage != null )
         {
             UrlItem url = new UrlItem( strPortalUrl );
-            url.addParameter( XPageAppService.PARAM_XPAGE_APP, HtmlPagePlugin.PLUGIN_NAME );
+            url.addParameter( XPageAppService.PARAM_XPAGE_APP, HtmlPageService.PLUGIN_NAME );
             url.addParameter( PARAMETER_HTMLPAGE_ID, htmlpage.getId( ) );
 
             org.apache.lucene.document.Document docHtmlPage = null;
@@ -180,7 +180,7 @@ public class HtmlPageIndexer implements SearchIndexer
         String strEnable = AppPropertiesService.getProperty( PROPERTY_INDEXER_ENABLE );
 
         if ( ( strEnable != null ) && ( strEnable.equalsIgnoreCase( Boolean.TRUE.toString( ) ) || strEnable.equals( ENABLE_VALUE_TRUE ) )
-                && PluginService.isPluginEnable( HtmlPagePlugin.PLUGIN_NAME ) )
+                && PluginService.isPluginEnable( HtmlPageService.PLUGIN_NAME ) )
         {
             bReturn = true;
         }
@@ -243,7 +243,7 @@ public class HtmlPageIndexer implements SearchIndexer
         // separately.
         doc.add( new Field( SearchItem.FIELD_TITLE, htmlpage.getDescription( ), ftdfp ) );
 
-        doc.add( new Field( SearchItem.FIELD_TYPE, HtmlPagePlugin.PLUGIN_NAME, ft ) );
+        doc.add( new Field( SearchItem.FIELD_TYPE, HtmlPageService.PLUGIN_NAME, ft ) );
 
         // return the document
         return doc;
@@ -276,7 +276,7 @@ public class HtmlPageIndexer implements SearchIndexer
     public List<String> getListType( )
     {
         List<String> listType = new ArrayList<String>( );
-        listType.add( HtmlPagePlugin.PLUGIN_NAME );
+        listType.add( HtmlPageService.PLUGIN_NAME );
 
         return listType;
     }

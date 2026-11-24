@@ -102,7 +102,7 @@ public class HtmlPageWorkgroupRemovalListener implements RemovalListener
             return true;
         }
 
-        Collection<HtmlPage> listHtmlPage = HtmlPageHome.findAll( PluginService.getPlugin( HtmlPagePlugin.PLUGIN_NAME ) );
+        Collection<HtmlPage> listHtmlPage = HtmlPageHome.findAll( PluginService.getPlugin( HtmlPageService.PLUGIN_NAME ) );
 
         for ( HtmlPage htmlpage : listHtmlPage )
         {

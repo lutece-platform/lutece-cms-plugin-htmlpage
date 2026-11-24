@@ -36,11 +36,9 @@ package fr.paris.lutece.plugins.htmlpage.business;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
-import fr.paris.lutece.plugins.htmlpage.service.HtmlPageWorkgroupRemovalListener;
 import fr.paris.lutece.plugins.htmlpage.utils.HtmlPageUtil;
 import fr.paris.lutece.portal.service.workgroup.AdminWorkgroupResource;
 import fr.paris.lutece.portal.service.workgroup.AdminWorkgroupService;
-import fr.paris.lutece.portal.service.workgroup.WorkgroupRemovalListenerService;
 
 /**
  * This class represents business object HtmlPage
@@ -55,7 +53,6 @@ public class HtmlPage implements AdminWorkgroupResource, Serializable
     public static final String ROLE_NONE = "none";
     private static final String EMPTY_STRING = "";
     private static final long serialVersionUID = -6267054010459177934L;
-    private static HtmlPageWorkgroupRemovalListener _listenerWorkgroup;
     private int _nId;
     private int _nStatus;
     private String _strDescription;
@@ -69,19 +66,6 @@ public class HtmlPage implements AdminWorkgroupResource, Serializable
     /** Creates a new instance of HtmlPage */
     public HtmlPage( )
     {
-    }
-
-    /**
-     * Initialize the HtmlPageList
-     */
-    public static void init( )
-    {
-        // Create removal listeners and register them
-        if ( _listenerWorkgroup == null )
-        {
-            _listenerWorkgroup = new HtmlPageWorkgroupRemovalListener( );
-            WorkgroupRemovalListenerService.getService( ).registerListener( _listenerWorkgroup );
-        }
     }
 
     /**

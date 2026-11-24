@@ -40,7 +40,6 @@ import org.junit.jupiter.api.Test;
 
 import fr.paris.lutece.plugins.htmlpage.business.HtmlPage;
 import fr.paris.lutece.plugins.htmlpage.service.EnumStatus;
-import fr.paris.lutece.plugins.htmlpage.service.HtmlPagePlugin;
 import fr.paris.lutece.plugins.htmlpage.service.HtmlPageService;
 import fr.paris.lutece.portal.business.user.AdminUser;
 import fr.paris.lutece.portal.service.admin.AccessDeniedException;
@@ -66,7 +65,7 @@ public class HtmlPageJspBeanTest extends LuteceTestCase
     {
         if ( _htmlPage != null )
         {
-            _htmlPageService.remove( _htmlPage, HtmlPagePlugin.getPlugin( ) );
+            _htmlPageService.remove( _htmlPage, HtmlPageService.getPlugin( ) );
         }
     }
 
@@ -94,7 +93,7 @@ public class HtmlPageJspBeanTest extends LuteceTestCase
         _htmlPage.setStatus( EnumStatus.disabled.getId( ) );
         _htmlPage.setWorkgroup( "all" );
         _htmlPage.setRole( "none" );
-        _htmlPageService.create( _htmlPage, HtmlPagePlugin.getPlugin( ) );
+        _htmlPageService.create( _htmlPage, HtmlPageService.getPlugin( ) );
 
         MockHttpServletRequest request = getUserRequest( );
         _bean.init( request, HtmlPageJspBean.RIGHT_MANAGE_HTMLPAGE );
