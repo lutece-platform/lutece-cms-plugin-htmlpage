@@ -145,7 +145,7 @@ public class HtmlPageJspBean extends AbstractManageHtmlPageJspBean <Integer, Htm
     {
         setPageTitleProperty( PROPERTY_PAGE_TITLE_HTMLPAGE_LIST );
         
-        if ( request.getParameter( AbstractPaginator.PARAMETER_PAGE_INDEX) == null || _listIdHtmlPages.isEmpty( ) )
+        if ( request.getParameter( AbstractPaginator.PARAMETER_PAGE_INDEX) == null || _listIdHtmlPages == null || _listIdHtmlPages.isEmpty( ) )
         {
         	_listIdHtmlPages = getAuthorizedIdHtmlPagesList( );
         }

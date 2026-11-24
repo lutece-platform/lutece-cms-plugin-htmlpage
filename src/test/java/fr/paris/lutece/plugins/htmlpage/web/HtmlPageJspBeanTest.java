@@ -33,6 +33,7 @@
  */
 package fr.paris.lutece.plugins.htmlpage.web;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.AfterEach;
@@ -109,6 +110,22 @@ public class HtmlPageJspBeanTest extends LuteceTestCase
         assertTrue( strUrl.endsWith( AdminMessageService.getMessageRelativeUrl( ) ), strUrl );
         String strBackUrl = AdminMessageService.getMessage( request ).getBackUrl( );
         assertTrue( strBackUrl.endsWith( "jsp/admin/plugins/htmlpage/ModifyHtmlPage.jsp?id_htmlpage=" + _htmlPage.getId( ) ), strBackUrl );
+    }
+
+    /**
+     * A page of the list asked first in a new session (bookmark, session expired) shows the list
+     */
+    @Test
+    public void testPageOfTheListInANewSession( ) throws Exception
+    {
+        MockHttpServletRequest request = getUserRequest( );
+        _bean.init( request, HtmlPageJspBean.RIGHT_MANAGE_HTMLPAGE );
+        java.lang.reflect.Field field = HtmlPageJspBean.class.getDeclaredField( "_listIdHtmlPages" );
+        field.setAccessible( true );
+        field.set( ( (org.jboss.weld.proxy.WeldClientProxy) _bean ).getMetadata( ).getContextualInstance( ), null );
+        request.setParameter( "page_index", "1" );
+
+        assertDoesNotThrow( ( ) -> _bean.getManageHtmlPage( request ) );
     }
 
     private MockHttpServletRequest getUserRequest( )
