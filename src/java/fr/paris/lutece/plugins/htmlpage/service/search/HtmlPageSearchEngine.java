@@ -33,6 +33,10 @@
  */
 package fr.paris.lutece.plugins.htmlpage.service.search;
 
+import fr.paris.lutece.plugins.htmlpage.business.HtmlPage;
+import fr.paris.lutece.plugins.htmlpage.business.HtmlPageHome;
+import fr.paris.lutece.plugins.htmlpage.service.HtmlPageService;
+import fr.paris.lutece.plugins.htmlpage.utils.HtmlPageUtil;
 import fr.paris.lutece.portal.service.search.IndexationService;
 import fr.paris.lutece.portal.service.search.LuceneSearchEngine;
 import fr.paris.lutece.portal.service.search.SearchEngine;
@@ -43,11 +47,14 @@ import fr.paris.lutece.portal.service.util.AppLogService;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
 import jakarta.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
@@ -72,6 +79,8 @@ import org.apache.lucene.store.Directory;
 @Named( "htmlpage.htmlpageSearchEngine" )
 public class HtmlPageSearchEngine implements SearchEngine
 {
+    private static final Pattern PATTERN_HTMLPAGE_ID = Pattern.compile( "[?&]htmlpage_id=(\\d+)" );
+
     /**
      * Return search results
      * 
@@ -120,7 +129,36 @@ public class HtmlPageSearchEngine implements SearchEngine
             AppLogService.error( e.getMessage( ), e );
         }
 
-        return convertList( listResults );
+        return filterVisibleResults( convertList( listResults ), request );
+    }
+
+    /**
+     * Keeps the results whose html page can be displayed to the visitor: an existing page, in its publication period, whose role the
+     * visitor holds, as in the list of the pages and on the page itself
+     *
+     * @param listResults
+     *            the results of the search
+     * @param request
+     *            the HTTP request
+     * @return the results the visitor may see
+     */
+    static List<SearchResult> filterVisibleResults( List<SearchResult> listResults, HttpServletRequest request )
+    {
+        List<SearchResult> listVisible = new ArrayList<>( );
+
+        for ( SearchResult result : listResults )
+        {
+            Matcher matcher = PATTERN_HTMLPAGE_ID.matcher( StringUtils.defaultString( result.getUrl( ) ) );
+            HtmlPage htmlPage = matcher.find( ) ? HtmlPageHome.findByPrimaryKey( Integer.parseInt( matcher.group( 1 ) ), HtmlPageService.getPlugin( ) )
+                    : null;
+
+            if ( htmlPage != null && HtmlPageUtil.isActivedPageHtml( htmlPage ) && HtmlPageUtil.isVisible( request, htmlPage.getRole( ) ) )
+            {
+                listVisible.add( result );
+            }
+        }
+
+        return listVisible;
     }
 
     /**
