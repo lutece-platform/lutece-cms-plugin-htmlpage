@@ -1,42 +1,61 @@
+<#assign createUrl = 'jsp/admin/plugins/htmlpage/CreateHtmlPage.jsp' />
+<#assign pageTitle><span class="avatar avatar-sm bg-blue-lt me-2" aria-hidden="true"><@icon style='file-code' /></span>#i18n{htmlpage.manage_htmlpage.tableLabel}</#assign>
 <@pageContainer>
 	<@pageColumn>
-		<@pageHeader title='#i18n{htmlpage.manage_htmlpage.tableLabel}'>
-			<@offcanvas targetUrl='jsp/admin/plugins/htmlpage/CreateHtmlPage.jsp' useIframe=true targetElement='#create_html_page' id='htmlpage-create' title='#i18n{htmlpage.create_htmlpage.tableLabel}' btnTitle='#i18n{htmlpage.manage_htmlpage.buttonAddHtmlPage}' btnIcon='plus' hideTitle=['xs','sm'] position='end' size='full' />
+		<@pageHeader title=pageTitle>
+			<@aButton href=createUrl title='#i18n{htmlpage.manage_htmlpage.buttonAddHtmlPage}' buttonIcon='plus' color='primary' hideTitle=['xs','sm','md'] />
 		</@pageHeader>
-		<@manageFeature>
+		<@messages infos=infos![] errors=errors![] warnings=warnings![] />
+		<#if ( htmlpage_list![] )?has_content>
+		<@manageFeature layout='list' id='htmlpages'>
 		<#list htmlpage_list as htmlpage >
-			<@manageFeatureItem>
-				<@manageFeatureItemColumn cols='12 col-md-4' flex=false>
-					<@h level=2 class='h3 mb-1' params={"title": "#i18n{htmlpage.modify_htmlpage.title_modify} ${htmlpage.description}"}>
-						<#if htmlpage.status==1 || ( htmlpage.status==2 && ( htmlpage.dateStart lte .now && htmlpage.dateEnd gte .now) ) >
-							<@link href='jsp/site/Portal.jsp?page=htmlpage&htmlpage_id=${htmlpage.id}' target='_blank' title=htmlpage.description>${htmlpage.description}<span class="visually-hidden"> #i18n{htmlpage.manage_htmlpage.labelNewWindow}</span></@link>
-						<#else>
-							${htmlpage.description}
+			<#assign modifyUrl = 'jsp/admin/plugins/htmlpage/ModifyHtmlPage.jsp?id_htmlpage=${htmlpage.id?c}' />
+			<#assign published = htmlpage.status==1 || ( htmlpage.status==2 && htmlpage.dateStart?? && htmlpage.dateEnd?? && ( htmlpage.dateStart lte .now && htmlpage.dateEnd gte .now ) ) />
+			<@manageFeatureItem id='htmlpage_${htmlpage.id?c}'>
+				<@manageFeatureItemColumn class='d-flex align-items-center gap-2 text-truncate'>
+					<span class="avatar avatar-sm bg-blue-lt" aria-hidden="true"><@icon style='file-code' /></span>
+					<@div class='text-truncate'>
+						<@link href=modifyUrl class='text-reset fw-semibold' title='#i18n{htmlpage.modify_htmlpage.title_modify} ${htmlpage.description}'>${htmlpage.description}</@link>
+						<@div class='text-secondary small text-truncate'>#i18n{htmlpage.manage_htmlpage.workgroup} : ${htmlpage.workgroup!} &middot; <code class="copy-content"><#noparse>$</#noparse>{htmlpage_${htmlpage.id?c}!}</code></@div>
+					</@div>
+				</@manageFeatureItemColumn>
+				<@manageFeatureItemColumn auto=true align='end' class='d-flex align-items-center gap-2'>
+					<@div class='badge-list flex-nowrap'>
+					<#if htmlpage.status==1>
+						<@tag color='' class='bg-green-lt' tagIcon='check'>#i18n{portal.util.labelEnabled}</@tag>
+					<#elseif htmlpage.status==0>
+						<@tag color='' class='bg-red-lt' tagIcon='x'>#i18n{portal.util.labelDisabled}</@tag>
+					<#elseif htmlpage.status==2>
+						<@tag color='' class='bg-azure-lt' tagIcon='calendar-check'>#i18n{htmlpage.modify_htmlpage.statusLabelConditioned}</@tag>
+						<@tag color='' class='bg-secondary-lt'>${i18n( 'htmlpage.manage_htmlpage.labelPeriod', (htmlpage.dateStart?string.short)!'', (htmlpage.dateEnd?string.short)!'' )}</@tag>
+					</#if>
+					</@div>
+					<@div class='btn-actions'>
+						<#if published>
+						<@aButton href='jsp/site/Portal.jsp?page=htmlpage&htmlpage_id=${htmlpage.id?c}' style='btn-action' color='' buttonIcon='external-link' title='${htmlpage.description} #i18n{htmlpage.manage_htmlpage.labelNewWindow}' hideTitle=['all'] target='_blank' />
 						</#if>
-					</@h>	
-					<@p class='mb-1'><#if htmlpage.status==1><@tag color='success' title="#i18n{portal.util.labelEnabled}"><@icon style='check' /> #i18n{portal.util.labelEnabled}</@tag><#elseif htmlpage.status == 0><@tag color='danger' title="#i18n{portal.util.labelDisabled}"><@icon style='times' /> #i18n{portal.util.labelDisabled}</@tag><#elseif htmlpage.status == 2><@tag color='secondary'><@icon style='check' /> #i18n{htmlpage.modify_htmlpage.statusLabelConditioned}</@tag><@tag color='success' class='ml-1'><@icon style='calendar-check' /><strong>${i18n( 'htmlpage.manage_htmlpage.labelPeriod', (htmlpage.dateStart?string.short)!'', (htmlpage.dateEnd?string.short)!'' )}</strong></@tag></#if></@p>
-					<@p class='mb-0'>#i18n{htmlpage.manage_htmlpage.workgroup} : ${htmlpage.workgroup}</@p>
+						<@aButton href=modifyUrl style='btn-action' color='' buttonIcon='pencil' title='#i18n{htmlpage.modify_htmlpage.buttonModify} ${htmlpage.description}' hideTitle=['all'] />
+						<@tform method='post' action='jsp/admin/plugins/htmlpage/DoDuplicateHtmlPage.jsp' class='d-inline'>
+							<@input type='hidden' name='id_htmlpage' id='id_htmlpage_${htmlpage.id?c}' value='${htmlpage.id?c}' />
+							<@input type='hidden' name='token' id='token_${htmlpage.id?c}' value='${token}' />
+							<@button type='submit' title='#i18n{htmlpage.manage_htmlpage.actionDuplicate} ${htmlpage.description}' buttonIcon='copy' color='ghost-secondary' class='btn-icon' hideTitle=['all'] />
+						</@tform>
+						<@tform method='post' action='jsp/admin/plugins/htmlpage/RemoveHtmlPage.jsp' class='d-inline'>
+							<@input type='hidden' name='id_htmlpage' id='remove_id_htmlpage_${htmlpage.id?c}' value='${htmlpage.id?c}' />
+							<@input type='hidden' name='description' id='remove_description_${htmlpage.id?c}' value='${htmlpage.description}' />
+							<@button type='submit' title='#i18n{htmlpage.manage_htmlpage.actionDelete} ${htmlpage.description}' buttonIcon='trash' color='ghost-danger' class='btn-icon' hideTitle=['all'] />
+						</@tform>
+					</@div>
 				</@manageFeatureItemColumn>
-				<@manageFeatureItemColumn cols='12 col-md-2'>
-					<@code class='mb-0' codeClass='fw-bold copy-content lh-1'><#noparse>$</#noparse>{htmlpage_${htmlpage.id}!}</@code>
-				</@manageFeatureItemColumn>
-				<@manageFeatureItemColumn align='end'>
-					<@offcanvas targetUrl='jsp/admin/plugins/htmlpage/ModifyHtmlPage.jsp?id_htmlpage=${htmlpage.id}' useIframe=true targetElement='#modify_htmlpage' id='htmlpage-modify-${htmlpage.id}' title='#i18n{htmlpage.modify_htmlpage.buttonModify}' btnTitle='#i18n{htmlpage.modify_htmlpage.buttonModify}' hideTitle=['xs','sm'] btnIcon='pencil' position='end' size='full' params={'aria-label': '#i18n{htmlpage.modify_htmlpage.buttonModify} ' + htmlpage.description} />
-					<@tform method='post' action='jsp/admin/plugins/htmlpage/DoDuplicateHtmlPage.jsp'>
-						<@input type='hidden' name='id_htmlpage' id='id_htmlpage' value='${htmlpage.id}' />
-						<@input type='hidden' name='token' id='token_${htmlpage.id}' value='${token}' />
-						<@button type='submit' title='#i18n{htmlpage.manage_htmlpage.actionDuplicate}' buttonIcon='copy me-1' hideTitle=['xs','sm'] params={'aria-label': '#i18n{htmlpage.manage_htmlpage.actionDuplicate} ' + htmlpage.description} />
-					</@tform>
-					<@tform method='post' action='jsp/admin/plugins/htmlpage/RemoveHtmlPage.jsp'>
-						<@input type='hidden' name='id_htmlpage' value='${htmlpage.id}' />
-						<@input type='hidden' name='description' value='${htmlpage.description}' />
-						<@button type='submit' title='#i18n{htmlpage.manage_htmlpage.actionDelete}' hideTitle=['xs','sm'] buttonIcon='trash me-1' color='danger' params={'aria-label': '#i18n{htmlpage.manage_htmlpage.actionDelete} ' + htmlpage.description} />
-					</@tform> 
-				</@manageFeatureItemColumn>
-			</@manageFeatureItem>					
+			</@manageFeatureItem>
 		</#list>
 		</@manageFeature>
-		<@paginationAdmin paginator=paginator />
+		<#if paginator?? && ( paginator.pagesCount gt 1 || paginator.itemsCount gt 10 )><@paginationAdmin paginator=paginator combo=1 /></#if>
+		<#else>
+		<@card>
+			<@empty title='#i18n{portal.util.labelNoItem}' iconName='file-off' subtitle=' ' actionTitle='#i18n{htmlpage.manage_htmlpage.buttonAddHtmlPage}' actionUrl=createUrl />
+		</@card>
+		</#if>
 	</@pageColumn>
 </@pageContainer>
-<@copyElementToClipboard selector='.copy-content' btnClass='link text-light fs-3' />
+<@copyElementToClipboard selector='.copy-content' />

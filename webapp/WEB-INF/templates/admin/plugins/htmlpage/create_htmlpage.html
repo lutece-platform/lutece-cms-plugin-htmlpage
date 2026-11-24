@@ -1,22 +1,26 @@
 <#include '/admin/util/editor/editor.html' />
 <@pageContainer>
 	<@pageColumn>
-		<@pageHeader title='#i18n{htmlpage.create_htmlpage.tableLabel}' />
-		<@tform method='post' name='create_htmlpage' id='create_htmlpage' action='jsp/admin/plugins/htmlpage/DoCreateHtmlPage.jsp' boxed=true id='create_html_page'>
+		<#assign pageTitle><span class="avatar avatar-sm bg-blue-lt me-2" aria-hidden="true"><@icon style='file-plus' /></span>#i18n{htmlpage.create_htmlpage.tableLabel}</#assign>
+		<@pageHeader title=pageTitle>
+			<@aButton href='jsp/admin/plugins/htmlpage/ManageHtmlPage.jsp' title='#i18n{portal.util.labelBack}' buttonIcon='arrow-left' color='light' hideTitle=['xs','sm','md'] />
+		</@pageHeader>
+		<@messages infos=infos![] errors=errors![] warnings=warnings![] />
+		<@tform method='post' name='create_htmlpage' id='create_htmlpage' action='jsp/admin/plugins/htmlpage/DoCreateHtmlPage.jsp' boxed=true>
 			<@input type='hidden' name='token' value='${token}' />
-			<@formGroup labelFor='description' labelKey='#i18n{htmlpage.create_htmlpage.rowTitleLabel}' mandatory=true> 
+			<@formGroup rows=2 labelFor='description' labelKey='#i18n{htmlpage.create_htmlpage.rowTitleLabel}' mandatory=true> 
 				<@input type='text' id='description' name='description' inputSize=60 maxlength=50 />
 			</@formGroup>
-			<@formGroup labelFor='status' labelKey='#i18n{htmlpage.create_htmlpage.labelStatus}'>
+			<@formGroup rows=2 labelFor='status' labelKey='#i18n{htmlpage.create_htmlpage.labelStatus}'>
 				<@select id='status' name='status' items=status_list default_value='1' />
 			</@formGroup>    
-			<@formGroup labelFor='workgroup' labelKey='#i18n{htmlpage.create_htmlpage.labelWorkgroupKey}' mandatory=true>
+			<@formGroup rows=2 labelFor='workgroup' labelKey='#i18n{htmlpage.create_htmlpage.labelWorkgroupKey}' mandatory=true>
 				<@select name='workgroup' default_value='all' items=workgroups_list />
 			</@formGroup>
-			<@formGroup labelFor='role' labelKey='#i18n{htmlpage.create_htmlpage.labelRole}' mandatory=true>
+			<@formGroup rows=2 labelFor='role' labelKey='#i18n{htmlpage.create_htmlpage.labelRole}' mandatory=true>
 				<@select name='role' default_value='none' items=roles_list />
 			</@formGroup>
-			<@formGroup labelFor='dateStart' id='fgDateStart' labelKey='#i18n{htmlpage.create_htmlpage.labelDateStart}'>
+			<@formGroup rows=2 labelFor='dateStart' id='fgDateStart' labelKey='#i18n{htmlpage.create_htmlpage.labelDateStart}'>
 				<@inputGroup>
 					<@input type='datetime' name='date_start' id='dateStart' />
 					<@inputGroupItem type='text'>
@@ -24,7 +28,7 @@
 					</@inputGroupItem>
 				</@inputGroup>
 			</@formGroup>
-			<@formGroup labelFor='dateEnd' id='fgDateEnd' labelKey='#i18n{htmlpage.create_htmlpage.labelDateEnd}'>
+			<@formGroup rows=2 labelFor='dateEnd' id='fgDateEnd' labelKey='#i18n{htmlpage.create_htmlpage.labelDateEnd}'>
 				<@inputGroup>
 					<@input type='datetime' name='date_end' id='dateEnd' />
 					<@inputGroupItem type='text'>
@@ -32,12 +36,12 @@
 					</@inputGroupItem>
 				</@inputGroup>
 			</@formGroup>
-			<@formGroup labelFor='html_content' labelKey='#i18n{htmlpage.create_htmlpage.labelHtmlContent}'>
+			<@formGroup rows=2 labelFor='html_content' labelKey='#i18n{htmlpage.create_htmlpage.labelHtmlContent}'>
 				<@input type='textarea' id='html_content' richtext=true name='html_content' rows=20>${html_content}</@input>
 			</@formGroup>
-			<@formGroup>
-				<@button type='submit' buttonIcon='check' title='#i18n{htmlpage.create_htmlpage.buttonValidate}' class='form-validation' />
-				<@aButton href='jsp/admin/plugins/htmlpage/ManageHtmlPage.jsp' buttonIcon='times' title='#i18n{portal.admin.message.buttonCancel}' color='default' class='form-validation' />
+			<@formGroup rows=2>
+				<@button type='submit' buttonIcon='check' title='#i18n{htmlpage.create_htmlpage.buttonValidate}' color='primary' class='form-validation' />
+				<@aButton href='jsp/admin/plugins/htmlpage/ManageHtmlPage.jsp' buttonIcon='x' title='#i18n{portal.util.labelCancel}' color='light' class='form-validation' />
 			</@formGroup>
 		</@tform>
 	</@pageColumn>
