@@ -57,11 +57,12 @@ public class PublicHtmlPageCacheService extends AbstractCacheableService
     }
 
     /**
-     * Get the instance of this service
+     * Get the instance of this service. Synchronized : HtmlPageInclude calls it on every page, so the first concurrent requests after a start
+     * would each build the service, and the cache manager refuses a second cache of the same name
      * 
      * @return the instance of this service
      */
-    public static PublicHtmlPageCacheService getService( )
+    public static synchronized PublicHtmlPageCacheService getService( )
     {
         if ( _singleton == null )
         {
@@ -119,7 +120,8 @@ public class PublicHtmlPageCacheService extends AbstractCacheableService
      */
     public void addHtmlPageCache( List<HtmlPage> htmlPageList )
     {
-        if ( htmlPageList != null && getHtmlPageCache( "all" ) == null )
+        // the key holds the list : read back as a single page, it failed the cast as soon as a concurrent request had cached it
+        if ( htmlPageList != null && getHtmlPageListCache( ) == null )
         {
             putInCache( getCacheKey( "all" ), htmlPageList );
         }
